@@ -1,0 +1,3 @@
+Build Target,Product Family,Part Number,Device,Device Version,Package,Speed Grade,Board Part,Bitstream Ext,Default,Boot Rom Update Only Supported,Security Mode Supported
+ARTYS7-25,Spartan 7,xc7s25csga324-1,xc7s25,1,csga324,1,digilentinc.com:arty-s7-25:part0:1.1,bit,YES,YES,YES
+ARTYS7-50,Spartan 7,xc7s50csga324-1,xc7s50,1,csga324,1,digilentinc.com:arty-s7-50:part0:1.1,bit,YES,YES,YES

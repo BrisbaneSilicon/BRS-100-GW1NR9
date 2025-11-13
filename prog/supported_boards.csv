@@ -1,0 +1,4 @@
+Board,Build Target,Platform,BitstreamExt,Default
+BRS-100-GW1NR9,GW1NR-9-C7/I6,gowin,fs,NO
+ARTYS7-25,ARTYS7-25,xilinx,bit,YES
+ARTYS7-50,ARTYS7-50,xilinx,bit,YES
