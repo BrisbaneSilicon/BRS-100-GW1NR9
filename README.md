@@ -254,7 +254,7 @@ sudo tio -b 115200 /dev/ttyUSB1 --output-delay 20
 Next, reset the board by pressing pushbutton one (the pushbutton closest to Pin 1). The terminal should clear and then print out something similar to the following:
 ```bash
 BOARD: BRS-100-GW1NR9
-FW: 5bda9a1-dirty|2025-12-09 13:33:33
+FW: c2ce822|2025-12-09 15:30:43
 ```
 
 The 'FW' tag can be described as follows:<br>
@@ -263,7 +263,7 @@ The 'FW' tag can be described as follows:<br>
 ```
 <br>
 
-So I built commit SHA ID ____, with local changes, on the __12/09/2025__ at approximately __pm__. Note, there may be more printed, see [roadmap](#roadmap).<br><br>
+So I built commit SHA ID [c2ce822](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9/commit/c2ce822baf2d6a4d22435ef2df5be94f321e9bb4), with no local changes, on the __12/09/2025__ at approximately __3:30pm__. Note, there may be more printed, see [roadmap](#roadmap).<br><br>
 In board demonstration mode, the state of GPIO<1..16> (the demonstration firmware configures these pins as inputs) will be reflected on GPIO<17..32> (the demonstration firmware configures these pins as outputs). For example, GPIO17 will reflect the state of GPIO1. To test this, simply connect GPIO1 alternatively to VCC or GND (both next to GPIO32) and monitor GPIO17 on your oscilloscope or multimeter.
 
 ### Windows
