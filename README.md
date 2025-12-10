@@ -288,8 +288,8 @@ Official documentation for the BRS-100-GW1NR9 is available [here](https://brisba
 ## Roadmap
 
 1. Implement Windows-based project workflow.
-2. Board demonstration mode will exercise both PSRAM and Flash memory.
-3. Ability to target different development boards, i.e. Digilent ARTY-S7.
+2. Enhance board demonstration mode to exercise both PSRAM and Flash memory.
+3. Add the ability to target different development boards / ecosystems, i.e. Digilent ARTY-S7 / Xilinx/AMD.
 
 <br>
 
@@ -301,7 +301,7 @@ Official documentation for the BRS-100-GW1NR9 is available [here](https://brisba
 
 ## Appendix
 
-For developing with the project, we recommend [Sublime Text](https://www.sublimetext.com/), with the VHDL and/or Systemverilog syntax highlighing enabled.<br>
+For developing with the project, we recommend [Sublime Text](https://www.sublimetext.com/), with the VHDL and/or Systemverilog syntax highlighing enabled.<br><br>
 If you like this project, follow us on X [here](https://x.com/brisbanesilicon)!
 <br>
 
