@@ -41,8 +41,8 @@ Fufill the below prerequisites.
    - Other flavours of Linux may work but aren't officially supported.
    - We recommend [Ubuntu](https://ubuntu.com/).
    - Support for Windows is coming soon! See section [roadmap](#roadmap) below.
-3. An installation of GOWIN EDA V1.9.11 or V1.9.12.
-   - Available from the official GOWIN EDA [download page](https://www.gowinsemi.com/en/support/download_eda/) or direct link to [V1.9.11](https://cdn.gowinsemi.com.cn/Gowin_V1.9.11_linux.tar.gz) or [V1.9.12](https://cdn.gowinsemi.com.cn/Gowin_V1.9.12_linux.tar.gz).
+3. An installation of GOWIN EDA V1.9.12.
+   - Available from the official GOWIN EDA [download page](https://www.gowinsemi.com/en/support/download_eda/) or direct link to [V1.9.12](https://cdn.gowinsemi.com.cn/Gowin_V1.9.12_linux.tar.gz).
    - You may need to first register as a GOWIN member [here](https://www.gowinsemi.com/en/member/).
    - On Linux, please ensure that GOWIN EDA is installed to one of the following directories (or be prepared to modify the build script):
      - `$HOME/Applications` `/opt/gowin` `/opt/GOWIN` `/opt/Gowin` `$HOME/Documents/Applications/`
@@ -104,11 +104,11 @@ A list of public GOWIN EDA license servers is below. These are community reporte
 
 1. Prior to building the project, set 'LD_LIBRARY_PATH' to point at the GOWIN IDE libraries at `<GOWIN IDE install directory>/IDE/lib`. For example:
 ```bash
-export LD_LIBRARY_PATH=/opt/Gowin/Gowin_V1.9.11_linux/IDE/lib
+export LD_LIBRARY_PATH=/opt/Gowin/Gowin_V1.9.12_linux/IDE/lib
 ```
 2. Prior to programing the BRS-100-GW1NR9 board, add `<GOWIN IDE install directory>/Programmer/bin/` to your PATH. For example:
 ```bash
-export PATH=$PATH:/opt/Gowin/Gowin_V1.9.11_linux/Programmer/bin/
+export PATH=$PATH:/opt/Gowin/Gowin_V1.9.12_linux/Programmer/bin/
 ```
 
 <br>
@@ -138,8 +138,8 @@ export PATH=$PATH:/opt/Gowin/Gowin_V1.9.11_linux/Programmer/bin/
 > [!NOTE]
 > If you are going to be building the project often, we recommend (on Linux) you add a bash alias for the above environment variables to your '.bashrc'. For example: <br>
 > ```bash
-> alias gowin_ini='export LD_LIBRARY_PATH=/opt/Gowin/Gowin_V1.9.11_linux/IDE/lib; \
-> export PATH=$PATH:/opt/Gowin/Gowin_V1.9.11_linux/Programmer/bin/; export \
+> alias gowin_ini='export LD_LIBRARY_PATH=/opt/Gowin/Gowin_V1.9.12_linux/IDE/lib; \
+> export PATH=$PATH:/opt/Gowin/Gowin_V1.9.12_linux/Programmer/bin/; export \
 > LD_PRELOAD=/lib/x86_64-linux-gnu/libfreetype.so'
 > ```
 
