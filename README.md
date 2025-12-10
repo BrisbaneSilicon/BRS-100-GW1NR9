@@ -272,6 +272,11 @@ In board demonstration mode, the state of GPIO<1..16> (the demonstration firmwar
 Support for Windows is coming soon!
 <br><br>
 
+> [!NOTE]
+> If you notice that after programming the board all six user LEDs are slowly flashing, it means you have built the example project without the '-b' switch. This results in the 'user.sv' module (why by default only flashes all LEDs) being included in the firmware instead of the 'board_demonstration.sv' module.
+
+<br>
+
 ## Development
 
 Extending the project with your custom firmware is quite straightforward, simply modify the __user.sv__ file (located in \<BRS-100-GW1NR9 repository directory>/BRS-100-GW1NR9/proj/common/systemverilog/). You can also instantiate your own Systemverilog or VHDL modules, but ensure you add them to the appropriate build script file __synth.tcl__ ('scripts' directories).
