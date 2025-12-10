@@ -74,6 +74,7 @@ Launch a bash terminal and perform the following:
    - `cd <GOWIN IDE install directory>/IDE/bin/`
 2. Run the licensing manager.
    - `./license_config_gui`
+   - Alternatively you can run the GOWIN IDE `./gw_ide` and click 'Help' - 'Manage License'.
 3. Either point the licensing manager at your local license file (Option 1 above) or a floating license server.
 4. Press 'Check' to validate the license.
    - If the license has been successfully validated, it should produce a popup window __INFO__ with the message __Server is OK__.
