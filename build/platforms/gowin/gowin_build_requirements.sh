@@ -4,7 +4,7 @@ verbose_print="${1:-true}"
 
 platform="gowin"
 
-gowin_fpga_dsngr_ver_reqd=V1.9.11
+gowin_fpga_dsngr_ver_reqd=V1.9.12
 
 gowin_fpga_dsngr_search_dirs=( "$HOME/Applications" "/opt/gowin" "/opt/GOWIN" "/opt/Gowin" $HOME"/Documents/Applications/" )
 gowin_fpga_dsngr_install_linux_foldername="Gowin_${gowin_fpga_dsngr_ver_reqd}_linux"
