@@ -33,7 +33,7 @@ The project workflow is fully scripted (fetch, build, program); it does not requ
 
 ## Getting Started
 
-Fufill the below prerequisites.
+Fulfill the below prerequisites.
 
 ### Prerequisites
 
