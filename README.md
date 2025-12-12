@@ -191,7 +191,7 @@ Support for Windows is coming soon!
 
 ## Program
 
-After building the BRS-100-GW1NR9 firmware you are ready to program it to the board! It is worth noting that this stage also programs the internal non-volatile bitstream flash, so your firmware will auto-load after baord power on! <br><br>After plugging the board into your PC via the USB-C cable, simply perform the following:
+After building the BRS-100-GW1NR9 firmware you are ready to program it to the board! It is worth noting that this stage also programs the internal non-volatile bitstream flash, so your firmware will auto-load after board power on! <br><br>After plugging the board into your PC via the USB-C cable, simply perform the following:
 
 ### Linux
 
