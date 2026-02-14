@@ -235,7 +235,10 @@ The most commonly used are listed below.
 
 ### Windows
 
-Support for Windows is coming soon!
+Support for scripted programming in Windows is coming soon! If you use GOWIN EDA or Programmer, ensure that you connect to the board with 'using ftd2xx driver' unselected:
+
+![Alt text](img/programmer_connection_settings.png)
+
 <br><br>
 
 ## Board Demonstration
