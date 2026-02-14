@@ -235,7 +235,10 @@ The most commonly used are listed below.
 
 ### Windows
 
-Support for scripted programming in Windows is coming soon! If you use GOWIN EDA or Programmer, ensure that you connect to the board with 'using ftd2xx driver' unselected:
+Support for scripted programming in Windows is coming soon!<br>
+
+> [!NOTE]
+> If you use GOWIN EDA or GOWIN Programmer to flash the BRS-100-GW1NR9, ensure that you connect to the board with 'using ftd2xx driver' unselected:
 
 ![Alt text](img/programmer_connection_settings.png)
 
