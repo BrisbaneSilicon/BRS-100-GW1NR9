@@ -1,0 +1,214 @@
+[
+ {
+  "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/build/platforms/gowin/devices/GW1NR-9/C7I6/output/.artifacts/autogen_top_wrapper.sv",
+  "InstLine" : 37,
+  "InstName" : "autogen_top_wrapper",
+  "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/build/platforms/gowin/devices/GW1NR-9/C7I6/output/.artifacts/autogen_top_wrapper.sv",
+  "ModuleLine" : 37,
+  "ModuleName" : "autogen_top_wrapper",
+  "SubInsts" : [
+   {
+    "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/build/platforms/gowin/devices/GW1NR-9/C7I6/output/.artifacts/autogen_top_wrapper.sv",
+    "InstLine" : 105,
+    "InstName" : "top_inst",
+    "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/top.sv",
+    "ModuleLine" : 28,
+    "ModuleName" : "top",
+    "SubInsts" : [
+     {
+      "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/top.sv",
+      "InstLine" : 152,
+      "InstName" : "user_comms_inst",
+      "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/common/systemverilog/uart.sv",
+      "ModuleLine" : 26,
+      "ModuleName" : "uart",
+      "SubInsts" : [
+       {
+        "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/common/systemverilog/uart.sv",
+        "InstLine" : 456,
+        "InstName" : "rx_buffer_inst",
+        "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/common/vhdl/axis_fifo_sync.vhd",
+        "ModuleLine" : 9,
+        "ModuleName" : "axis_fifo_sync"
+       },
+       {
+        "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/common/systemverilog/uart.sv",
+        "InstLine" : 508,
+        "InstName" : "tx_buffer_inst",
+        "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/common/vhdl/axis_fifo_sync.vhd",
+        "ModuleLine" : 9,
+        "ModuleName" : "axis_fifo_sync"
+       }
+      ]
+     },
+     {
+      "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/top.sv",
+      "InstLine" : 182,
+      "InstName" : "ram_memory_Inst",
+      "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv",
+      "ModuleLine" : 58,
+      "ModuleName" : "ram_memory",
+      "SubInsts" : [
+       {
+        "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv",
+        "InstLine" : 449,
+        "InstName" : "[0].hyperram_of_inst",
+        "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/common/vhdl/axis_fifo_sync.vhd",
+        "ModuleLine" : 9,
+        "ModuleName" : "axis_fifo_sync"
+       },
+       {
+        "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv",
+        "InstLine" : 537,
+        "InstName" : "[0].hyperram_skb_inst",
+        "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/common/systemverilog/axis_skid_buffer_fp_opt.sv",
+        "ModuleLine" : 26,
+        "ModuleName" : "axis_skid_buffer_fp_opt"
+       },
+       {
+        "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv",
+        "InstLine" : 567,
+        "InstName" : "psram_controller_inst_0",
+        "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/psram_controller.sv",
+        "ModuleLine" : 1,
+        "ModuleName" : "psram_controller"
+       },
+       {
+        "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv",
+        "InstLine" : 604,
+        "InstName" : "psram_controller_inst_1",
+        "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/psram_controller.sv",
+        "ModuleLine" : 1,
+        "ModuleName" : "psram_controller"
+       },
+       {
+        "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv",
+        "InstLine" : 654,
+        "InstName" : "sram_8k_inst_0",
+        "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv",
+        "ModuleLine" : 30,
+        "ModuleName" : "sram_8k"
+       },
+       {
+        "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv",
+        "InstLine" : 666,
+        "InstName" : "sram_8k_inst_1",
+        "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv",
+        "ModuleLine" : 30,
+        "ModuleName" : "sram_8k"
+       },
+       {
+        "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv",
+        "InstLine" : 678,
+        "InstName" : "sram_8k_inst_2",
+        "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv",
+        "ModuleLine" : 30,
+        "ModuleName" : "sram_8k"
+       },
+       {
+        "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv",
+        "InstLine" : 690,
+        "InstName" : "sram_8k_inst_3",
+        "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv",
+        "ModuleLine" : 30,
+        "ModuleName" : "sram_8k"
+       }
+      ]
+     },
+     {
+      "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/top.sv",
+      "InstLine" : 236,
+      "InstName" : "saxisce_spimemcfg_inst",
+      "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/common/systemverilog/axis_bus_to_axis_bus_ce.sv",
+      "ModuleLine" : 26,
+      "ModuleName" : "axis_bus_to_axis_bus_ce"
+     },
+     {
+      "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/top.sv",
+      "InstLine" : 256,
+      "InstName" : "flash_memory_inst",
+      "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/flash_memory.sv",
+      "ModuleLine" : 3,
+      "ModuleName" : "flash_memory",
+      "SubInsts" : [
+       {
+        "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/flash_memory.sv",
+        "InstLine" : 37,
+        "InstName" : "spi_puya_inst",
+        "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/flash_memory.sv",
+        "ModuleLine" : 74,
+        "ModuleName" : "spi_puya",
+        "SubInsts" : [
+         {
+          "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/flash_memory.sv",
+          "InstLine" : 213,
+          "InstName" : "xfer",
+          "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/flash_memory.sv",
+          "ModuleLine" : 446,
+          "ModuleName" : "spimemio_xfer"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/top.sv",
+      "InstLine" : 363,
+      "InstName" : "rst_sync_inst",
+      "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/common/systemverilog/rst_sync.sv",
+      "ModuleLine" : 3,
+      "ModuleName" : "rst_sync"
+     },
+     {
+      "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/top.sv",
+      "InstLine" : 397,
+      "InstName" : "clk51mhz_inst",
+      "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk51mhz.sv",
+      "ModuleLine" : 1,
+      "ModuleName" : "clk51mhz"
+     }
+    ]
+   },
+   {
+    "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/build/platforms/gowin/devices/GW1NR-9/C7I6/output/.artifacts/autogen_top_wrapper.sv",
+    "InstLine" : 157,
+    "InstName" : "board_demonstration_inst",
+    "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/board_demonstration.sv",
+    "ModuleLine" : 28,
+    "ModuleName" : "board_demonstration"
+   }
+  ]
+ },
+ {
+  "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/common/systemverilog/axis_skid_buffer.sv",
+  "InstLine" : 29,
+  "InstName" : "axis_skid_buffer",
+  "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/common/systemverilog/axis_skid_buffer.sv",
+  "ModuleLine" : 29,
+  "ModuleName" : "axis_skid_buffer"
+ },
+ {
+  "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/common/systemverilog/mbus_skid_buffer.sv",
+  "InstLine" : 26,
+  "InstName" : "mbus_skid_buffer",
+  "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/common/systemverilog/mbus_skid_buffer.sv",
+  "ModuleLine" : 26,
+  "ModuleName" : "mbus_skid_buffer"
+ },
+ {
+  "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clkdiv2.sv",
+  "InstLine" : 1,
+  "InstName" : "clkdiv2",
+  "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clkdiv2.sv",
+  "ModuleLine" : 1,
+  "ModuleName" : "clkdiv2"
+ },
+ {
+  "InstFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clkdiv5.sv",
+  "InstLine" : 1,
+  "InstName" : "clkdiv5",
+  "ModuleFile" : "C:/Users/JQ/BRS-100/Forked repo BRS-100/BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clkdiv5.sv",
+  "ModuleLine" : 1,
+  "ModuleName" : "clkdiv5"
+ }
+]

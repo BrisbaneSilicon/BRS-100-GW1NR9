@@ -1,0 +1,18 @@
+-d C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9.vg
+-p GW1NR-9C-QFN88P-7
+-pn GW1NR-LV9QN88PC7/I6
+-cst C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\constraints\location.cst
+-cfg C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\device.cfg
+-sdc C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\constraints\timing_51mhz.sdc
+-bit
+-tr
+-ph
+-timing
+-replicate
+-cst_error
+-place_option 2
+-route_option 1
+-clock_route_order 1
+-correct_hold 1
+-route_maxfan 23
+-global_freq 50.000
