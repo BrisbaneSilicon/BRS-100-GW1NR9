@@ -1,0 +1,133 @@
+GowinSynthesis start
+Running parser ...
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\axis_bus_to_axis_bus_ce.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer_fp_opt.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\mbus_skid_buffer.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\reg_sync.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\rst_sync.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\dff_sync.sv'
+WARN  (EX2478) : Non-net output port 'sync' cannot be initialized at declaration in SystemVerilog mode("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\dff_sync.sv":36)
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\muxes.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\util.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\user.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clkdiv5.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clkdiv2.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk51mhz.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk66mhz.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk75mhz.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk81mhz.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk87mhz.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv'
+Undeclared symbol 'ck_tbuf_n', assumed default net type 'wire'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":197)
+WARN  (EX2478) : Non-net output port 'dout' cannot be initialized at declaration in SystemVerilog mode("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":16)
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\board_demonstration.sv'
+Analyzing Verilog file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv'
+Analyzing VHDL file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\vhdl\utils.vhd'
+Analyzing package 'utils'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\vhdl\utils.vhd":10)
+Analyzing package body 'utils'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\vhdl\utils.vhd":38)
+Analyzing VHDL file 'C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd'
+Analyzing entity 'axis_fifo_sync'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":9)
+Analyzing architecture 'rtl'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":30)
+Compiling module 'autogen_top_wrapper'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":37)
+WARN  (EX3073) : Port 'xip_fifo_almost_full' remains unconnected for this instance("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":201)
+WARN  (EX3073) : Port 'cfg_mode_enabled' remains unconnected for this instance("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":279)
+Compiling module 'top(VERSION="W: 3febae3-dirty|2026-03-20 16:39:40",CLK_FREQUENCY_MHZ=51,UART_BAUD=115200,PUSHBUTTON0_AS_RESET=1)'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":28)
+Compiling module 'uart(OUTPUT_BUFFER_ENABLE=1,INPUT_BUFFER_ENABLE=1,INC_RX_ESC_SEQUENCE_FILTER=0)'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":26)
+WARN  (EX3791) : Expression size 17 truncated to fit in target size 16("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":156)
+WARN  (EX3791) : Expression size 5 truncated to fit in target size 4("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":196)
+Switching to VHDL mode to elaborate design unit 'axis_fifo_sync'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":468)
+Processing 'axis_fifo_sync(g_data_bits=8,g_depth=128)(rtl)'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":9)
+Extracting RAM for identifier 'memory'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":39)
+Returning to Verilog mode to proceed with elaboration("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":468)
+Switching to VHDL mode to elaborate design unit 'axis_fifo_sync'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":520)
+Returning to Verilog mode to proceed with elaboration("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":520)
+WARN  (EX3791) : Expression size 17 truncated to fit in target size 16("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":546)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 5("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":568)
+WARN  (EX3670) : Actual bit length 32 differs from formal bit length 16 for port 'divider'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":159)
+Compiling module 'ram_memory(IF=1,CLK_FREQ_HZ=51000000,XIP_FIFO_DEPTH_WORDS=8)'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":58)
+WARN  (EX3791) : Expression size 21 truncated to fit in target size 20("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":413)
+Switching to VHDL mode to elaborate design unit 'axis_fifo_sync'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":463)
+Processing 'axis_fifo_sync(g_data_bits=52,g_depth=8)(rtl)'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":9)
+Extracting RAM for identifier 'memory'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":39)
+Returning to Verilog mode to proceed with elaboration("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":463)
+Compiling module 'axis_skid_buffer_fp_opt(pDATA_LEN=32,pID_LEN=1,pUSER_LEN=1)'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer_fp_opt.sv":26)
+WARN  (EX3073) : Port 'Q1' remains unconnected for this instance("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":176)
+WARN  (EX3073) : Port 'Q1' remains unconnected for this instance("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":193)
+WARN  (EX3073) : Port 'Q1' remains unconnected for this instance("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":198)
+Compiling module 'psram_controller(FREQ=51000000,LATENCY=3)'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":1)
+WARN  (EX3791) : Expression size 15 truncated to fit in target size 14("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":148)
+WARN  (EX2565) : Input 'TX' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":176)
+WARN  (EX2565) : Input 'TX' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":193)
+WARN  (EX2565) : Input 'TX' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":198)
+Compiling module 'sram_8k'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":30)
+Extracting RAM for identifier 'mem'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":41)
+WARN  (EX2565) : Input 's_id[0]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":550)
+WARN  (EX2565) : Input 's_user[0]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":550)
+Compiling module 'axis_bus_to_axis_bus_ce'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\axis_bus_to_axis_bus_ce.sv":26)
+Compiling module 'flash_memory'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":3)
+Compiling module 'spi_puya'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":74)
+Compiling module 'spimemio_xfer'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":446)
+WARN  (EX3791) : Expression size 8 truncated to fit in target size 4("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":592)
+WARN  (EX3791) : Expression size 25 truncated to fit in target size 24("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":268)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 20("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":336)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 9("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":343)
+WARN  (EX3791) : Expression size 11 truncated to fit in target size 10("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":352)
+Compiling module 'rst_sync'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\rst_sync.sv":3)
+Compiling module 'clk51mhz'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk51mhz.sv":1)
+WARN  (EX1998) : Net 'i_mbus_sram_addr[0][31]' does not have a driver("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":104)
+WARN  (EX1998) : Net 'i_mbus_sram_wdata[0][31]' does not have a driver("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":105)
+WARN  (EX1998) : Net 'i_mbus_sram_wstrb[0][3]' does not have a driver("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":106)
+WARN  (EX1998) : Net 'i_mbus_sram_valid[0]' does not have a driver("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":108)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_addr[31]' does not have a driver("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":111)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_wdata[31]' does not have a driver("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":112)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_wstrb[3]' does not have a driver("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":113)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_valid' does not have a driver("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":115)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_addr[31]' does not have a driver("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":125)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_wdata[31]' does not have a driver("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":126)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_wstrb[3]' does not have a driver("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":127)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_valid' does not have a driver("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":129)
+Compiling module 'user'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":28)
+NOTE  (EX0101) : Current top module is "autogen_top_wrapper"
+WARN  (EX0211) : The output port "uart_tx_valid" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":40)
+WARN  (EX0211) : The output port "uart_tx_data[7]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[6]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[5]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[4]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[3]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[2]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[1]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[0]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_rx_ready" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":44)
+[5%] Running netlist conversion ...
+WARN  (CV0018) : Input pad_user_buttons_n[1] is unused("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":48)
+WARN  (CV0016) : Input pad_ser_rx is unused("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":50)
+Running device independent optimization ...
+[10%] Optimizing Phase 0 completed
+[15%] Optimizing Phase 1 completed
+[25%] Optimizing Phase 2 completed
+Running inference ...
+[30%] Inferring Phase 0 completed
+[40%] Inferring Phase 1 completed
+[50%] Inferring Phase 2 completed
+[55%] Inferring Phase 3 completed
+Running technical mapping ...
+[60%] Tech-Mapping Phase 0 completed
+[65%] Tech-Mapping Phase 1 completed
+[75%] Tech-Mapping Phase 2 completed
+[80%] Tech-Mapping Phase 3 completed
+[90%] Tech-Mapping Phase 4 completed
+WARN  (NL0002) : The module "axis_skid_buffer_fp_opt" instantiated to "[0].hyperram_skb_inst" is swept in optimizing("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":550)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_0" is swept in optimizing("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":664)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_1" is swept in optimizing("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":676)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_2" is swept in optimizing("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":688)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_3" is swept in optimizing("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":700)
+WARN  (NL0002) : The module "axis_bus_to_axis_bus_ce" instantiated to "saxisce_spimemcfg_inst" is swept in optimizing("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":254)
+WARN  (NL0002) : The module "axis_fifo_sync" instantiated to "rx_buffer_inst" is swept in optimizing("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":456)
+[95%] Generate netlist file "C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9.vg" completed
+[100%] Generate report file "C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9_syn.rpt.html" completed
+GowinSynthesis finish

@@ -51,15 +51,19 @@
     [switch]$y
 )
 
-# version 0.3: implemented -p / proj_only flag, implemented -s / synth_only and -a / clean_all_platforms flags
+# version 0.3  
+#   - added command line options and generate_top_wrapper
+#   - implemented -p / proj_only flag
+#   - implemented -s / synth_only and -a / clean_all_platforms flags
+#   - added /output copy for -p and -a, added y/n prompt for -a
 
 # ---- PROCESS CORE PARAMETERS INTO CLEAN VARIABLES ----
 $BoardDemonstration = if ($b) { 1 } else { 0 }
 $ClockMhz           = $k
 $UartBaud           = $u
 $PushbuttonReset    = if ($r) { 0 } else { 1 }
-$DoProjectGenOnly   = if ($p) { "true" } else { "false" }   # ✅ wired to -p
-$DoSynthOnly        = if ($s) { "true" } else { "false" }   # ✅ wired to -s
+$DoProjectGenOnly   = if ($p) { "true" } else { "false" }
+$DoSynthOnly        = if ($s) { "true" } else { "false" }
 
 # ---- TOOL DIRECTORY - change according to your installation ----
 $GowinInstallDir    = "C:\Gowin\Gowin_V1.9.12.01_x64"
@@ -70,6 +74,7 @@ $RepoRoot           = "C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9"
 $GwSh               = "$GowinInstallDir\IDE\bin\gw_sh.exe"
 $BuildTcl           = "$RepoRoot\build\platforms\gowin\devices\GW1NR-9\build.tcl"
 $OutputDir          = "$RepoRoot\build\platforms\gowin\devices\GW1NR-9\C7I6\output"
+$WindowsOutputDir   = "$PSScriptRoot\output"
 
 # ---- CHIP SETTINGS FROM CSV ----
 $ProjectName        = "BRS-100-GW1NR9"
@@ -122,24 +127,50 @@ if ($a) {
     Write-Host "====================================="
     Write-Host " CLEAN ALL BUILD OUTPUT"
     Write-Host "====================================="
+    Write-Host ""
+    Write-Host "WARNING: The following folders will be permanently deleted."
+    Write-Host "There is no way to restore them without rebuilding."
+    Write-Host ""
+
+    # show exactly what will be deleted
+    if (Test-Path $OutputDir) {
+        Write-Host "  $OutputDir"
+    } else {
+        Write-Host "  $OutputDir (does not exist, nothing to clean)"
+    }
+    if (Test-Path $WindowsOutputDir) {
+        Write-Host "  $WindowsOutputDir"
+    } else {
+        Write-Host "  $WindowsOutputDir (does not exist, nothing to clean)"
+    }
+
+    Write-Host ""
+    $confirm = Read-Host "Are you sure you want to delete these folders? Contents cannot be restored after deleting (y/n)"
+
+    if ($confirm -ne "y") {
+        Write-Host "Clean cancelled."
+        exit 0
+    }
+
+    Write-Host ""
 
     # clean gowin build output
-    $gowinOutput = "$RepoRoot\build\platforms\gowin\devices\GW1NR-9\C7I6\output"
-    if (Test-Path $gowinOutput) {
-        Remove-Item -Recurse -Force $gowinOutput
-        Write-Host "Cleaned: $gowinOutput"
+    if (Test-Path $OutputDir) {
+        Remove-Item -Recurse -Force $OutputDir
+        Write-Host "Cleaned: $OutputDir"
     } else {
-        Write-Host "Nothing to clean at: $gowinOutput"
+        Write-Host "Nothing to clean at: $OutputDir"
     }
 
     # clean windows output folder
-    if (Test-Path "$PSScriptRoot\output") {
-        Remove-Item -Recurse -Force "$PSScriptRoot\output"
-        Write-Host "Cleaned: $PSScriptRoot\output"
+    if (Test-Path $WindowsOutputDir) {
+        Remove-Item -Recurse -Force $WindowsOutputDir
+        Write-Host "Cleaned: $WindowsOutputDir"
     } else {
-        Write-Host "Nothing to clean at: $PSScriptRoot\output"
+        Write-Host "Nothing to clean at: $WindowsOutputDir"
     }
 
+    Write-Host ""
     Write-Host "====================================="
     Write-Host " CLEAN COMPLETE"
     Write-Host "====================================="
@@ -221,15 +252,41 @@ if ($LASTEXITCODE -eq 0) {
         # ---- PROJECT ONLY RESULT ----
         Write-Host " PROJECT GENERATION COMPLETE"
         Write-Host "====================================="
-        Write-Host "Project files at: $OutputDir\$ProjectName"
-        Write-Host "Open GOWIN IDE and load the project from that folder."
+
+        $projSource = "$OutputDir\$ProjectName"
+        $projDest   = "$WindowsOutputDir\$ProjectName"
+
+        Write-Host "Project files at: $projSource"
+
+        # copy project folder to windows output
+        if (-not (Test-Path $WindowsOutputDir)) {
+            New-Item -ItemType Directory -Path $WindowsOutputDir -Force | Out-Null
+        }
+        Copy-Item $projSource $projDest -Recurse -Force
+        Write-Host "Project copied to: $projDest"
+        Write-Host ""
+        Write-Host "Open GOWIN IDE and load the project from: $projDest"
 
     } elseif ($s) {
         # ---- SYNTHESIS ONLY RESULT ----
         Write-Host " SYNTHESIS COMPLETE"
         Write-Host "====================================="
-        Write-Host "Synthesis report at:"
-        Write-Host "$OutputDir\$ProjectName\impl\gwsynthesis\$ProjectName`_syn.rpt.html"
+
+        $rptSource = "$OutputDir\$ProjectName\impl\gwsynthesis\$ProjectName`_syn.rpt.html"
+        $rptDest   = "$WindowsOutputDir\$ProjectName`_syn.rpt.html"
+
+        Write-Host "Synthesis report at: $rptSource"
+
+        # copy synthesis report to windows output
+        if (Test-Path $rptSource) {
+            if (-not (Test-Path $WindowsOutputDir)) {
+                New-Item -ItemType Directory -Path $WindowsOutputDir -Force | Out-Null
+            }
+            Copy-Item $rptSource $rptDest -Force
+            Write-Host "Report copied to: $rptDest"
+        } else {
+            Write-Host "WARNING: Synthesis report not found at expected location."
+        }
 
     } else {
         # ---- FULL BUILD RESULT ----
@@ -237,14 +294,14 @@ if ($LASTEXITCODE -eq 0) {
         Write-Host "====================================="
 
         $fsSource = "$OutputDir\.artifacts\BRS-100-GW1NR9.fs"
-        $fsDest   = "$PSScriptRoot\output\BRS-100-GW1NR9.fs"
+        $fsDest   = "$WindowsOutputDir\BRS-100-GW1NR9.fs"
 
         if (Test-Path $fsSource) {
             Write-Host ".fs file ready at: $fsSource"
 
-            # copy to clean windows output folder
-            if (-not (Test-Path "$PSScriptRoot\output")) {
-                New-Item -ItemType Directory -Path "$PSScriptRoot\output" -Force | Out-Null
+            # copy to windows output folder
+            if (-not (Test-Path $WindowsOutputDir)) {
+                New-Item -ItemType Directory -Path $WindowsOutputDir -Force | Out-Null
             }
             Copy-Item $fsSource $fsDest -Force
             Write-Host ".fs file copied to: $fsDest"

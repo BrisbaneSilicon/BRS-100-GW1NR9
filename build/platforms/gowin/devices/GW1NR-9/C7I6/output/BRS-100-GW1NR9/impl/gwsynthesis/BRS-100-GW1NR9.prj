@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gowin-synthesis-project>
+<Project>
+    <Version>beta</Version>
+    <Device id="GW1NR-9C" package="QFN88P" speed="7" partNumber="GW1NR-LV9QN88PC7/I6"/>
+    <FileList>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\axis_bus_to_axis_bus_ce.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer_fp_opt.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\mbus_skid_buffer.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\reg_sync.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\rst_sync.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\dff_sync.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\muxes.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\util.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\user.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clkdiv5.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clkdiv2.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk51mhz.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk66mhz.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk75mhz.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk81mhz.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk87mhz.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\board_demonstration.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv" type="verilog"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd" type="vhdl"/>
+        <File path="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\vhdl\utils.vhd" type="vhdl"/>
+    </FileList>
+    <OptionList>
+        <Option type="disable_insert_pad" value="0"/>
+        <Option type="global_freq" value="50.000"/>
+        <Option type="looplimit" value="2000"/>
+        <Option type="output_file" value="C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9.vg"/>
+        <Option type="print_all_synthesis_warning" value="0"/>
+        <Option type="ram_rw_check" value="0"/>
+        <Option type="top_module" value="autogen_top_wrapper"/>
+        <Option type="vcc" value="1.2"/>
+        <Option type="verilog_language" value="sysv-2017"/>
+        <Option type="vhdl_language" value="vhdl-2008"/>
+    </OptionList>
+</Project>
