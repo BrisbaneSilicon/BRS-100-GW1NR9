@@ -15,13 +15,17 @@
     [Alias('help')]
     [switch]$h,
 
-    # ---- NOT YET IMPLEMENTED (Phase 3) ----
+    # ---- IMPLEMENTED PHASE 3 FLAGS ----
     [Alias('proj_only')]
-    [switch]$p,
+    [switch]$p,                         # ✅ implemented
 
     [Alias('synth_only')]
-    [switch]$s,
+    [switch]$s,                         # ✅ implemented
 
+    [Alias('clean_all_platforms')]
+    [switch]$a,                         # ✅ implemented
+
+    # ---- NOT YET IMPLEMENTED ----
     [Alias('custom_target')]
     [string]$t          = "",
 
@@ -33,9 +37,6 @@
 
     [Alias('clean_platform')]
     [switch]$m,
-
-    [Alias('clean_all_platforms')]
-    [switch]$a,
 
     [Alias('list_default_target')]
     [switch]$d,
@@ -50,13 +51,15 @@
     [switch]$y
 )
 
-# v0.3
+# version 0.3: implemented -p / proj_only flag, implemented -s / synth_only and -a / clean_all_platforms flags
 
 # ---- PROCESS CORE PARAMETERS INTO CLEAN VARIABLES ----
 $BoardDemonstration = if ($b) { 1 } else { 0 }
 $ClockMhz           = $k
 $UartBaud           = $u
 $PushbuttonReset    = if ($r) { 0 } else { 1 }
+$DoProjectGenOnly   = if ($p) { "true" } else { "false" }   # ✅ wired to -p
+$DoSynthOnly        = if ($s) { "true" } else { "false" }   # ✅ wired to -s
 
 # ---- TOOL DIRECTORY - change according to your installation ----
 $GowinInstallDir    = "C:\Gowin\Gowin_V1.9.12.01_x64"
@@ -73,8 +76,6 @@ $ProjectName        = "BRS-100-GW1NR9"
 $PartNumber         = "GW1NR-LV9QN88PC7/I6"
 $DeviceVersion      = "C"
 $SpeedGrade         = "C7I6"
-$DoProjectGenOnly   = "false"   # wired to -p in Phase 3
-$DoSynthOnly        = "false"   # wired to -s in Phase 3
 
 # ---- HELP ----
 if ($h) {
@@ -86,16 +87,16 @@ if ($h) {
     Write-Host "  -k, -clock_frequency <MHz>          System clock frequency in MHz (default: 51)"
     Write-Host "  -u, -uart_baud <baud>               UART baud rate (default: 115200)"
     Write-Host "  -r, -disable_pushbutton_reset       Disable pushbutton 1 as reset (default: enabled)"
+    Write-Host "  -p, -proj_only                      Generate project file only, then exit"
+    Write-Host "  -s, -synth_only                     Stop after synthesis, then exit"
+    Write-Host "  -a, -clean_all_platforms            Delete all build output and exit"
     Write-Host "  -h, -help                           Show this help and exit"
     Write-Host ""
     Write-Host "  Not Yet Implemented:"
-    Write-Host "  -p, -proj_only                      Generate project file only, then exit"
-    Write-Host "  -s, -synth_only                     Stop after synthesis, then exit"
     Write-Host "  -t, -custom_target <TARGET>         Target a different board"
     Write-Host "  -f, -platform <PLATFORM>            Specify platform explicitly"
     Write-Host "  -c, -clean                          Clean target build and exit"
     Write-Host "  -m, -clean_platform                 Clean all devices for platform and exit"
-    Write-Host "  -a, -clean_all_platforms            Clean everything and exit"
     Write-Host "  -d, -list_default_target            Print default target and exit"
     Write-Host "  -i, -list_supported_platforms       List supported platforms and exit"
     Write-Host "  -l, -list_supported_targets         List supported targets and exit"
@@ -108,18 +109,48 @@ if ($h) {
     Write-Host "  .\build.ps1 -b -k 66                Board demo at 66 MHz"
     Write-Host "  .\build.ps1 -u 9600                 LED blink with 9600 baud UART"
     Write-Host "  .\build.ps1 -r                      Disable pushbutton reset"
+    Write-Host "  .\build.ps1 -p                      Generate project file only"
+    Write-Host "  .\build.ps1 -s                      Run synthesis only"
+    Write-Host "  .\build.ps1 -a                      Clean all build output"
     Write-Host ""
     exit 0
 }
 
+# ---- CLEAN ALL PLATFORMS ---- runs before preflight checks
+if ($a) {
+    Write-Host ""
+    Write-Host "====================================="
+    Write-Host " CLEAN ALL BUILD OUTPUT"
+    Write-Host "====================================="
+
+    # clean gowin build output
+    $gowinOutput = "$RepoRoot\build\platforms\gowin\devices\GW1NR-9\C7I6\output"
+    if (Test-Path $gowinOutput) {
+        Remove-Item -Recurse -Force $gowinOutput
+        Write-Host "Cleaned: $gowinOutput"
+    } else {
+        Write-Host "Nothing to clean at: $gowinOutput"
+    }
+
+    # clean windows output folder
+    if (Test-Path "$PSScriptRoot\output") {
+        Remove-Item -Recurse -Force "$PSScriptRoot\output"
+        Write-Host "Cleaned: $PSScriptRoot\output"
+    } else {
+        Write-Host "Nothing to clean at: $PSScriptRoot\output"
+    }
+
+    Write-Host "====================================="
+    Write-Host " CLEAN COMPLETE"
+    Write-Host "====================================="
+    exit 0
+}
+
 # ---- DUMMY HANDLERS FOR NOT YET IMPLEMENTED FLAGS ----
-if ($p) { Write-Host "NOTE: -p / -proj_only is not yet implemented. Continuing with full build." }
-if ($s) { Write-Host "NOTE: -s / -synth_only is not yet implemented. Continuing with full build." }
 if ($t) { Write-Host "NOTE: -t / -custom_target is not yet implemented. Using default target." }
 if ($f) { Write-Host "NOTE: -f / -platform is not yet implemented. Using default platform." }
 if ($c) { Write-Host "NOTE: -c / -clean is not yet implemented."; exit 0 }
 if ($m) { Write-Host "NOTE: -m / -clean_platform is not yet implemented."; exit 0 }
-if ($a) { Write-Host "NOTE: -a / -clean_all_platforms is not yet implemented."; exit 0 }
 if ($d) { Write-Host "NOTE: -d / -list_default_target is not yet implemented."; exit 0 }
 if ($i) { Write-Host "NOTE: -i / -list_supported_platforms is not yet implemented."; exit 0 }
 if ($l) { Write-Host "NOTE: -l / -list_supported_targets is not yet implemented."; exit 0 }
@@ -174,6 +205,7 @@ Write-Host "Clock   : $ClockMhz MHz"
 Write-Host "UART    : $UartBaud baud"
 Write-Host "Reset   : $(if ($PushbuttonReset -eq 1) { 'enabled' } else { 'disabled' })"
 Write-Host "Mode    : $(if ($BoardDemonstration -eq 1) { 'board demonstration' } else { 'LED blink (user.sv)' })"
+Write-Host "Build   : $(if ($p) { 'project only' } elseif ($s) { 'synthesis only' } else { 'full build' })"
 Write-Host "====================================="
 Write-Host "Starting build..."
 Write-Host ""
@@ -184,26 +216,44 @@ Write-Host ""
 if ($LASTEXITCODE -eq 0) {
     Write-Host ""
     Write-Host "====================================="
-    Write-Host " BUILD SUCCESS"
-    Write-Host "====================================="
 
-    $fsSource = "$OutputDir\.artifacts\BRS-100-GW1NR9.fs"
-    $fsDest   = "$PSScriptRoot\output\BRS-100-GW1NR9.fs"
+    if ($p) {
+        # ---- PROJECT ONLY RESULT ----
+        Write-Host " PROJECT GENERATION COMPLETE"
+        Write-Host "====================================="
+        Write-Host "Project files at: $OutputDir\$ProjectName"
+        Write-Host "Open GOWIN IDE and load the project from that folder."
 
-    if (Test-Path $fsSource) {
-        Write-Host ".fs file ready at: $fsSource"
-
-        # copy to clean windows output folder
-        if (-not (Test-Path "$PSScriptRoot\output")) {
-            New-Item -ItemType Directory -Path "$PSScriptRoot\output" -Force | Out-Null
-        }
-        Copy-Item $fsSource $fsDest -Force
-        Write-Host ".fs file copied to: $fsDest"
+    } elseif ($s) {
+        # ---- SYNTHESIS ONLY RESULT ----
+        Write-Host " SYNTHESIS COMPLETE"
+        Write-Host "====================================="
+        Write-Host "Synthesis report at:"
+        Write-Host "$OutputDir\$ProjectName\impl\gwsynthesis\$ProjectName`_syn.rpt.html"
 
     } else {
-        Write-Host "WARNING: .fs not found at expected location."
-        Write-Host "Searching output folder for .fs files..."
-        Get-ChildItem -Recurse -Filter "*.fs" -Path $OutputDir
+        # ---- FULL BUILD RESULT ----
+        Write-Host " BUILD SUCCESS"
+        Write-Host "====================================="
+
+        $fsSource = "$OutputDir\.artifacts\BRS-100-GW1NR9.fs"
+        $fsDest   = "$PSScriptRoot\output\BRS-100-GW1NR9.fs"
+
+        if (Test-Path $fsSource) {
+            Write-Host ".fs file ready at: $fsSource"
+
+            # copy to clean windows output folder
+            if (-not (Test-Path "$PSScriptRoot\output")) {
+                New-Item -ItemType Directory -Path "$PSScriptRoot\output" -Force | Out-Null
+            }
+            Copy-Item $fsSource $fsDest -Force
+            Write-Host ".fs file copied to: $fsDest"
+
+        } else {
+            Write-Host "WARNING: .fs not found at expected location."
+            Write-Host "Searching output folder for .fs files..."
+            Get-ChildItem -Recurse -Filter "*.fs" -Path $OutputDir
+        }
     }
 
 } else {
