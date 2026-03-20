@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Module name="autogen_top_wrapper" Lut="2" T_Register="925(0)" T_Alu="45(0)" T_Lut="1013(2)" T_Bsram="1(0)">
- <SubModule name="top_inst" Register="39" Lut="58" T_Register="429(39)" T_Alu="45(0)" T_Lut="490(58)" T_Bsram="1(0)">
-  <SubModule name="user_comms_inst" Register="43" Alu="15" Lut="32" T_Register="65(43)" T_Alu="15(15)" T_Lut="68(32)" T_Bsram="1(0)">
-   <SubModule name="tx_buffer_inst" Register="22" Lut="36" Bsram="1" T_Register="22(22)" T_Lut="36(36)" T_Bsram="1(1)"/>
+<Module name="autogen_top_wrapper" Lut="1" T_Register="404(0)" T_Alu="51(0)" T_Lut="452(1)">
+ <SubModule name="top_inst" Register="37" Lut="51" T_Register="403(37)" T_Alu="51(0)" T_Lut="451(51)">
+  <SubModule name="user_comms_inst" Register="34" Alu="15" Lut="28" T_Register="41(34)" T_Alu="21(15)" T_Lut="30(28)">
+   <SubModule name="tx_buffer_inst" Register="7" Alu="6" Lut="2" T_Register="7(7)" T_Alu="6(6)" T_Lut="2(2)"/>
   </SubModule>
-  <SubModule name="ram_memory_Inst" Register="88" Lut="104" T_Register="267(88)" T_Alu="26(0)" T_Lut="255(104)">
+  <SubModule name="ram_memory_Inst" Register="88" Lut="103" T_Register="267(88)" T_Alu="26(0)" T_Lut="256(103)">
    <SubModule name="[0].hyperram_of_inst" Register="23" Lut="5" T_Register="23(23)" T_Lut="5(5)"/>
-   <SubModule name="psram_controller_inst_0" Register="78" Alu="13" Lut="73" T_Register="78(78)" T_Alu="13(13)" T_Lut="73(73)"/>
-   <SubModule name="psram_controller_inst_1" Register="78" Alu="13" Lut="73" T_Register="78(78)" T_Alu="13(13)" T_Lut="73(73)"/>
+   <SubModule name="psram_controller_inst_0" Register="78" Alu="13" Lut="74" T_Register="78(78)" T_Alu="13(13)" T_Lut="74(74)"/>
+   <SubModule name="psram_controller_inst_1" Register="78" Alu="13" Lut="74" T_Register="78(78)" T_Alu="13(13)" T_Lut="74(74)"/>
   </SubModule>
-  <SubModule name="flash_memory_inst" Lut="1" T_Register="50(0)" T_Lut="107(1)">
-   <SubModule name="spi_puya_inst" Register="25" Lut="70" T_Register="50(25)" T_Lut="106(70)">
+  <SubModule name="flash_memory_inst" Lut="1" T_Register="50(0)" T_Lut="112(1)">
+   <SubModule name="spi_puya_inst" Register="25" Lut="75" T_Register="50(25)" T_Lut="111(75)">
     <SubModule name="xfer" Register="25" Lut="36" T_Register="25(25)" T_Lut="36(36)"/>
    </SubModule>
   </SubModule>
   <SubModule name="rst_sync_inst" Register="8" Alu="4" Lut="2" T_Register="8(8)" T_Alu="4(4)" T_Lut="2(2)"/>
   <SubModule name="clk51mhz_inst"/>
  </SubModule>
- <SubModule name="board_demonstration_inst" Register="496" Lut="521" T_Register="496(496)" T_Lut="521(521)"/>
+ <SubModule name="user_inst" Register="1" T_Register="1(1)"/>
 </Module>
