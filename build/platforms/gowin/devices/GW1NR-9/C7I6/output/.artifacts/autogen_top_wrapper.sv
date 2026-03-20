@@ -35,12 +35,12 @@
 import util::*;
 
 module autogen_top_wrapper #(
-    parameter reg   [(8*VERSION_CHARS)-1:0] VERSION                 = "FW: ac0d8d9-dirty|2026-03-11 15:39:38",
+    parameter reg   [(8*VERSION_CHARS)-1:0] VERSION                 = "FW: 029c3a3-dirty|2026-03-20 12:12:00",
 
     parameter int                           CLK_FREQUENCY_MHZ       = 51,
     parameter int                           UART_BAUD               = 115200,
     parameter int                           PUSHBUTTON0_AS_RESET    = 1,
-    parameter int                           BOARD_DEMONSTRATION     = 1
+    parameter int                           BOARD_DEMONSTRATION     = 0
 
 ) (
     input                               pad_clk_27Mhz,
@@ -203,7 +203,7 @@ localparam CS_WIDTH         = 2;
                 .uart_tx_data       (i_uart_tx_data),
                 .uart_rx_valid      (i_uart_rx_valid),
                 .uart_rx_ready      (i_uart_rx_ready),
-                .uart_rx_data       (i_uart_rx_data)
+                .uart_rx_data               (i_uart_rx_data)
             );
 
             assign pad_leds_n = ~i_user_leds;
