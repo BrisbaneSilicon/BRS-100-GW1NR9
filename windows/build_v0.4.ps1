@@ -171,6 +171,7 @@ if (-not $GowinInstallDir) {
     exit 1
 }
 
+
 # ---- GOWIN VERSION COMPATIBILITY CHECK ----
 # note: more specific version checks must come before general ones
 $installFolderName = Split-Path $GowinInstallDir -Leaf
