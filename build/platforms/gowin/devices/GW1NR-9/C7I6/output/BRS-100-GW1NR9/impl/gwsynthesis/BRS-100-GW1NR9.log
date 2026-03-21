@@ -36,7 +36,7 @@ Analyzing architecture 'rtl'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW
 Compiling module 'autogen_top_wrapper'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":37)
 WARN  (EX3073) : Port 'xip_fifo_almost_full' remains unconnected for this instance("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":201)
 WARN  (EX3073) : Port 'cfg_mode_enabled' remains unconnected for this instance("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":279)
-Compiling module 'top(VERSION="W: 2dc2ba7-dirty|2026-03-20 19:55:44",CLK_FREQUENCY_MHZ=51,UART_BAUD=115200,PUSHBUTTON0_AS_RESET=1)'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":28)
+Compiling module 'top(VERSION="W: d8e01b1-dirty|2026-03-21 15:19:13",CLK_FREQUENCY_MHZ=51,UART_BAUD=115200,PUSHBUTTON0_AS_RESET=1)'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":28)
 Compiling module 'uart(OUTPUT_BUFFER_ENABLE=1,INPUT_BUFFER_ENABLE=1,INC_RX_ESC_SEQUENCE_FILTER=0)'("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":26)
 WARN  (EX3791) : Expression size 17 truncated to fit in target size 16("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":156)
 WARN  (EX3791) : Expression size 5 truncated to fit in target size 4("C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":196)
