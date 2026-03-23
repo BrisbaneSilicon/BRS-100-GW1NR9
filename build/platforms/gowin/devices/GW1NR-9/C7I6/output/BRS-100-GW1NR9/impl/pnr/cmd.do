@@ -3,7 +3,7 @@
 -pn GW1NR-LV9QN88PC7/I6
 -cst C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\constraints\location.cst
 -cfg C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\device.cfg
--sdc C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\constraints\timing_51mhz.sdc
+-sdc C:\Users\JQ\BRS-100\Forked repo BRS-100\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\constraints\timing_66mhz.sdc
 -bit
 -tr
 -ph

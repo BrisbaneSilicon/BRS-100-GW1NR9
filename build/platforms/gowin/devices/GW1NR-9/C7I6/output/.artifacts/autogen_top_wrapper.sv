@@ -35,12 +35,12 @@
 import util::*;
 
 module autogen_top_wrapper #(
-    parameter reg   [(8*VERSION_CHARS)-1:0] VERSION                 = "FW: c35c74d-dirty|2026-03-21 17:53:20",
+    parameter reg   [(8*VERSION_CHARS)-1:0] VERSION                 = "FW: 2ead66d-dirty|2026-03-23 13:44:29",
 
-    parameter int                           CLK_FREQUENCY_MHZ       = 51,
-    parameter int                           UART_BAUD               = 115200,
-    parameter int                           PUSHBUTTON0_AS_RESET    = 1,
-    parameter int                           BOARD_DEMONSTRATION     = 0
+    parameter int                           CLK_FREQUENCY_MHZ       = 66,
+    parameter int                           UART_BAUD               = 9600,
+    parameter int                           PUSHBUTTON0_AS_RESET    = 0,
+    parameter int                           BOARD_DEMONSTRATION     = 1
 
 ) (
     input                               pad_clk_27Mhz,

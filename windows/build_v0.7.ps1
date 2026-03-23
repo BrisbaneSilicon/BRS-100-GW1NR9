@@ -65,6 +65,7 @@ param (
 #               improved RepoRoot empty string handling
 # version 0.7 - implemented setup_build_output_directory — clean before build
 #               implemented is_supported_platform — validate platform exists
+#               note: xilinx not yet implemented. This script is currently only for GOWIN builds.
 
 # ---- HELP ---- runs before any detection so -h works without GOWIN installed
 if ($h) {
@@ -455,8 +456,28 @@ if ($a) {
     exit 0
 }
 
+# ---- PARTIALLY IMPLEMENTED FLAGS ----
+if ($t) {
+    # check if the target exists in the CSV
+    $customDevice = $devices | Where-Object { $_.'Build Target'.Trim() -eq $t }
+    if (-not $customDevice) {
+        Write-Host ""
+        Write-Host "ERROR: Build target '$t' is not supported."
+        Write-Host ""
+        Write-Host "Supported targets:"
+        $devices | ForEach-Object { Write-Host "  $($_.'Build Target'.Trim())" }
+        Write-Host ""
+        Write-Host "Note: -t / -custom_target is not yet fully implemented."
+        Write-Host "      Only the default target '$ProjectName' is currently supported."
+        exit 1
+    }
+    Write-Host "NOTE: -t / -custom_target is not yet fully implemented."
+    Write-Host "      Continuing with default target: $ProjectName"
+}
+
 # ---- DUMMY HANDLERS FOR NOT YET IMPLEMENTED FLAGS ----
-if ($t) { Write-Host "NOTE: -t / -custom_target is not yet implemented. Using default target." }
+
+
 if ($f) { Write-Host "NOTE: -f / -platform is not yet implemented. Using default platform." }
 if ($m) { Write-Host "NOTE: -m / -clean_platform is not yet implemented."; exit 0 }
 
