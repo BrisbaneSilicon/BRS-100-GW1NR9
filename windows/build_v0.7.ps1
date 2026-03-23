@@ -141,6 +141,12 @@ $commonPaths = @(
     "C:\Program Files\Gowin\Gowin_V1.9.12.01",
     "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.01_x64",
     "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.01"
+    "C:\Gowin\Gowin_V1.9.12.02_x64",
+    "C:\Gowin\Gowin_V1.9.12.02",
+    "C:\Program Files\Gowin\Gowin_V1.9.12.02_x64",
+    "C:\Program Files\Gowin\Gowin_V1.9.12.02",
+    "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.02_x64",
+    "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.02"
 )
 
 # first check environment variable — allows user to override without editing script
