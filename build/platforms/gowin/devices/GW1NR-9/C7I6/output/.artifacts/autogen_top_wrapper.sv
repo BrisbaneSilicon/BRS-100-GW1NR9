@@ -35,7 +35,7 @@
 import util::*;
 
 module autogen_top_wrapper #(
-    parameter reg   [(8*VERSION_CHARS)-1:0] VERSION                 = "FW: c9eb450-dirty|2026-03-23 16:27:24",
+    parameter reg   [(8*VERSION_CHARS)-1:0] VERSION                 = "FW: 252768b-dirty|2026-03-27 15:40:24",
 
     parameter int                           CLK_FREQUENCY_MHZ       = 51,
     parameter int                           UART_BAUD               = 115200,
