@@ -1,0 +1,102 @@
+TROUBLESHOOTING - BRS-100-GW1NR9 Windows Programming
+=====================================================
+
+INTERMITTENT FREEZE DURING PROGRAMMING
+---------------------------------------
+
+Symptom:
+    The script prints:
+        Operation "embFlash Erase,Program" for device#1...
+    ...and then hangs indefinitely with no further output.
+
+Cause:
+    programmer_cli.exe (GOWIN's tool) can hang during embFlash erase if the
+    ftd2xx USB driver has stale handle state from a previous run. The script
+    calls FT_CyclePort via ftd2xx.dll before each programming attempt to
+    clear this state (equivalent to a physical USB unplug/replug), but this
+    does not fully prevent the issue on all machines.
+
+    The flash controller inside the GW1NR-9C chip also needs a small recovery
+    window between rapid erase/program cycles. Programming the board multiple
+    times in quick succession increases the chance of a freeze.
+
+Recovery steps:
+    1. Press Ctrl+C in the terminal to stop the script.
+    2. Open Task Manager (Ctrl+Shift+Esc) and check if programmer_cli.exe
+       is still running. If it is, right-click it and select End Task.
+       Alternatively, run in a new PowerShell window:
+           Stop-Process -Name programmer_cli -Force -ErrorAction SilentlyContinue
+    3. Unplug the USB-C cable from the board.
+    4. Wait 5 seconds.
+    5. Plug the USB-C cable back in.
+    6. Wait for Windows to finish enumerating the device (Device Manager will
+       show "USB Debugger A" again — usually takes 2-3 seconds).
+    7. Run the programming script again.
+
+Prevention:
+    - Wait a few seconds between programming runs.
+    - Do not run the script while GOWIN Programmer GUI is open — it holds an
+      exclusive lock on the USB cable and will cause immediate failure.
+    - The script already detects if programmer.exe is running and will warn you.
+
+
+CABLE FAILED TO OPEN
+---------------------
+
+Symptom:
+    Error: Cable failed to open via the location.
+
+Cause:
+    The USB device is in a bad state (usually from a previous hung
+    programmer_cli process that was killed without releasing the ftd2xx handle).
+
+Recovery:
+    Follow the recovery steps above (Ctrl+C, kill programmer_cli, replug USB).
+
+
+PROGRAM FAILED (exit code non-zero)
+-------------------------------------
+
+Symptom:
+    PROGRAMMING FAILED (exit code: 1)
+    Status Code is: 0x00015421
+
+Cause:
+    The wrong cable type was selected internally. This happens if
+    programmer_cli.exe ignores the --cable-index 4 argument (a known bug
+    in some versions) and falls back to the FT2CH driver path.
+
+    Status codes starting with 0x0001xxxx = FT2CH driver path (wrong).
+    Status codes starting with 0x0003xxxx = USB Debugger A / ftd2xx (correct).
+
+Recovery:
+    Unplug and replug the board, then retry. If the issue persists, try
+    reinstalling GOWIN EDA.
+
+
+GOWIN EDA NOT FOUND
+--------------------
+
+Symptom:
+    ERROR: Could not find GOWIN programmer_cli.exe.
+
+Fix:
+    Install GOWIN EDA V1.9.12.01 or V1.9.12.02 from:
+        https://www.gowinsemi.com/en/support/download_eda/
+
+    Or set the GOWIN_INSTALL_DIR environment variable to your install path:
+        [System.Environment]::SetEnvironmentVariable('GOWIN_INSTALL_DIR', 'C:\your\gowin\path', 'User')
+    Then reopen PowerShell and retry.
+
+
+SCRIPT EXECUTION POLICY ERROR
+-------------------------------
+
+Symptom:
+    .\program_board_v0.4.1.ps1 cannot be loaded because running scripts is
+    disabled on this system.
+
+Fix:
+    Run PowerShell as Administrator and execute:
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+    Then retry the script.
