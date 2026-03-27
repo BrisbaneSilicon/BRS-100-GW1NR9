@@ -3,6 +3,7 @@
 # Minimal Windows programming script for BRS-100-GW1NR9
 # version 0.1 - minimal functionality:
 #               find programmer_cli.exe
+#               scan for JTAG cable and verify board connected
 #               find .fs file at default location
 #               auto-trigger build if .fs not found
 #               program board via programmer_cli.exe
@@ -23,13 +24,19 @@ $GowinInstallDir = $null
 
 $commonPaths = @(
     "C:\Gowin\Gowin_V1.9.12.01_x64",
+    "C:\Gowin\Gowin_V1.9.12.02_x64",
     "C:\Gowin\Gowin_V1.9.12.01",
+    "C:\Gowin\Gowin_V1.9.12.02",
     "C:\Gowin\Gowin_V1.9.12_x64",
     "C:\Gowin\Gowin_V1.9.12",
     "C:\Program Files\Gowin\Gowin_V1.9.12.01_x64",
+    "C:\Program Files\Gowin\Gowin_V1.9.12.02_x64",
     "C:\Program Files\Gowin\Gowin_V1.9.12.01",
+    "C:\Program Files\Gowin\Gowin_V1.9.12.02",
     "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.01_x64",
-    "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.01"
+    "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.02_x64",
+    "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.01",
+    "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.02"
 )
 
 # first check environment variable
@@ -65,7 +72,7 @@ if (-not $GowinInstallDir) {
     }
     Write-Host ""
     Write-Host "To fix this, either:"
-    Write-Host "  1. Install GOWIN EDA V1.9.12.01 to one of the above locations."
+    Write-Host "  1. Install GOWIN EDA V1.9.12.01 or V1.9.12.02 to one of the above locations."
     Write-Host "     Download: https://www.gowinsemi.com/en/support/download_eda/"
     Write-Host ""
     Write-Host "  2. Set the GOWIN_INSTALL_DIR environment variable to your install path:"
@@ -73,6 +80,53 @@ if (-not $GowinInstallDir) {
     Write-Host "     [System.Environment]::SetEnvironmentVariable('GOWIN_INSTALL_DIR', 'C:\your\gowin\path', 'User')"
     Write-Host ""
     exit 1
+}
+
+# ---- GOWIN VERSION COMPATIBILITY CHECK ----
+$installFolderName = Split-Path $GowinInstallDir -Leaf
+Write-Host "Found GOWIN programmer at: $GowinInstallDir"
+
+if ($installFolderName -like "*1.9.12.01*" -or
+    $installFolderName -like "*1.9.12.02*") {
+    Write-Host "GOWIN version: $installFolderName (verified compatible)"
+
+} elseif ($installFolderName -like "*1.9.12*") {
+    Write-Host ""
+    Write-Host "WARNING: GOWIN $installFolderName has not been verified with this script."
+    Write-Host "         Verified versions: V1.9.12.01, V1.9.12.02"
+    Write-Host "         Continuing anyway..."
+    Write-Host ""
+
+} elseif ($installFolderName -like "*1.9.11.01*") {
+    Write-Host ""
+    Write-Host "ERROR: GOWIN EDA V1.9.11.01 is a known broken release."
+    Write-Host "Please install V1.9.12.01 or V1.9.12.02 from:"
+    Write-Host "https://www.gowinsemi.com/en/support/download_eda/"
+    exit 1
+
+} elseif ($installFolderName -like "*1.9.8*"  -or
+          $installFolderName -like "*1.9.9*"  -or
+          $installFolderName -like "*1.9.10*" -or
+          $installFolderName -like "*1.9.11*") {
+    Write-Host ""
+    Write-Host "WARNING: GOWIN EDA $installFolderName has not been tested with this script."
+    Write-Host "         Verified versions: V1.9.12.01, V1.9.12.02"
+    Write-Host "         Continuing anyway..."
+    Write-Host ""
+
+} elseif ($installFolderName -notlike "*1.9.*") {
+    Write-Host ""
+    Write-Host "WARNING: Unrecognised GOWIN EDA version: $installFolderName"
+    Write-Host "         Verified versions: V1.9.12.01, V1.9.12.02"
+    Write-Host "         Continuing anyway..."
+    Write-Host ""
+
+} else {
+    Write-Host ""
+    Write-Host "WARNING: GOWIN EDA $installFolderName has not been tested with this script."
+    Write-Host "         Verified versions: V1.9.12.01, V1.9.12.02"
+    Write-Host "         Continuing anyway..."
+    Write-Host ""
 }
 
 # ---- PATHS ----
@@ -137,13 +191,42 @@ $FsFile       = "$ArtifactsDir\$ProjectName.$BitstreamExt"
 $SpeedGradeCategory = $SpeedGrade.Substring(0, 1)
 $DeviceArg          = "$DeviceId$SpeedGradeCategory"
 
-Write-Host "Found GOWIN programmer at: $ProgrammerCli"
 Write-Host "Board    : $ProjectName ($BoardPlatform)"
 Write-Host "Device   : $DeviceArg"
 Write-Host "Bitstream: $FsFile"
 
+
+
+# ---- SCAN FOR JTAG CABLE ----
+# scan first, display results, then extract JTAG location dynamically
+# board shows up as two USB Debugger A interfaces:
+#   index 0 - JTAG  - used for programming
+#   index 1 - UART  - used for serial communication
+Write-Host ""
+Write-Host "Scanning for connected cables..."
+$scanOutput = & $ProgrammerCli --scan-cables 2>&1
+Write-Host $scanOutput
+
+# extract JTAG cable location from scan output
+# scan output format: "USB Debugger A/0/529/null"
+$locationMatch = ($scanOutput | Out-String)
+$regexMatch    = [regex]::Match($locationMatch, "USB Debugger A/0/(\d+)/null")
+
+if (-not $regexMatch.Success) {
+    Write-Host ""
+    Write-Host "ERROR: Could not find JTAG interface (USB Debugger A, index 0)."
+    Write-Host ""
+    Write-Host "Common causes:"
+    Write-Host "  1. Board not plugged in via USB-C"
+    Write-Host "  2. Wrong USB cable (must support data, not just power)"
+    Write-Host "  3. Driver issue - try unplugging and replugging the board"
+    exit 1
+}
+
+$cableLocation = $regexMatch.Groups[1].Value
+Write-Host "JTAG interface found at USB location: $cableLocation - proceeding."
+
 # ---- CHECK IF FIRMWARE IS BUILT ----
-# if .fs not found, auto-trigger build first - matches Linux behaviour
 if (-not (Test-Path $FsFile)) {
     Write-Host ""
     Write-Host "Detected firmware not built - triggering build..."
@@ -163,7 +246,6 @@ if (-not (Test-Path $FsFile)) {
         exit 1
     }
 
-    # check again after build
     if (-not (Test-Path $FsFile)) {
         Write-Host "ERROR: Build completed but .fs file not found at: $FsFile"
         exit 1
@@ -179,15 +261,21 @@ Write-Host ""
 Write-Host "====================================="
 Write-Host " BRS-100-GW1NR9 Windows Programmer"
 Write-Host "====================================="
-Write-Host "Device     : $DeviceArg"
-Write-Host "Bitstream  : $FsFile"
-Write-Host "Programmer : $ProgrammerCli"
+Write-Host "Device    : $DeviceArg"
+Write-Host "Cable     : USB Debugger A (location $cableLocation - JTAG)"
+Write-Host "Operation : embFlash Erase, Program, Verify (index 6)"
+Write-Host "Bitstream : $FsFile"
+Write-Host "Programmer: $ProgrammerCli"
 Write-Host "====================================="
-Write-Host ""
-Write-Host "NOTE: Make sure the board is plugged in via USB-C before continuing."
+Write-Host "Programming board..."
 Write-Host ""
 
-& $ProgrammerCli --device $DeviceArg --operation_index 5 -f $FsFile
+$programArgs = @(
+    "--device", $DeviceArg,
+    "--cable-index", "4",
+    "--operation_index", "6",
+    "--fsFile", $FsFile
+)
 
 # ---- RESULT ----
 if ($LASTEXITCODE -eq 0) {
