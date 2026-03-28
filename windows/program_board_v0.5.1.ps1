@@ -185,10 +185,13 @@ if ($UpdateFlashOnly) {
 }
 
 if ($CustomTarget) {
-    Write-Host "ERROR: -t / --custom_target is not implemented on Windows."
-    Write-Host "       Currently only one target (BRS-100-GW1NR9) is supported."
-    Write-Host "       This flag exists for compatibility with the Linux script."
-    exit 1
+    if ($CustomTarget -eq "BRS-100-GW1NR9") {
+        Write-Host "Target '$CustomTarget' is already the default target - continuing."
+    } else {
+        Write-Host "ERROR: Target '$CustomTarget' is not supported."
+        Write-Host "       Only 'BRS-100-GW1NR9' is supported in this version."
+        exit 1
+    }
 }
 
 # ---- VALIDATE JTAG FREQUENCY ----
@@ -691,7 +694,9 @@ Write-Host "Operation : embFlash Erase, Program (index 5)"
 Write-Host "Bitstream : $FsFile"
 Write-Host "Programmer: $ProgrammerCli"
 Write-Host "====================================="
-Write-Host "Programming board..."
+
+# echo exact command line before executing (matches Linux behaviour)
+Write-Host "Program command line: '$ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile'"
 Write-Host ""
 
 & $ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile
