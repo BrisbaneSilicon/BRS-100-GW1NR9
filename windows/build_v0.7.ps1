@@ -1,5 +1,5 @@
 # =============================================================
-# build_v0.6.ps1
+# build_v0.7.ps1
 # Windows build script for BRS-100-GW1NR9
 #
 # Author:    Bruce Mao
@@ -79,7 +79,7 @@ param (
     [Alias('clean')]
     [switch]$c,
 
-    # ---- NOT YET IMPLEMENTED, NOT IMPORTANT FOR CURRNET BOARD----
+    # ---- NOT YET IMPLEMENTED, NOT IMPORTANT FOR CURRENT BOARD----
     [Alias('custom_target')]
     [string]$t          = "",
 
@@ -424,7 +424,7 @@ if ($PSBoundParameters.ContainsKey('k')) {
 }
 
 # ---- IMPLEMENT -c / clean ----
-# deletes current target build output only — matches Linux behaviour, no prompt
+# deletes current target build output only
 if ($c) {
     Write-Host ""
     Write-Host "====================================="
@@ -526,14 +526,14 @@ if ($m) { Write-Host "NOTE: -m / -clean_platform is not yet implemented."; exit 
 
 # ---- PRE-FLIGHT CHECKS ----
 
-## generate_top_wrapper.ps1 — match Linux pattern of checking script exists
+## checks generate_top_wrapper.ps1
 if (-not (Test-Path "$PSScriptRoot\generate_top_wrapper.ps1")) {
     Write-Host "ERROR: generate_top_wrapper.ps1 not found at: $PSScriptRoot"
     Write-Host "Make sure generate_top_wrapper.ps1 is in the same folder as this script."
     exit 1
 }
 
-## build.tcl
+## checks build.tcl
 if (-not (Test-Path $BuildTcl)) {
     Write-Host "ERROR: Cannot find build.tcl at: $BuildTcl"
     Write-Host "Please check RepoRoot was correctly derived from Git."
