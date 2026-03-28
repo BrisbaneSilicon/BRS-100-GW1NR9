@@ -3,6 +3,7 @@
 # Windows build script for BRS-100-GW1NR9
 #
 # Author:    Bruce Mao
+# Based on build.sh, originally authored by Craig Haywood
 # Copyright: (C) Brisbane Silicon, Pty Ltd. All rights reserved.
 #
 # The source code contained herein is provided on an "as is" basis.
