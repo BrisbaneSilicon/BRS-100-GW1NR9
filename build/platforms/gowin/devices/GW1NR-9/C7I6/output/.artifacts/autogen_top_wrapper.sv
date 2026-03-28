@@ -35,9 +35,9 @@
 import util::*;
 
 module autogen_top_wrapper #(
-    parameter reg   [(8*VERSION_CHARS)-1:0] VERSION                 = "FW: 252768b-dirty|2026-03-27 15:40:24",
+    parameter reg   [(8*VERSION_CHARS)-1:0] VERSION                 = "FW: e2503fd-dirty|2026-03-28 18:46:53",
 
-    parameter int                           CLK_FREQUENCY_MHZ       = 51,
+    parameter int                           CLK_FREQUENCY_MHZ       = 66,
     parameter int                           UART_BAUD               = 115200,
     parameter int                           PUSHBUTTON0_AS_RESET    = 1,
     parameter int                           BOARD_DEMONSTRATION     = 0

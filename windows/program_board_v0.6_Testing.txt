@@ -1,0 +1,1223 @@
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -c
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.06 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Clean build requested - cleaning build output first...
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ CLEAN TARGET BUILD OUTPUT
+=====================================
+Nothing to clean at: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+=====================================
+ CLEAN COMPLETE
+=====================================
+
+Rebuilding firmware...
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+Setting up build output directory...
+  Created artifacts dir: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts
+Generating autogen_top_wrapper.sv...
+  Git commit  : e2503fd-dirty
+  Build time  : 2026-03-28 18:39:54
+  Version str : FW: e2503fd-dirty|2026-03-28 18:39:54
+  Generated   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv
+
+=====================================
+ BRS-100-GW1NR9 Windows Build
+=====================================
+Repo     : C:\github repo\BRS-100-GW1NR9
+Platform : gowin
+Output   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+Device   : GW1NR-LV9QN88PC7/I6 (vC, C7I6)
+Clock    : 51 MHz
+UART     : 115200 baud
+Reset    : enabled
+Mode     : LED blink (user.sv)
+Build    : full build
+GOWIN    : Gowin_V1.9.12.02_x64
+=====================================
+Starting build...
+
+*** GOWIN Tcl Command Line Console  *** 
+Creating Gowin FPGA project 'BRS-100-GW1NR9' specs -
+        Target part number: GW1NR-LV9QN88PC7/I6
+        Target part version: C
+current working directory: C:/github repo/BRS-100-GW1NR9/build/platforms/gowin/devices/GW1NR-9/C7I6/output/BRS-100-GW1NR9
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/axis_bus_to_axis_bus_ce.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/axis_skid_buffer.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/axis_skid_buffer_fp_opt.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/mbus_skid_buffer.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/reg_sync.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/rst_sync.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/dff_sync.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/muxes.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/uart.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/util.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/user.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clkdiv5.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clkdiv2.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk51mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk66mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk75mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk81mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk87mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/top.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/flash_memory.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/psram_controller.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/board_demonstration.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/vhdl/axis_fifo_sync.vhd"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/vhdl/utils.vhd"
+add new file: "../../constraints/location.cst"
+add new file: "../../constraints/timing_51mhz.sdc"
+add new file: "../.artifacts/autogen_top_wrapper.sv"
+Project generation complete
+Launching Synthesis
+GowinSynthesis start
+Running parser ...
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_bus_to_axis_bus_ce.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer_fp_opt.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\mbus_skid_buffer.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\reg_sync.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\rst_sync.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\dff_sync.sv'
+WARN  (EX2478) : Non-net output port 'sync' cannot be initialized at declaration in SystemVerilog mode("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\dff_sync.sv":36)
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\muxes.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\util.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clkdiv5.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clkdiv2.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk51mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk66mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk75mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk81mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk87mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv'
+Undeclared symbol 'ck_tbuf_n', assumed default net type 'wire'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":197)
+WARN  (EX2478) : Non-net output port 'dout' cannot be initialized at declaration in SystemVerilog mode("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":16)
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\board_demonstration.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv'     
+Analyzing VHDL file 'C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\utils.vhd'
+Analyzing package 'utils'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\utils.vhd":10)
+Analyzing package body 'utils'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\utils.vhd":38)
+Analyzing VHDL file 'C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd'
+Analyzing entity 'axis_fifo_sync'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":9)
+Analyzing architecture 'rtl'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":30)
+Compiling module 'autogen_top_wrapper'("C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":37)
+WARN  (EX3073) : Port 'xip_fifo_almost_full' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":201)
+WARN  (EX3073) : Port 'cfg_mode_enabled' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":279)
+Compiling module 'top(VERSION="W: e2503fd-dirty|2026-03-28 18:39:54",CLK_FREQUENCY_MHZ=51,UART_BAUD=115200,PUSHBUTTON0_AS_RESET=1)'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":28)
+Compiling module 'uart(OUTPUT_BUFFER_ENABLE=1,INPUT_BUFFER_ENABLE=1,INC_RX_ESC_SEQUENCE_FILTER=0)'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":26)
+WARN  (EX3791) : Expression size 17 truncated to fit in target size 16("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":156)  
+WARN  (EX3791) : Expression size 5 truncated to fit in target size 4("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":196)    
+Switching to VHDL mode to elaborate design unit 'axis_fifo_sync'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":468)        
+Processing 'axis_fifo_sync(g_data_bits=8,g_depth=128)(rtl)'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":9)
+Extracting RAM for identifier 'memory'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":39)
+Returning to Verilog mode to proceed with elaboration("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":468)
+Switching to VHDL mode to elaborate design unit 'axis_fifo_sync'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":520)        
+Returning to Verilog mode to proceed with elaboration("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":520)
+WARN  (EX3791) : Expression size 17 truncated to fit in target size 16("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":546)  
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 5("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":568)   
+WARN  (EX3670) : Actual bit length 32 differs from formal bit length 16 for port 'divider'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":159)
+Compiling module 'ram_memory(IF=1,CLK_FREQ_HZ=51000000,XIP_FIFO_DEPTH_WORDS=8)'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":58)
+WARN  (EX3791) : Expression size 21 truncated to fit in target size 20("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":413)
+Switching to VHDL mode to elaborate design unit 'axis_fifo_sync'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":463)
+Processing 'axis_fifo_sync(g_data_bits=52,g_depth=8)(rtl)'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":9)
+Extracting RAM for identifier 'memory'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":39)
+Returning to Verilog mode to proceed with elaboration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":463)
+Compiling module 'axis_skid_buffer_fp_opt(pDATA_LEN=32,pID_LEN=1,pUSER_LEN=1)'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer_fp_opt.sv":26)
+WARN  (EX3073) : Port 'Q1' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":176)
+WARN  (EX3073) : Port 'Q1' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":193)
+WARN  (EX3073) : Port 'Q1' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":198)
+Compiling module 'psram_controller(FREQ=51000000,LATENCY=3)'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":1)
+WARN  (EX3791) : Expression size 15 truncated to fit in target size 14("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":148)
+WARN  (EX2565) : Input 'TX' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":176)
+WARN  (EX2565) : Input 'TX' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":193)
+WARN  (EX2565) : Input 'TX' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":198)
+Compiling module 'sram_8k'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":30)
+Extracting RAM for identifier 'mem'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":41)
+WARN  (EX2565) : Input 's_id[0]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":550)
+WARN  (EX2565) : Input 's_user[0]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":550)
+Compiling module 'axis_bus_to_axis_bus_ce'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_bus_to_axis_bus_ce.sv":26)
+Compiling module 'flash_memory'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":3)
+Compiling module 'spi_puya'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":74)
+Compiling module 'spimemio_xfer'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":446)
+WARN  (EX3791) : Expression size 8 truncated to fit in target size 4("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":592)
+WARN  (EX3791) : Expression size 25 truncated to fit in target size 24("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":268)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 20("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":336)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 9("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":343)
+WARN  (EX3791) : Expression size 11 truncated to fit in target size 10("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":352)
+Compiling module 'rst_sync'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\rst_sync.sv":3)
+Compiling module 'clk51mhz'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk51mhz.sv":1)
+WARN  (EX1998) : Net 'i_mbus_sram_addr[0][31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":104)
+WARN  (EX1998) : Net 'i_mbus_sram_wdata[0][31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":105)
+WARN  (EX1998) : Net 'i_mbus_sram_wstrb[0][3]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":106)
+WARN  (EX1998) : Net 'i_mbus_sram_valid[0]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":108)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_addr[31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":111)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_wdata[31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":112)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_wstrb[3]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":113)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_valid' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":115)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_addr[31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":125)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_wdata[31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":126)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_wstrb[3]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":127)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_valid' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":129)
+Compiling module 'user'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":28)
+NOTE  (EX0101) : Current top module is "autogen_top_wrapper"
+WARN  (EX0211) : The output port "uart_tx_valid" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":40)
+WARN  (EX0211) : The output port "uart_tx_data[7]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[6]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[5]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[4]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[3]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[2]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[1]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[0]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_rx_ready" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":44)
+[5%] Running netlist conversion ...
+WARN  (CV0018) : Input pad_user_buttons_n[1] is unused("C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":48)
+WARN  (CV0016) : Input pad_ser_rx is unused("C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":50)
+Running device independent optimization ...
+[10%] Optimizing Phase 0 completed
+[15%] Optimizing Phase 1 completed
+[25%] Optimizing Phase 2 completed
+Running inference ...
+[30%] Inferring Phase 0 completed
+[40%] Inferring Phase 1 completed
+[50%] Inferring Phase 2 completed
+[55%] Inferring Phase 3 completed
+Running technical mapping ...
+[60%] Tech-Mapping Phase 0 completed
+[65%] Tech-Mapping Phase 1 completed
+[75%] Tech-Mapping Phase 2 completed
+[80%] Tech-Mapping Phase 3 completed
+[90%] Tech-Mapping Phase 4 completed
+WARN  (NL0002) : The module "axis_skid_buffer_fp_opt" instantiated to "[0].hyperram_skb_inst" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":550)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_0" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":664)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_1" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":676)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_2" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":688)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_3" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":700)
+WARN  (NL0002) : The module "axis_bus_to_axis_bus_ce" instantiated to "saxisce_spimemcfg_inst" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":254)
+WARN  (NL0002) : The module "axis_fifo_sync" instantiated to "rx_buffer_inst" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":456)
+[95%] Generate netlist file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9.vg" completed
+[100%] Generate report file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9_syn.rpt.html" completed
+GowinSynthesis finish
+Synthesis complete
+Launching Place-and-Route
+Reading netlist file: "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9.vg"
+Parsing netlist file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9.vg" completed
+Processing netlist completed
+Reading constraint file: "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\constraints\location.cst"
+Physical Constraint parsed completed
+Running placement......
+[10%] Placement Phase 0 completed
+[20%] Placement Phase 1 completed
+[30%] Placement Phase 2 completed
+[50%] Placement Phase 3 completed
+Running routing......
+[60%] Routing Phase 0 completed
+[70%] Routing Phase 1 completed
+[80%] Routing Phase 2 completed
+[90%] Routing Phase 3 completed
+Running timing analysis......
+[95%] Timing analysis completed
+Placement and routing completed
+Bitstream generation in progress......
+Bitstream generation completed
+Running power analysis......
+[100%] Power analysis completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.power.html" completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.pin.html" completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.rpt.html" completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.rpt.txt" completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.tr.html" completed
+Sat Mar 28 18:40:03 2026
+
+Deploying bitstream
+
+=====================================
+ BUILD SUCCESS
+=====================================
+.fs file ready at: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+.fs file copied to: C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9.fs
+
+Build time: 0m 8s
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+Erasing embFlash ...: [                         ] 0%                  Status Code is: 0x00039020
+Erasing embFlash ...: [#########################] 100%
+Programing...: [#########################] 100%
+ Status Code is: 0x0003F020
+ User Code: 0x00005AAC
+ Program Finished!
+ Finished.
+ Cost 7.68 second(s)
+
+
+=====================================
+ PROGRAMMING SUCCESS
+=====================================
+Board programmed successfully.
+The design will auto-load on every power-on.
+PS C:\github repo\BRS-100-GW1NR9\windows> 
+
+
+S C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -c
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.16 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Clean build requested - cleaning build output first...
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ CLEAN TARGET BUILD OUTPUT
+=====================================
+Cleaned: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+=====================================
+ CLEAN COMPLETE
+=====================================
+
+Rebuilding firmware...
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+Setting up build output directory...
+  Created artifacts dir: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts
+Generating autogen_top_wrapper.sv...
+  Git commit  : e2503fd-dirty
+  Build time  : 2026-03-28 18:43:54
+  Version str : FW: e2503fd-dirty|2026-03-28 18:43:54
+  Generated   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv
+
+=====================================
+ BRS-100-GW1NR9 Windows Build
+=====================================
+Repo     : C:\github repo\BRS-100-GW1NR9
+Platform : gowin
+Output   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+Device   : GW1NR-LV9QN88PC7/I6 (vC, C7I6)
+Clock    : 51 MHz
+UART     : 115200 baud
+Reset    : enabled
+Mode     : LED blink (user.sv)
+Build    : full build
+GOWIN    : Gowin_V1.9.12.02_x64
+=====================================
+Starting build...
+
+*** GOWIN Tcl Command Line Console  *** 
+Creating Gowin FPGA project 'BRS-100-GW1NR9' specs -
+        Target part number: GW1NR-LV9QN88PC7/I6
+        Target part version: C
+current working directory: C:/github repo/BRS-100-GW1NR9/build/platforms/gowin/devices/GW1NR-9/C7I6/output/BRS-100-GW1NR9
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/axis_bus_to_axis_bus_ce.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/axis_skid_buffer.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/axis_skid_buffer_fp_opt.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/mbus_skid_buffer.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/reg_sync.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/rst_sync.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/dff_sync.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/muxes.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/uart.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/util.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/user.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clkdiv5.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clkdiv2.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk51mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk66mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk75mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk81mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk87mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/top.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/flash_memory.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/psram_controller.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/board_demonstration.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/vhdl/axis_fifo_sync.vhd"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/vhdl/utils.vhd"
+add new file: "../../constraints/location.cst"
+add new file: "../../constraints/timing_51mhz.sdc"
+add new file: "../.artifacts/autogen_top_wrapper.sv"
+Project generation complete
+Launching Synthesis
+GowinSynthesis start
+Running parser ...
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_bus_to_axis_bus_ce.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer_fp_opt.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\mbus_skid_buffer.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\reg_sync.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\rst_sync.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\dff_sync.sv'
+WARN  (EX2478) : Non-net output port 'sync' cannot be initialized at declaration in SystemVerilog mode("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\dff_sync.sv":36)
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\muxes.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\util.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clkdiv5.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clkdiv2.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk51mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk66mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk75mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk81mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk87mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv'
+Undeclared symbol 'ck_tbuf_n', assumed default net type 'wire'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":197)
+WARN  (EX2478) : Non-net output port 'dout' cannot be initialized at declaration in SystemVerilog mode("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":16)
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\board_demonstration.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv'     
+Analyzing VHDL file 'C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\utils.vhd'
+Analyzing package 'utils'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\utils.vhd":10)
+Analyzing package body 'utils'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\utils.vhd":38)
+Analyzing VHDL file 'C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd'
+Analyzing entity 'axis_fifo_sync'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":9)
+Analyzing architecture 'rtl'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":30)
+Compiling module 'autogen_top_wrapper'("C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":37)
+WARN  (EX3073) : Port 'xip_fifo_almost_full' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":201)
+WARN  (EX3073) : Port 'cfg_mode_enabled' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":279)
+Compiling module 'top(VERSION="W: e2503fd-dirty|2026-03-28 18:43:54",CLK_FREQUENCY_MHZ=51,UART_BAUD=115200,PUSHBUTTON0_AS_RESET=1)'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":28)
+Compiling module 'uart(OUTPUT_BUFFER_ENABLE=1,INPUT_BUFFER_ENABLE=1,INC_RX_ESC_SEQUENCE_FILTER=0)'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":26)
+WARN  (EX3791) : Expression size 17 truncated to fit in target size 16("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":156)  
+WARN  (EX3791) : Expression size 5 truncated to fit in target size 4("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":196)    
+Switching to VHDL mode to elaborate design unit 'axis_fifo_sync'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":468)        
+Processing 'axis_fifo_sync(g_data_bits=8,g_depth=128)(rtl)'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":9)
+Extracting RAM for identifier 'memory'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":39)
+Returning to Verilog mode to proceed with elaboration("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":468)
+Switching to VHDL mode to elaborate design unit 'axis_fifo_sync'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":520)        
+Returning to Verilog mode to proceed with elaboration("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":520)
+WARN  (EX3791) : Expression size 17 truncated to fit in target size 16("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":546)  
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 5("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":568)   
+WARN  (EX3670) : Actual bit length 32 differs from formal bit length 16 for port 'divider'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":159)
+Compiling module 'ram_memory(IF=1,CLK_FREQ_HZ=51000000,XIP_FIFO_DEPTH_WORDS=8)'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":58)
+WARN  (EX3791) : Expression size 21 truncated to fit in target size 20("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":413)
+Switching to VHDL mode to elaborate design unit 'axis_fifo_sync'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":463)
+Processing 'axis_fifo_sync(g_data_bits=52,g_depth=8)(rtl)'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":9)
+Extracting RAM for identifier 'memory'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":39)
+Returning to Verilog mode to proceed with elaboration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":463)
+Compiling module 'axis_skid_buffer_fp_opt(pDATA_LEN=32,pID_LEN=1,pUSER_LEN=1)'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer_fp_opt.sv":26)
+WARN  (EX3073) : Port 'Q1' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":176)
+WARN  (EX3073) : Port 'Q1' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":193)
+WARN  (EX3073) : Port 'Q1' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":198)
+Compiling module 'psram_controller(FREQ=51000000,LATENCY=3)'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":1)
+WARN  (EX3791) : Expression size 15 truncated to fit in target size 14("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":148)
+WARN  (EX2565) : Input 'TX' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":176)
+WARN  (EX2565) : Input 'TX' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":193)
+WARN  (EX2565) : Input 'TX' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":198)
+Compiling module 'sram_8k'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":30)
+Extracting RAM for identifier 'mem'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":41)
+WARN  (EX2565) : Input 's_id[0]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":550)
+WARN  (EX2565) : Input 's_user[0]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":550)
+Compiling module 'axis_bus_to_axis_bus_ce'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_bus_to_axis_bus_ce.sv":26)
+Compiling module 'flash_memory'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":3)
+Compiling module 'spi_puya'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":74)
+Compiling module 'spimemio_xfer'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":446)
+WARN  (EX3791) : Expression size 8 truncated to fit in target size 4("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":592)
+WARN  (EX3791) : Expression size 25 truncated to fit in target size 24("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":268)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 20("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":336)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 9("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":343)
+WARN  (EX3791) : Expression size 11 truncated to fit in target size 10("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":352)
+Compiling module 'rst_sync'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\rst_sync.sv":3)
+Compiling module 'clk51mhz'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk51mhz.sv":1)
+WARN  (EX1998) : Net 'i_mbus_sram_addr[0][31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":104)
+WARN  (EX1998) : Net 'i_mbus_sram_wdata[0][31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":105)
+WARN  (EX1998) : Net 'i_mbus_sram_wstrb[0][3]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":106)
+WARN  (EX1998) : Net 'i_mbus_sram_valid[0]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":108)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_addr[31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":111)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_wdata[31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":112)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_wstrb[3]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":113)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_valid' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":115)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_addr[31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":125)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_wdata[31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":126)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_wstrb[3]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":127)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_valid' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":129)
+Compiling module 'user'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":28)
+NOTE  (EX0101) : Current top module is "autogen_top_wrapper"
+WARN  (EX0211) : The output port "uart_tx_valid" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":40)
+WARN  (EX0211) : The output port "uart_tx_data[7]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[6]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[5]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[4]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[3]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[2]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[1]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[0]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_rx_ready" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":44)
+[5%] Running netlist conversion ...
+WARN  (CV0018) : Input pad_user_buttons_n[1] is unused("C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":48)
+WARN  (CV0016) : Input pad_ser_rx is unused("C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":50)
+Running device independent optimization ...
+[10%] Optimizing Phase 0 completed
+[15%] Optimizing Phase 1 completed
+[25%] Optimizing Phase 2 completed
+Running inference ...
+[30%] Inferring Phase 0 completed
+[40%] Inferring Phase 1 completed
+[50%] Inferring Phase 2 completed
+[55%] Inferring Phase 3 completed
+Running technical mapping ...
+[60%] Tech-Mapping Phase 0 completed
+[65%] Tech-Mapping Phase 1 completed
+[75%] Tech-Mapping Phase 2 completed
+[80%] Tech-Mapping Phase 3 completed
+[90%] Tech-Mapping Phase 4 completed
+WARN  (NL0002) : The module "axis_skid_buffer_fp_opt" instantiated to "[0].hyperram_skb_inst" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":550)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_0" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":664)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_1" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":676)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_2" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":688)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_3" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":700)
+WARN  (NL0002) : The module "axis_bus_to_axis_bus_ce" instantiated to "saxisce_spimemcfg_inst" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":254)
+WARN  (NL0002) : The module "axis_fifo_sync" instantiated to "rx_buffer_inst" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":456)
+[95%] Generate netlist file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9.vg" completed
+[100%] Generate report file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9_syn.rpt.html" completed
+GowinSynthesis finish
+Synthesis complete
+Launching Place-and-Route
+Reading netlist file: "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9.vg"
+Parsing netlist file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9.vg" completed
+Processing netlist completed
+Reading constraint file: "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\constraints\location.cst"
+Physical Constraint parsed completed
+Running placement......
+[10%] Placement Phase 0 completed
+[20%] Placement Phase 1 completed
+[30%] Placement Phase 2 completed
+[50%] Placement Phase 3 completed
+Running routing......
+[60%] Routing Phase 0 completed
+[70%] Routing Phase 1 completed
+[80%] Routing Phase 2 completed
+[90%] Routing Phase 3 completed
+Running timing analysis......
+[95%] Timing analysis completed
+Placement and routing completed
+Bitstream generation in progress......
+Bitstream generation completed
+Running power analysis......
+[100%] Power analysis completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.power.html" completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.pin.html" completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.rpt.html" completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.rpt.txt" completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.tr.html" completed
+Sat Mar 28 18:44:01 2026
+
+Deploying bitstream
+
+=====================================
+ BUILD SUCCESS
+=====================================
+.fs file ready at: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+.fs file copied to: C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9.fs
+
+Build time: 0m 7s
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+Erasing embFlash ...: [                         ] 0%                  Status Code is: 0x00039020
+Erasing embFlash ...: [#########################] 100%
+Programing...: [#########################] 100%
+ Status Code is: 0x0003F020
+ User Code: 0x00005AAC
+ Program Finished!
+ Finished.
+ Cost 7.57 second(s)
+
+
+=====================================
+ PROGRAMMING SUCCESS
+=====================================
+Board programmed successfully.
+The design will auto-load on every power-on.
+PS C:\github repo\BRS-100-GW1NR9\windows> 
+
+
+
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -c -k 66
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.16 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Clean build requested - cleaning build output first...
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ CLEAN TARGET BUILD OUTPUT
+=====================================
+Cleaned: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+=====================================
+ CLEAN COMPLETE
+=====================================
+
+Rebuilding firmware...
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+Setting up build output directory...
+  Created artifacts dir: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts
+Generating autogen_top_wrapper.sv...
+  Git commit  : e2503fd-dirty
+  Build time  : 2026-03-28 18:46:41
+  Version str : FW: e2503fd-dirty|2026-03-28 18:46:41
+  Generated   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv
+
+=====================================
+ BRS-100-GW1NR9 Windows Build
+=====================================
+Repo     : C:\github repo\BRS-100-GW1NR9
+Platform : gowin
+Output   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+Device   : GW1NR-LV9QN88PC7/I6 (vC, C7I6)
+Clock    : 66 MHz
+UART     : 115200 baud
+Reset    : enabled
+Mode     : LED blink (user.sv)
+Build    : full build
+GOWIN    : Gowin_V1.9.12.02_x64
+=====================================
+Starting build...
+
+License verification failed  Server not responding.
+
+=====================================
+ BUILD FAILED (exit code: 1)
+=====================================
+Failed after: 0m 1s
+
+ERROR: Build failed - cannot program board.
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -c -k 66
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.15 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Clean build requested - cleaning build output first...
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ CLEAN TARGET BUILD OUTPUT
+=====================================
+Cleaned: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+=====================================
+ CLEAN COMPLETE
+=====================================
+
+Rebuilding firmware...
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+Setting up build output directory...
+  Created artifacts dir: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts
+Generating autogen_top_wrapper.sv...
+  Git commit  : e2503fd-dirty
+  Build time  : 2026-03-28 18:46:53
+  Version str : FW: e2503fd-dirty|2026-03-28 18:46:53
+  Generated   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv
+
+=====================================
+ BRS-100-GW1NR9 Windows Build
+=====================================
+Repo     : C:\github repo\BRS-100-GW1NR9
+Platform : gowin
+Output   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+Device   : GW1NR-LV9QN88PC7/I6 (vC, C7I6)
+Clock    : 66 MHz
+UART     : 115200 baud
+Reset    : enabled
+Mode     : LED blink (user.sv)
+Build    : full build
+GOWIN    : Gowin_V1.9.12.02_x64
+=====================================
+Starting build...
+
+*** GOWIN Tcl Command Line Console  *** 
+Creating Gowin FPGA project 'BRS-100-GW1NR9' specs -
+        Target part number: GW1NR-LV9QN88PC7/I6
+        Target part version: C
+current working directory: C:/github repo/BRS-100-GW1NR9/build/platforms/gowin/devices/GW1NR-9/C7I6/output/BRS-100-GW1NR9
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/axis_bus_to_axis_bus_ce.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/axis_skid_buffer.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/axis_skid_buffer_fp_opt.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/mbus_skid_buffer.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/reg_sync.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/rst_sync.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/dff_sync.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/muxes.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/uart.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/util.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/systemverilog/user.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clkdiv5.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clkdiv2.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk51mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk66mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk75mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk81mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/clk87mhz.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/top.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/flash_memory.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/ram_memory.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/psram_controller.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/foreign/gowin/GW1NR-9/C7I6/systemverilog/board_demonstration.sv"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/vhdl/axis_fifo_sync.vhd"
+add new file: "C:\github repo\BRS-100-GW1NR9/proj/common/vhdl/utils.vhd"
+add new file: "../../constraints/location.cst"
+add new file: "../../constraints/timing_66mhz.sdc"
+add new file: "../.artifacts/autogen_top_wrapper.sv"
+Project generation complete
+Launching Synthesis
+GowinSynthesis start
+Running parser ...
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_bus_to_axis_bus_ce.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer_fp_opt.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\mbus_skid_buffer.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\reg_sync.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\rst_sync.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\dff_sync.sv'
+WARN  (EX2478) : Non-net output port 'sync' cannot be initialized at declaration in SystemVerilog mode("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\dff_sync.sv":36)
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\muxes.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\util.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clkdiv5.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clkdiv2.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk51mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk66mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk75mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk81mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk87mhz.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv'
+Undeclared symbol 'ck_tbuf_n', assumed default net type 'wire'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":197)
+WARN  (EX2478) : Non-net output port 'dout' cannot be initialized at declaration in SystemVerilog mode("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":16)
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\board_demonstration.sv'
+Analyzing Verilog file 'C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv'     
+Analyzing VHDL file 'C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\utils.vhd'
+Analyzing package 'utils'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\utils.vhd":10)
+Analyzing package body 'utils'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\utils.vhd":38)
+Analyzing VHDL file 'C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd'
+Analyzing entity 'axis_fifo_sync'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":9)
+Analyzing architecture 'rtl'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":30)
+Compiling module 'autogen_top_wrapper'("C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":37)
+WARN  (EX3073) : Port 'xip_fifo_almost_full' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":201)
+WARN  (EX3073) : Port 'cfg_mode_enabled' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":279)
+Compiling module 'top(VERSION="W: e2503fd-dirty|2026-03-28 18:46:53",CLK_FREQUENCY_MHZ=66,UART_BAUD=115200,PUSHBUTTON0_AS_RESET=1)'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":28)
+Compiling module 'uart(OUTPUT_BUFFER_ENABLE=1,INPUT_BUFFER_ENABLE=1,INC_RX_ESC_SEQUENCE_FILTER=0)'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":26)
+WARN  (EX3791) : Expression size 17 truncated to fit in target size 16("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":156)  
+WARN  (EX3791) : Expression size 5 truncated to fit in target size 4("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":196)
+Switching to VHDL mode to elaborate design unit 'axis_fifo_sync'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":468)        
+Processing 'axis_fifo_sync(g_data_bits=8,g_depth=128)(rtl)'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":9)
+Extracting RAM for identifier 'memory'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":39)
+Returning to Verilog mode to proceed with elaboration("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":468)
+Switching to VHDL mode to elaborate design unit 'axis_fifo_sync'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":520)        
+Returning to Verilog mode to proceed with elaboration("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":520)
+WARN  (EX3791) : Expression size 17 truncated to fit in target size 16("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":546)  
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 5("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":568)   
+WARN  (EX3670) : Actual bit length 32 differs from formal bit length 16 for port 'divider'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":159)
+Compiling module 'ram_memory(IF=1,CLK_FREQ_HZ=66000000,XIP_FIFO_DEPTH_WORDS=8)'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":58)
+WARN  (EX3791) : Expression size 21 truncated to fit in target size 20("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":413)
+Switching to VHDL mode to elaborate design unit 'axis_fifo_sync'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":463)
+Processing 'axis_fifo_sync(g_data_bits=52,g_depth=8)(rtl)'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":9)
+Extracting RAM for identifier 'memory'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axis_fifo_sync.vhd":39)
+Returning to Verilog mode to proceed with elaboration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":463)
+Compiling module 'axis_skid_buffer_fp_opt(pDATA_LEN=32,pID_LEN=1,pUSER_LEN=1)'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_skid_buffer_fp_opt.sv":26)
+WARN  (EX3073) : Port 'Q1' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":176)
+WARN  (EX3073) : Port 'Q1' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":193)
+WARN  (EX3073) : Port 'Q1' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":198)
+Compiling module 'psram_controller(FREQ=66000000,LATENCY=3)'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":1)
+WARN  (EX3791) : Expression size 16 truncated to fit in target size 15("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":148)
+WARN  (EX2565) : Input 'TX' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":176)
+WARN  (EX2565) : Input 'TX' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":193)
+WARN  (EX2565) : Input 'TX' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\psram_controller.sv":198)
+Compiling module 'sram_8k'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":30)
+Extracting RAM for identifier 'mem'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":41)
+WARN  (EX2565) : Input 's_id[0]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":550)
+WARN  (EX2565) : Input 's_user[0]' on this instance is undriven. Assigning to 0, simulation mismatch possible. Please assign the input or remove the declaration("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":550)
+Compiling module 'axis_bus_to_axis_bus_ce'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\axis_bus_to_axis_bus_ce.sv":26)
+Compiling module 'flash_memory'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":3)
+Compiling module 'spi_puya'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":74)
+Compiling module 'spimemio_xfer'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":446)
+WARN  (EX3791) : Expression size 8 truncated to fit in target size 4("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":592)
+WARN  (EX3791) : Expression size 25 truncated to fit in target size 24("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\flash_memory.sv":268)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 20("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":336)
+WARN  (EX3791) : Expression size 32 truncated to fit in target size 9("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":343)
+WARN  (EX3791) : Expression size 11 truncated to fit in target size 10("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":352)
+Compiling module 'rst_sync'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\rst_sync.sv":3)
+Compiling module 'clk66mhz'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\clk66mhz.sv":1)
+WARN  (EX1998) : Net 'i_mbus_sram_addr[0][31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":104)
+WARN  (EX1998) : Net 'i_mbus_sram_wdata[0][31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":105)
+WARN  (EX1998) : Net 'i_mbus_sram_wstrb[0][3]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":106)
+WARN  (EX1998) : Net 'i_mbus_sram_valid[0]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":108)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_addr[31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":111)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_wdata[31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":112)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_wstrb[3]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":113)
+WARN  (EX1998) : Net 'i_mbus_spimemcfg_valid' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":115)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_addr[31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":125)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_wdata[31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":126)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_wstrb[3]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":127)
+WARN  (EX1998) : Net 'i_mbus_spimemxip_valid' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":129)
+Compiling module 'user'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":28)
+NOTE  (EX0101) : Current top module is "autogen_top_wrapper"
+WARN  (EX0211) : The output port "uart_tx_valid" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":40)
+WARN  (EX0211) : The output port "uart_tx_data[7]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[6]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[5]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[4]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[3]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[2]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[1]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_tx_data[0]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
+WARN  (EX0211) : The output port "uart_rx_ready" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":44)
+[5%] Running netlist conversion ...
+WARN  (CV0018) : Input pad_user_buttons_n[1] is unused("C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":48)
+WARN  (CV0016) : Input pad_ser_rx is unused("C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":50)
+Running device independent optimization ...
+[10%] Optimizing Phase 0 completed
+[15%] Optimizing Phase 1 completed
+[25%] Optimizing Phase 2 completed
+Running inference ...
+[30%] Inferring Phase 0 completed
+[40%] Inferring Phase 1 completed
+[50%] Inferring Phase 2 completed
+[55%] Inferring Phase 3 completed
+Running technical mapping ...
+[60%] Tech-Mapping Phase 0 completed
+[65%] Tech-Mapping Phase 1 completed
+[75%] Tech-Mapping Phase 2 completed
+[80%] Tech-Mapping Phase 3 completed
+[90%] Tech-Mapping Phase 4 completed
+WARN  (NL0002) : The module "axis_skid_buffer_fp_opt" instantiated to "[0].hyperram_skb_inst" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":550)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_0" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":664)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_1" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":676)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_2" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":688)
+WARN  (NL0002) : The module "sram_8k" instantiated to "sram_8k_inst_3" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\ram_memory.sv":700)
+WARN  (NL0002) : The module "axis_bus_to_axis_bus_ce" instantiated to "saxisce_spimemcfg_inst" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":254)
+WARN  (NL0002) : The module "axis_fifo_sync" instantiated to "rx_buffer_inst" is swept in optimizing("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":456)
+[95%] Generate netlist file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9.vg" completed
+[100%] Generate report file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9_syn.rpt.html" completed
+GowinSynthesis finish
+Synthesis complete
+Launching Place-and-Route
+Reading netlist file: "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9.vg"
+Parsing netlist file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9.vg" completed
+Processing netlist completed
+Reading constraint file: "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\constraints\location.cst"
+Physical Constraint parsed completed
+Running placement......
+[10%] Placement Phase 0 completed
+[20%] Placement Phase 1 completed
+[30%] Placement Phase 2 completed
+[50%] Placement Phase 3 completed
+Running routing......
+[60%] Routing Phase 0 completed
+[70%] Routing Phase 1 completed
+[80%] Routing Phase 2 completed
+[90%] Routing Phase 3 completed
+Running timing analysis......
+[95%] Timing analysis completed
+Placement and routing completed
+Bitstream generation in progress......
+Bitstream generation completed
+Running power analysis......
+[100%] Power analysis completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.power.html" completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.pin.html" completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.rpt.html" completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.rpt.txt" completed
+Generate file "C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\pnr\BRS-100-GW1NR9.tr.html" completed
+Sat Mar 28 18:47:00 2026
+
+Deploying bitstream
+
+=====================================
+ BUILD SUCCESS
+=====================================
+.fs file ready at: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+.fs file copied to: C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9.fs
+
+Build time: 0m 7s
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+Erasing embFlash ...: [                         ] 0%                  Status Code is: 0x00039020
+Erasing embFlash ...: [#########################] 100%
+Programing...: [#########################] 100%
+ Status Code is: 0x0003F020
+ User Code: 0x00003B1F
+ Program Finished!
+ Finished.
+ Cost 7.57 second(s)
+
+
+=====================================
+ PROGRAMMING SUCCESS
+=====================================
+Board programmed successfully.
+The design will auto-load on every power-on.
+PS C:\github repo\BRS-100-GW1NR9\windows> ^C
+PS C:\github repo\BRS-100-GW1NR9\windows> ^C
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -jtag_frequency 2.5MHz 
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.12 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Detected firmware already built - reusing.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 2.5MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 2.5MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@2.5MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+Erasing embFlash ...: [                         ] 0%                  Status Code is: 0x00019020
+Erasing embFlash ...: [#########################] 100%
+Programing...: [#########################] 100%
+ Status Code is: 0x0001F020
+ User Code: 0x00003B1F
+ Program Finished!
+ Finished.
+ Cost 10.1 second(s)
+
+
+=====================================
+ PROGRAMMING SUCCESS
+=====================================
+Board programmed successfully.
+The design will auto-load on every power-on.
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -jtag_frequency 0.01MHz
+ERROR: Invalid JTAG frequency '0.01MHz'.
+Valid values: 2.5MHz, 2MHz, 15MHz, 10MHz, 1.5MHz, 1.1MHz, 0.9MHz, 0.75MHz, 0.5MHz, 0.3MHz, 0.4MHz, 0.1MHz, 0.02MHz
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -jtag_frequency 114514MHz
+ERROR: Invalid JTAG frequency '114514MHz'.
+Valid values: 2.5MHz, 2MHz, 15MHz, 10MHz, 1.5MHz, 1.1MHz, 0.9MHz, 0.75MHz, 0.5MHz, 0.3MHz, 0.4MHz, 0.1MHz, 0.02MHz
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -jtag_frequency 0.02MHz  
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.07 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Detected firmware already built - reusing.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+
+=====================================
+ PROGRAMMING FAILED (exit code: 1)
+=====================================
+
+Common causes:
+  1. Board not plugged in via USB-C
+  2. Wrong USB cable (must support data, not just power)
+  3. GOWIN Programmer GUI is open - close it and try again
+  4. Driver issue - try unplugging and replugging the board
+  5. License issue - check GOWIN license via IDE: Help > Manage License
+
+If the script froze and you had to Ctrl+C, see:
+  windows\TROUBLESHOOTING.txt
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -jtag_frequency 0.02MHz
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.1 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Detected firmware already built - reusing.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+Erasing embFlash ...: [                         ] 0%                  Status Code is: 0x00039020
+Erasing embFlash ...: [#########################] 100%
+Programing...: [#########################] 100%
+ Status Code is: 0x0003F020
+ User Code: 0x00003B1F
+ Program Finished!
+ Finished.
+ Cost 7.52 second(s)
+
+
+=====================================
+ PROGRAMMING SUCCESS
+=====================================
+Board programmed successfully.
+The design will auto-load on every power-on.
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -jtag_frequency 0.012MHz
+ERROR: Invalid JTAG frequency '0.012MHz'.
+Valid values: 2.5MHz, 2MHz, 15MHz, 10MHz, 1.5MHz, 1.1MHz, 0.9MHz, 0.75MHz, 0.5MHz, 0.3MHz, 0.4MHz, 0.1MHz, 0.02MHz
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -jtag_frequency 0.012MHz^C
+PS C:\github repo\BRS-100-GW1NR9\windows> 
+
+
+
+
+
+
+
+
+
+=======================================
+TESTING BOARD UNPLUGGED WHEN RUNNING SCRIPT: 
+=======================================
+
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1                          
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+WARNING: No FTDI devices found for reset.
+FTDI USB reset skipped - proceeding anyway.
+
+Scanning for connected cables (ftd2xx)...
+ Cost 0.02 second(s)   
+
+ERROR: Could not find JTAG interface (USB Debugger A, index 0).
+
+Common causes:
+  1. Board not plugged in via USB-C
+  2. Wrong USB cable (must support data, not just power)
+  3. Driver issue - try unplugging and replugging the board
+PS C:\github repo\BRS-100-GW1NR9\windows> 
+
+
+

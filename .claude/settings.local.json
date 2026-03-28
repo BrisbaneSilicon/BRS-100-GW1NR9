@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -NoProfile -Command '& \"\".\\\\program_board_v0.6.ps1\"\" -h')",
+      "Bash(powershell -NoProfile -Command '& \"\".\\\\program_board_v0.6.ps1\"\" -d')"
+    ]
+  }
+}

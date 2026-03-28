@@ -42,7 +42,7 @@
 #               -m / --custom_bitfile     program a custom .fs file
 # version 0.4 - detect programmer.exe GUI running (exclusive cable lock)
 #               -k / --clock_frequency    pass clock frequency to build script
-#               -f / --jtag_frequency     override JTAG programming frequency
+#               -f / -jtag_frequency     override JTAG programming frequency
 #               warn if programmer.exe is running before cable scan
 # version 0.4.1 - fix intermittent hang during embFlash erase:
 #               programmer_cli.exe occasionally hangs because the ftd2xx driver
@@ -59,7 +59,7 @@
 #               -c / --clean_target_prior         renamed from --clean to match Linux
 #               -f / --update_flash_only          dummy flag (Xilinx only, not implemented)
 #               -t / --custom_target              dummy flag (single target, not implemented)
-#               --jtag_frequency                  renamed from -f (no short flag, avoids -f collision)
+#               -jtag_frequency                   renamed from -f (no short flag, avoids -f collision)
 # version 0.6 - add author and copyright statement
 #               update help text references to v0.6
 # =============================================================
@@ -163,7 +163,7 @@ function Show-Help {
     Write-Host "        auto-triggering a build. Ignored when using -m (custom bitfile)."
     Write-Host "        Valid values: 51, 66, 75, 81, 87 (default: 51)"
     Write-Host ""
-    Write-Host "    --jtag_frequency  <freq>"
+    Write-Host "    -jtag_frequency  <freq>"
     Write-Host "        Override the JTAG programming clock frequency (default: 0.5MHz)."
     Write-Host "        Valid values: $($ValidJtagFrequencies -join ', ')"
     Write-Host "        (Windows-only flag, no short form to avoid collision with -f)"
@@ -187,7 +187,7 @@ function Show-Help {
     Write-Host "    .\program_board_v0.6.ps1 -c -k 75"
     Write-Host "        Clean, rebuild at 75 MHz, and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.6.ps1 --jtag_frequency 2.5MHz"
+    Write-Host "    .\program_board_v0.6.ps1 -jtag_frequency 2.5MHz"
     Write-Host "        Program at 2.5MHz JTAG speed (faster, less reliable)."
     Write-Host ""
     Write-Host "IMPORTANT NOTICE"
@@ -677,30 +677,45 @@ Write-Host "JTAG interface found at USB location: $cableLocation - proceeding."
 
 # ---- BUILD IF NEEDED (skipped when -m custom bitfile is provided) ----
 if (-not $CustomBitfile) {
-    if (-not (Test-Path $FsFile) -or $CleanBuild) {
-        if ($CleanBuild) {
+    # match Linux program_board.sh flow:
+    #   1. if -c flag, clean build output first (separate step)
+    #   2. then check if firmware exists
+    #   3. if not, trigger a normal build (without -c)
+    if (-not (Test-Path $BuildScript)) {
+        Write-Host "ERROR: Cannot find build script at: $BuildScript"
+        Write-Host "Please check the build script exists at that location."
+        exit 1
+    }
+
+    if ($CleanBuild) {
+        Write-Host ""
+        Write-Host "Clean build requested - cleaning build output first..."
+        Write-Host ""
+
+        $cleanArgs = @{ c = $true }
+        & $BuildScript @cleanArgs
+
+        if ($LASTEXITCODE -ne 0) {
             Write-Host ""
-            Write-Host "Clean build requested - triggering build with -c flag..."
-        } else {
+            Write-Host "ERROR: Clean failed."
+            exit 1
+        }
+    }
+
+    if (-not (Test-Path $FsFile)) {
+        if (-not $CleanBuild) {
             Write-Host ""
             Write-Host "Detected firmware not built - triggering build..."
+        } else {
+            Write-Host ""
+            Write-Host "Rebuilding firmware..."
         }
         Write-Host ""
 
-        if (-not (Test-Path $BuildScript)) {
-            Write-Host "ERROR: Cannot find build script at: $BuildScript"
-            Write-Host "Please check the build script exists at that location."
-            exit 1
-        }
-
-        # build the argument list for the build script
-        $buildArgs = @()
-        if ($CleanBuild) {
-            $buildArgs += "-c"
-        }
+        # build without -c (clean already done above if requested)
+        $buildArgs = @{}
         if ($ClockMhz -gt 0) {
-            $buildArgs += "-k"
-            $buildArgs += $ClockMhz
+            $buildArgs['k'] = $ClockMhz
         }
 
         & $BuildScript @buildArgs
@@ -728,7 +743,7 @@ if (-not $CustomBitfile) {
 # required together to force the correct ftd2xx driver path:
 #   --cable-index 4  : selects "USB Debugger A" cable type (ftd2xx driver)
 #   --location <loc> : targets the specific USB device (from --scan-cables F)
-#   --frequency      : JTAG clock speed (default 0.5MHz, configurable via --jtag_frequency)
+#   --frequency      : JTAG clock speed (default 0.5MHz, configurable via -jtag_frequency)
 # without all three, programmer_cli falls back to FT2CH and fails with CRC errors.
 # operation_index 5 = embFlash Erase,Program (matches Linux build.sh behaviour)
 Write-Host ""
@@ -750,6 +765,8 @@ Write-Host ""
 
 # echo exact command line before executing (matches Linux behaviour)
 Write-Host "Program command line: '$ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile'"
+Write-Host ""
+Write-Host "*** GOWIN programmer_cli Command Line Console ***"
 Write-Host ""
 
 & $ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile

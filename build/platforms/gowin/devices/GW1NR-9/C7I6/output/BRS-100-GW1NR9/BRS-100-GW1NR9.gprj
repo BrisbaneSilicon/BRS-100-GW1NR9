@@ -32,6 +32,6 @@
         <File path="C:/github repo/BRS-100-GW1NR9/proj/common/vhdl/axis_fifo_sync.vhd" type="file.vhdl" enable="1"/>
         <File path="C:/github repo/BRS-100-GW1NR9/proj/common/vhdl/utils.vhd" type="file.vhdl" enable="1"/>
         <File path="C:/github repo/BRS-100-GW1NR9/build/platforms/gowin/devices/GW1NR-9/C7I6/constraints/location.cst" type="file.cst" enable="1"/>
-        <File path="C:/github repo/BRS-100-GW1NR9/build/platforms/gowin/devices/GW1NR-9/C7I6/constraints/timing_51mhz.sdc" type="file.sdc" enable="1"/>
+        <File path="C:/github repo/BRS-100-GW1NR9/build/platforms/gowin/devices/GW1NR-9/C7I6/constraints/timing_66mhz.sdc" type="file.sdc" enable="1"/>
     </FileList>
 </Project>
