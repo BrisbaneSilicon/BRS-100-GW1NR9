@@ -1,0 +1,617 @@
+================================================================================
+ build_v0.7.ps1 Test Results
+ Date: 2026-03-28
+ Tested by: Claude
+================================================================================
+
+
+================================================================================
+ GROUP 1: INFO / QUERY FLAGS
+================================================================================
+
+--- Test 1: .\build_v0.7.ps1 -h ---
+Result: PASS
+
+Usage: .\build.ps1 [OPTIONS]
+
+  Core Build Options:
+  -b, -board_demonstration            Board demonstration mode (default: LED blink)
+  -k, -clock_frequency <MHz>          System clock frequency in MHz (default: 51)
+  -u, -uart_baud <baud>               UART baud rate (default: 115200)
+  -r, -disable_pushbutton_reset       Disable pushbutton 1 as reset (default: enabled)
+  -p, -proj_only                      Generate project file only, then exit
+  -s, -synth_only                     Stop after synthesis, then exit
+  -a, -clean_all_platforms            Delete all build output and exit
+  -c, -clean                          Delete current target build output and exit
+  -y, -list_supported_system_clock_frequencies   List valid clock frequencies and exit
+  -d, -list_default_target            Print default target and exit
+  -i, -list_supported_platforms       List supported platforms and exit
+  -l, -list_supported_targets         List supported targets and exit
+  -h, -help                           Show this help and exit
+
+  Not Yet Implemented:
+  -t, -custom_target <TARGET>         Target a different board
+  -f, -platform <PLATFORM>            Specify platform explicitly
+  -m, -clean_platform                 Clean all devices for platform and exit
+
+  Examples:
+  .\build.ps1                         Default LED blink build
+  .\build.ps1 -b                      Board demonstration build
+  .\build.ps1 -k 66                   LED blink at 66 MHz
+  .\build.ps1 -b -k 66                Board demo at 66 MHz
+  .\build.ps1 -u 9600                 LED blink with 9600 baud UART
+  .\build.ps1 -r                      Disable pushbutton reset
+  .\build.ps1 -p                      Generate project file only
+  .\build.ps1 -s                      Run synthesis only
+  .\build.ps1 -a                      Clean all build output
+  .\build.ps1 -c                      Clean current target build output
+  .\build.ps1 -y                      List supported clock frequencies
+  .\build.ps1 -d                      Print default target
+  .\build.ps1 -i                      List supported platforms
+  .\build.ps1 -l                      List supported targets
+
+
+--- Test 2: .\build_v0.7.ps1 -d ---
+Result: PASS
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+Default target: BRS-100-GW1NR9
+
+
+--- Test 3: .\build_v0.7.ps1 -i ---
+Result: PASS
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ Supported Platforms
+=====================================
+  gowin
+  xilinx
+=====================================
+
+
+--- Test 4: .\build_v0.7.ps1 -l ---
+Result: PASS
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ Supported Targets
+=====================================
+  BRS-100-GW1NR9
+=====================================
+
+
+--- Test 5: .\build_v0.7.ps1 -y ---
+Result: PASS
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ Supported System Clock Frequencies
+=====================================
+Platform : gowin
+Target   : BRS-100-GW1NR9
+Freq MHz : 51, 66, 75, 81, 87
+=====================================
+
+
+================================================================================
+ GROUP 2: INPUT VALIDATION
+================================================================================
+
+--- Test 6: .\build_v0.7.ps1 -k 999 ---
+Result: PASS (exit code 1)
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+ERROR: Clock frequency 999 MHz is not supported.
+
+Supported frequencies (MHz): 51, 66, 75, 81, 87
+Use .\build.ps1 -y to list supported frequencies.
+
+
+--- Test 7: .\build_v0.7.ps1 -k 51 ---
+Result: PASS (tested manually)
+
+
+--- Test 8: .\build_v0.7.ps1 -t "FAKE-BOARD" ---
+Result: PASS (exit code 1)
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+ERROR: Build target 'FAKE-BOARD' is not supported.
+
+Supported targets:
+  BRS-100-GW1NR9
+
+Note: -t / -custom_target is not yet fully implemented.
+      Only the default target 'BRS-100-GW1NR9' is currently supported.
+
+
+--- Test 9: Run from outside git repo ---
+Result: PASS (exit code 1)
+
+ERROR: Could not determine repo root from Git.
+Make sure Git is installed and you are running this script from inside the repository.
+
+
+================================================================================
+ GROUP 3: CLEAN OPERATIONS
+================================================================================
+
+--- Test 10: .\build_v0.7.ps1 -c (output exists) ---
+Result: PASS (exit code 0)
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ CLEAN TARGET BUILD OUTPUT
+=====================================
+Cleaned: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+=====================================
+ CLEAN COMPLETE
+=====================================
+
+
+--- Test 11: .\build_v0.7.ps1 -c (no output dir) ---
+Result: PASS (exit code 0)
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ CLEAN TARGET BUILD OUTPUT
+=====================================
+Nothing to clean at: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+=====================================
+ CLEAN COMPLETE
+=====================================
+
+
+--- Test 12: .\build_v0.7.ps1 -a then type n ---
+Result: PASS (exit code 0)
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ CLEAN ALL BUILD OUTPUT
+=====================================
+
+WARNING: The following folders will be permanently deleted.
+There is no way to restore them without rebuilding.
+
+  C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output (does not exist, nothing to clean)
+  C:\github repo\BRS-100-GW1NR9\windows\output
+
+n
+Clean cancelled.
+
+
+--- Test 13: .\build_v0.7.ps1 -a then type y ---
+Result: PASS (exit code 0)
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ CLEAN ALL BUILD OUTPUT
+=====================================
+
+WARNING: The following folders will be permanently deleted.
+There is no way to restore them without rebuilding.
+
+  C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output (does not exist, nothing to clean)
+  C:\github repo\BRS-100-GW1NR9\windows\output
+
+y
+
+Nothing to clean at: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+Cleaned: C:\github repo\BRS-100-GW1NR9\windows\output
+
+=====================================
+ CLEAN COMPLETE
+=====================================
+
+
+--- Test 14: .\build_v0.7.ps1 -a (neither dir exists) ---
+Result: SKIP (covered by test 13 output which showed "does not exist" for build output dir)
+
+
+================================================================================
+ GROUP 4: BUILD MODES
+================================================================================
+
+--- Test 15: .\build_v0.7.ps1 (default LED blink build) ---
+Result: PASS (exit code 0, build time 7s)
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+Setting up build output directory...
+  Created artifacts dir: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts
+Generating autogen_top_wrapper.sv...
+  Git commit  : c4a664e-dirty
+  Build time  : 2026-03-28 21:28:52
+  Version str : FW: c4a664e-dirty|2026-03-28 21:28:52
+  Generated   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv
+
+=====================================
+ BRS-100-GW1NR9 Windows Build
+=====================================
+Repo     : C:\github repo\BRS-100-GW1NR9
+Platform : gowin
+Output   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+Device   : GW1NR-LV9QN88PC7/I6 (vC, C7I6)
+Clock    : 51 MHz
+UART     : 115200 baud
+Reset    : enabled
+Mode     : LED blink (user.sv)
+Build    : full build
+GOWIN    : Gowin_V1.9.12.02_x64
+=====================================
+Starting build...
+
+*** GOWIN Tcl Command Line Console  ***
+[... GOWIN synthesis and PnR output ...]
+Bitstream generation completed
+
+Deploying bitstream
+
+=====================================
+ BUILD SUCCESS
+=====================================
+.fs file ready at: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+.fs file copied to: C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9.fs
+
+Build time: 0m 7s
+
+
+--- Test 16: .\build_v0.7.ps1 -b (board demonstration) ---
+Result: PASS (exit code 0, build time 11s)
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+Setting up build output directory...
+  Cleaned old output: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+  Created artifacts dir: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts
+Generating autogen_top_wrapper.sv...
+  Git commit  : c4a664e-dirty
+  Build time  : 2026-03-28 21:29:07
+  Version str : FW: c4a664e-dirty|2026-03-28 21:29:07
+  Generated   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv
+
+=====================================
+ BRS-100-GW1NR9 Windows Build
+=====================================
+Repo     : C:\github repo\BRS-100-GW1NR9
+Platform : gowin
+Output   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+Device   : GW1NR-LV9QN88PC7/I6 (vC, C7I6)
+Clock    : 51 MHz
+UART     : 115200 baud
+Reset    : enabled
+Mode     : board demonstration
+Build    : full build
+GOWIN    : Gowin_V1.9.12.02_x64
+=====================================
+Starting build...
+
+*** GOWIN Tcl Command Line Console  ***
+[... GOWIN synthesis and PnR output ...]
+Bitstream generation completed
+
+Deploying bitstream
+
+=====================================
+ BUILD SUCCESS
+=====================================
+.fs file ready at: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+.fs file copied to: C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9.fs
+
+Build time: 0m 11s
+
+
+--- Test 17: .\build_v0.7.ps1 -p (project only) ---
+Result: PASS (exit code 0, build time 1s)
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+Setting up build output directory...
+  Cleaned old output: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+  Created artifacts dir: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts
+Generating autogen_top_wrapper.sv...
+  Git commit  : c4a664e-dirty
+  Build time  : 2026-03-28 21:29:19
+  Version str : FW: c4a664e-dirty|2026-03-28 21:29:19
+  Generated   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv
+
+=====================================
+ BRS-100-GW1NR9 Windows Build
+=====================================
+Repo     : C:\github repo\BRS-100-GW1NR9
+Platform : gowin
+Output   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+Device   : GW1NR-LV9QN88PC7/I6 (vC, C7I6)
+Clock    : 51 MHz
+UART     : 115200 baud
+Reset    : enabled
+Mode     : LED blink (user.sv)
+Build    : project only
+GOWIN    : Gowin_V1.9.12.02_x64
+=====================================
+Starting build...
+
+*** GOWIN Tcl Command Line Console  ***
+[... project file generation ...]
+Project generation complete
+
+=====================================
+ PROJECT GENERATION COMPLETE
+=====================================
+Project files at: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9
+Project copied to: C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9
+
+Open GOWIN IDE and load the project from: C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9
+
+Build time: 0m 1s
+
+
+--- Test 18: .\build_v0.7.ps1 -s (synthesis only) ---
+Result: PASS (exit code 0, build time 3s)
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+Setting up build output directory...
+  Cleaned old output: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+  Created artifacts dir: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts
+Generating autogen_top_wrapper.sv...
+  Git commit  : c4a664e-dirty
+  Build time  : 2026-03-28 21:29:28
+  Version str : FW: c4a664e-dirty|2026-03-28 21:29:28
+  Generated   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv
+
+=====================================
+ BRS-100-GW1NR9 Windows Build
+=====================================
+Repo     : C:\github repo\BRS-100-GW1NR9
+Platform : gowin
+Output   : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+Device   : GW1NR-LV9QN88PC7/I6 (vC, C7I6)
+Clock    : 51 MHz
+UART     : 115200 baud
+Reset    : enabled
+Mode     : LED blink (user.sv)
+Build    : synthesis only
+GOWIN    : Gowin_V1.9.12.02_x64
+=====================================
+Starting build...
+
+*** GOWIN Tcl Command Line Console  ***
+[... GOWIN synthesis output ...]
+GowinSynthesis finish
+Synthesis complete
+
+=====================================
+ SYNTHESIS COMPLETE
+=====================================
+Synthesis report at: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\BRS-100-GW1NR9\impl\gwsynthesis\BRS-100-GW1NR9_syn.rpt.html
+Report copied to: C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9_syn.rpt.html
+
+Build time: 0m 3s
+
+
+--- Test 19: .\build_v0.7.ps1 -b -k 66 ---
+Result: PASS (tested manually)
+
+
+--- Test 20: .\build_v0.7.ps1 -u 9600 ---
+Result: PASS (tested manually)
+
+
+--- Test 21: .\build_v0.7.ps1 -r (disable pushbutton reset) ---
+Result: PASS (exit code 0, build time 7s)
+
+[... standard build output ...]
+Reset    : disabled
+[... GOWIN synthesis and PnR output ...]
+
+=====================================
+ BUILD SUCCESS
+=====================================
+.fs file ready at: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+.fs file copied to: C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9.fs
+
+Build time: 0m 7s
+
+
+================================================================================
+ GROUP 5: GOWIN DETECTION
+================================================================================
+
+--- Test 22: No GOWIN installed, no env var ---
+Result: PASS (tested manually)
+
+
+--- Test 23: Valid install auto-detected ---
+Result: PASS (observed in all build tests)
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+
+
+--- Test 24: GOWIN_INSTALL_DIR set to invalid path ---
+Result: PASS
+
+WARNING: GOWIN_INSTALL_DIR is set but gw_sh.exe not found at:
+  C:\fake\path\IDE\bin\gw_sh.exe
+Falling back to common path search...
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+Default target: BRS-100-GW1NR9
+
+
+--- Test 25: GOWIN v1.9.11.01 installed ---
+Result: SKIP (requires different GOWIN installation)
+
+
+--- Test 26: GOWIN v1.9.8 installed ---
+Result: SKIP (requires different GOWIN installation)
+
+
+================================================================================
+ GROUP 6: ARTIFACT VERIFICATION
+================================================================================
+
+--- Test 27: autogen_top_wrapper.sv parameters ---
+Result: PASS
+
+Verified parameters in generated file:
+    parameter reg   [(8*VERSION_CHARS)-1:0] VERSION                 = "FW: c4a664e-dirty|2026-03-28 21:29:32",
+    parameter int                           CLK_FREQUENCY_MHZ       = 51,
+    parameter int                           UART_BAUD               = 115200,
+    parameter int                           PUSHBUTTON0_AS_RESET    = 0,
+    parameter int                           BOARD_DEMONSTRATION     = 0
+
+
+--- Test 28: .fs file in both output locations ---
+Result: PASS
+
+-r--r--r-- 1 jingq 197610 2070604 Mar 28 21:29 .../output/.artifacts/BRS-100-GW1NR9.fs
+-r--r--r-- 1 jingq 197610 2070604 Mar 28 21:29 .../windows/output/BRS-100-GW1NR9.fs
+
+Both files present, identical size (2,070,604 bytes).
+
+
+--- Test 29: Build timing displayed ---
+Result: PASS (observed in all build tests)
+
+Test 15: Build time: 0m 7s
+Test 16: Build time: 0m 11s
+Test 17: Build time: 0m 1s
+Test 18: Build time: 0m 3s
+Test 21: Build time: 0m 7s
+
+
+--- Test 30: Back-to-back builds start clean ---
+Result: PASS
+
+Observed in tests 16, 17, 18, 21 — each showed:
+  "Cleaned old output: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output"
+  "Created artifacts dir: ..."
+confirming old output is wiped before each new build.
+
+
+================================================================================
+ SUMMARY
+================================================================================
+
+ Group 1 (Info/Query):       5/5  PASS
+ Group 2 (Validation):       4/4  PASS
+ Group 3 (Clean):            4/5  PASS (1 SKIP)
+ Group 4 (Build):            7/7  PASS
+ Group 5 (GOWIN Detection):  3/5  PASS (2 SKIP)
+ Group 6 (Artifacts):        4/4  PASS
+
+ Total: 27 PASS, 3 SKIP, 0 FAIL
+
+ PASS (Claude):  22
+ PASS (Manual):   4  (tests 7, 19, 20, 22)
+ SKIP:            3  (tests 14, 25, 26)
+ FAIL:            0
+
+
+
+
+CHECKING FOR BUILD ID AND BUILD DATE
+from putty COM4 115200 baud 
+
+0HBOARD: BRS-100-GW1NR9
+FW: c4a664e-dirty|2026-03-28 22:26:18
+
+matches with .fs file generated time and git head

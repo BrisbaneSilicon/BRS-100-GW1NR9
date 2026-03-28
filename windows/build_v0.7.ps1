@@ -1,3 +1,42 @@
+# =============================================================
+# build_v0.6.ps1
+# Windows build script for BRS-100-GW1NR9
+#
+# Author:    Bruce Mao
+# Copyright: (C) Brisbane Silicon, Pty Ltd. All rights reserved.
+#
+# The source code contained herein is provided on an "as is" basis.
+# Brisbane Silicon, Pty Ltd. disclaims any and all warranties,
+# whether express, implied, or statutory, including any implied
+# warranties of merchantability or of fitness for a particular
+# purpose. In no event shall Brisbane Silicon, Pty Ltd. be liable
+# for any incidental, punitive, or consequential damages of any
+# kind whatsoever arising from the use of this source code.
+#
+# This disclaimer of warranty extends to the user of this source
+# code and user's customers, employees, agents, transferees,
+# successors and assigns.
+#
+# This is not a grant of patent rights.
+#
+# =============================================================
+# version 0.1 - minimal functionality, hardcoded paths
+# version 0.2 - added command line options and generate_top_wrapper
+# version 0.3 - implemented -p, -s, -a flags, added /output copy, y/n prompt for -a
+# version 0.4 - auto-derive RepoRoot from Git, auto-detect GOWIN install path,
+#               version compatibility check
+# version 0.5 - validate -k against CSV, implement -y, add build timing
+# version 0.6 - read chip settings from CSV, nothing hardcoded
+#               implemented -d, -i, -l, -c flags
+#               derive OutputDir and BuildTcl from CSV values
+#               added empty CSV checks matching Linux return code pattern
+#               added generate_top_wrapper.ps1 existence check
+#               improved RepoRoot empty string handling
+# version 0.7 - implemented setup_build_output_directory — clean before build
+#               implemented is_supported_platform — validate platform exists
+#               note: xilinx not yet implemented. This script is currently only for GOWIN builds.
+# =============================================================
+
 param (
     # ---- CORE BUILD FLAGS ----
     [Alias('board_demonstration')]
@@ -40,7 +79,7 @@ param (
     [Alias('clean')]
     [switch]$c,
 
-    # ---- NOT YET IMPLEMENTED ----
+    # ---- NOT YET IMPLEMENTED, NOT IMPORTANT FOR CURRNET BOARD----
     [Alias('custom_target')]
     [string]$t          = "",
 
@@ -51,23 +90,8 @@ param (
     [switch]$m
 )
 
-# version 0.1 - minimal functionality, hardcoded paths
-# version 0.2 - added command line options and generate_top_wrapper
-# version 0.3 - implemented -p, -s, -a flags, added /output copy, y/n prompt for -a
-# version 0.4 - auto-derive RepoRoot from Git, auto-detect GOWIN install path,
-#               version compatibility check
-# version 0.5 - validate -k against CSV, implement -y, add build timing
-# version 0.6 - read chip settings from CSV, nothing hardcoded
-#               implemented -d, -i, -l, -c flags
-#               derive OutputDir and BuildTcl from CSV values
-#               added empty CSV checks matching Linux return code pattern
-#               added generate_top_wrapper.ps1 existence check
-#               improved RepoRoot empty string handling
-# version 0.7 - implemented setup_build_output_directory — clean before build
-#               implemented is_supported_platform — validate platform exists
-#               note: xilinx not yet implemented. This script is currently only for GOWIN builds.
 
-# ---- HELP ---- runs before any detection so -h works without GOWIN installed
+# ---- HELP ---- 
 if ($h) {
     Write-Host ""
     Write-Host "Usage: .\build.ps1 [OPTIONS]"
@@ -108,10 +132,28 @@ if ($h) {
     Write-Host "  .\build.ps1 -i                      List supported platforms"
     Write-Host "  .\build.ps1 -l                      List supported targets"
     Write-Host ""
+    Write-Host "AUTHOR"
+    Write-Host "    Written by Bruce Mao"
+    Write-Host ""
+    Write-Host "COPYRIGHT"
+    Write-Host "    (C) Brisbane Silicon, Pty Ltd. All rights reserved."
+    Write-Host ""
+    Write-Host "    The source code contained herein is provided on an `"as is`" basis. Brisbane Silicon, Pty Ltd."
+    Write-Host "    disclaims any and all warranties, whether express, implied, or statutory, including any implied"
+    Write-Host "    warranties of merchantability or of fitness for a particular purpose. In no event shall Brisbane"
+    Write-Host "    Silicon, Pty Ltd. be liable for any incidental, punitive, or consequential damages of any kind"
+    Write-Host "    whatsoever arising from the use of this source code."
+    Write-Host ""
+    Write-Host "    This disclaimer of warranty extends to the user of this source code and user's customers,"
+    Write-Host "    employees, agents, transferees, successors and assigns."
+    Write-Host ""
+    Write-Host "    This is not a grant of patent rights."
+    Write-Host ""
+
     exit 0
 }
 
-# ---- PROCESS CORE PARAMETERS INTO CLEAN VARIABLES ----
+# ---- CORE PARAMS ----
 $BoardDemonstration = if ($b) { 1 } else { 0 }
 $ClockMhz           = $k
 $UartBaud           = $u
@@ -119,8 +161,7 @@ $PushbuttonReset    = if ($r) { 0 } else { 1 }
 $DoProjectGenOnly   = if ($p) { "true" } else { "false" }
 $DoSynthOnly        = if ($s) { "true" } else { "false" }
 
-# ---- AUTO-DERIVE REPO ROOT FROM GIT ----
-# no longer hardcoded - works on any PC regardless of where repo is cloned
+# ---- REPO ROOT DETECTION ----
 $RepoRoot = (git rev-parse --show-toplevel 2>$null) -replace '/', '\'
 if (-not $RepoRoot -or $RepoRoot.Trim() -eq '') {
     Write-Host "ERROR: Could not determine repo root from Git."
@@ -128,10 +169,10 @@ if (-not $RepoRoot -or $RepoRoot.Trim() -eq '') {
     exit 1
 }
 
-# ---- AUTO-DETECT GOWIN INSTALL PATH ----
+# ---- GOWIN INSTALL PATH DETECTION ----
 $GowinInstallDir = $null
 
-# define common paths up front — used for both search and error message
+# define common paths for GOWIN v1.9.12.01 and v1.9.12.01
 $commonPaths = @(
     "C:\Gowin\Gowin_V1.9.12.01_x64",
     "C:\Gowin\Gowin_V1.9.12.01",
@@ -149,7 +190,7 @@ $commonPaths = @(
     "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.02"
 )
 
-# first check environment variable — allows user to override without editing script
+# check environment variable
 if ($env:GOWIN_INSTALL_DIR) {
     if (Test-Path "$env:GOWIN_INSTALL_DIR\IDE\bin\gw_sh.exe") {
         $GowinInstallDir = $env:GOWIN_INSTALL_DIR
@@ -161,7 +202,7 @@ if ($env:GOWIN_INSTALL_DIR) {
     }
 }
 
-# then check common install locations
+# check common install locations
 if (-not $GowinInstallDir) {
     foreach ($path in $commonPaths) {
         if (Test-Path "$path\IDE\bin\gw_sh.exe") {
@@ -171,7 +212,7 @@ if (-not $GowinInstallDir) {
     }
 }
 
-# if still not found — fail with clear instructions
+# cannot locate in common location and path
 if (-not $GowinInstallDir) {
     Write-Host ""
     Write-Host "ERROR: Could not find GOWIN EDA installation."
@@ -193,7 +234,6 @@ if (-not $GowinInstallDir) {
 }
 
 # ---- GOWIN VERSION COMPATIBILITY CHECK ----
-# note: more specific version checks must come before general ones
 $installFolderName = Split-Path $GowinInstallDir -Leaf
 Write-Host "Found GOWIN EDA at: $GowinInstallDir"
 
@@ -201,7 +241,6 @@ if ($installFolderName -like "*1.9.12*") {
     Write-Host "GOWIN version: $installFolderName (verified compatible)"
 
 } elseif ($installFolderName -like "*1.9.11.01*") {
-    # must be checked BEFORE *1.9.11* otherwise this case is never reached
     Write-Host ""
     Write-Host "ERROR: GOWIN EDA V1.9.11.01 is a known broken release."
     Write-Host "Please install V1.9.12.01 from:"
@@ -245,8 +284,7 @@ $WindowsOutputDir   = "$PSScriptRoot\output"
 $Platform           = "gowin"
 
 # ---- IS_SUPPORTED_PLATFORM ----
-# matches Linux is_supported_platform() — checks platform folder exists
-# before proceeding with any platform-specific operations
+# checks platform folder exists before proceeding with any platform-specific operations
 function Test-SupportedPlatform {
     param([string]$PlatformName)
     $platformPath = "$PlatformsDir\$PlatformName"
@@ -267,18 +305,16 @@ if (-not (Test-SupportedPlatform $Platform)) {
 }
 
 # ---- PROJECT NAME ----
-# defined before CSV reading so it can be used as the lookup key
 $ProjectName        = "BRS-100-GW1NR9"
 
 # ---- CHIP SETTINGS FROM CSV ----
-# no longer hardcoded — read from gowin_supported_devices_information.csv
 if (-not (Test-Path $DevicesCsvPath)) {
     Write-Host "ERROR: Cannot find devices CSV at: $DevicesCsvPath"
     exit 1
 }
 $devices = Import-Csv $DevicesCsvPath
 
-# match Linux pattern — check if CSV loaded any devices at all
+# check if CSV loaded any devices
 if ($devices.Count -eq 0) {
     Write-Host "ERROR: No devices found in CSV at: $DevicesCsvPath"
     exit 1
@@ -303,20 +339,19 @@ Write-Host "  Speed Grade    : $SpeedGrade"
 Write-Host "  Device ID      : $DeviceId"
 
 # ---- DERIVE PATHS FROM CSV VALUES ----
-# matches Linux behaviour — paths constructed from looked-up device values
+# construct paths according to detected environment
 $BuildTcl  = "$RepoRoot\build\platforms\gowin\devices\$DeviceId\build.tcl"
 $OutputDir = "$RepoRoot\build\platforms\gowin\devices\$DeviceId\$SpeedGrade\output"
 $ArtifactsDir = "$OutputDir\.artifacts"
 
 # ---- LOAD SUPPORTED CLOCK FREQUENCIES FROM CSV ----
-# note: CSV has a space after comma so .Trim() is needed to parse correctly
 if (-not (Test-Path $FreqCsvPath)) {
     Write-Host "ERROR: Cannot find clock frequencies CSV at: $FreqCsvPath"
     exit 1
 }
 $freqData = Import-Csv $FreqCsvPath
 
-# match Linux pattern — check if CSV loaded any frequencies at all
+# check if CSV loaded any frequencies at all
 if ($freqData.Count -eq 0) {
     Write-Host "ERROR: No frequencies found in CSV at: $FreqCsvPath"
     exit 1
@@ -410,6 +445,8 @@ if ($c) {
 }
 
 # ---- CLEAN ALL PLATFORMS ----
+# note: added a (y/n) prompt, which linux version doesn't have. 
+# delete user prompt if needed
 if ($a) {
     Write-Host ""
     Write-Host "====================================="

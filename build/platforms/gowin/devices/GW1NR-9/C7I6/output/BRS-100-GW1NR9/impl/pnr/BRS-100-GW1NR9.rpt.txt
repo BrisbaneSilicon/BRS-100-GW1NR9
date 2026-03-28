@@ -12,27 +12,27 @@
   <Part Number>: GW1NR-LV9QN88PC7/I6
   <Device>: GW1NR-9
   <Device Version>: C
-  <Created Time>:Sat Mar 28 18:47:00 2026
+  <Created Time>:Sat Mar 28 22:26:29 2026
 
 
 2. PnR Details
 
   Running placement:
-    Placement Phase 0: CPU time = 0h 0m 0.065s, Elapsed time = 0h 0m 0.064s
-    Placement Phase 1: CPU time = 0h 0m 0.089s, Elapsed time = 0h 0m 0.089s
-    Placement Phase 2: CPU time = 0h 0m 0.079s, Elapsed time = 0h 0m 0.079s
-    Placement Phase 3: CPU time = 0h 0m 1s, Elapsed time = 0h 0m 1s
-    Total Placement: CPU time = 0h 0m 1s, Elapsed time = 0h 0m 1s
+    Placement Phase 0: CPU time = 0h 0m 0.152s, Elapsed time = 0h 0m 0.152s
+    Placement Phase 1: CPU time = 0h 0m 0.087s, Elapsed time = 0h 0m 0.087s
+    Placement Phase 2: CPU time = 0h 0m 0.161s, Elapsed time = 0h 0m 0.161s
+    Placement Phase 3: CPU time = 0h 0m 2s, Elapsed time = 0h 0m 2s
+    Total Placement: CPU time = 0h 0m 3s, Elapsed time = 0h 0m 3s
  Running routing:
-    Routing Phase 0: CPU time = 0h 0m 0.001s, Elapsed time = 0h 0m 0s
-    Routing Phase 1: CPU time = 0h 0m 0.225s, Elapsed time = 0h 0m 0.225s
-    Routing Phase 2: CPU time = 0h 0m 0.396s, Elapsed time = 0h 0m 0.396s
+    Routing Phase 0: CPU time = 0h 0m 0.001s, Elapsed time = 0h 0m 0.001s
+    Routing Phase 1: CPU time = 0h 0m 0.327s, Elapsed time = 0h 0m 0.327s
+    Routing Phase 2: CPU time = 0h 0m 0.861s, Elapsed time = 0h 0m 0.861s
     Routing Phase 3: CPU time = 0h 0m 0s, Elapsed time = 0h 0m 0s
-    Total Routing: CPU time = 0h 0m 0.622s, Elapsed time = 0h 0m 0.621s
+    Total Routing: CPU time = 0h 0m 1s, Elapsed time = 0h 0m 1s
  Generate output files:
-    CPU time = 0h 0m 1s, Elapsed time = 0h 0m 1s
+    CPU time = 0h 0m 2s, Elapsed time = 0h 0m 2s
 
- Total Time and Memory Usage: CPU time = 0h 0m 3s, Elapsed time = 0h 0m 3s, Peak memory usage = 244MB
+ Total Time and Memory Usage: CPU time = 0h 0m 5s, Elapsed time = 0h 0m 5s, Peak memory usage = 252MB
 
 
 3. Resource Usage Summary
@@ -40,23 +40,25 @@
   --------------------------------------------------------------------------------
   Resources                   | Usage                               | Utilization
   --------------------------------------------------------------------------------
-  Logic                       | 497/8640                            |  6%
-    --LUT,ALU,ROM16           | 497(439 LUT, 58 ALU, 0 ROM16)       | -
+  Logic                       | 1060/8640                           |  13%
+    --LUT,ALU,ROM16           | 1060(1009 LUT, 51 ALU, 0 ROM16)     | -
     --SSRAM(RAM16)            | 0                                   | -
-  Register                    | 406/6771                            |  6%
+  Register                    | 927/6771                            |  14%
     --Logic Register as Latch | 0/6480                              |  0%
-    --Logic Register as FF    | 404/6480                            |  7%
+    --Logic Register as FF    | 909/6480                            |  15%
     --I/O Register as Latch   | 0/291                               |  0%
-    --I/O Register as FF      | 2/291                               |  <1%
-  CLS                         | 375/4320                            |  9%
+    --I/O Register as FF      | 18/291                              |  7%
+  CLS                         | 675/4320                            |  16%
   I/O Port                    | 47/71                               |  67%
   I/O Buf                     | 45                                  | -
     --Input Buf               | 2                                   | -
-    --Output Buf              | 43                                  | -
-    --Inout Buf               | 0                                   | -
+    --Output Buf              | 27                                  | -
+    --Inout Buf               | 16                                  | -
   IOLOGIC                     | 26/97                               | 27%
     --IDDR                    | 2
     --ODDR                    | 24
+  BSRAM                       | 1/26                                | 4%
+    --SDPB                    | 1
   ================================================================================
 
 
@@ -78,7 +80,7 @@
   Clock Resource| Usage         | Utilization 
   ------------------------------------------
   PRIMARY       | 2/8           | 25%
-  LW            | 1/8           | 13%
+  LW            | 3/8           | 38%
   GCLK_PIN      | 3/3           | 100%
   rPLL          | 1/2           | 50%
   ==========================================
@@ -89,9 +91,11 @@
   -------------------------------------------
   Signal         | Global Clock   | Location
   -------------------------------------------
-  i_sysclk       | PRIMARY        |  TL BR BL
+  i_sysclk       | PRIMARY        |  TR TL BR BL
   top_inst/i_sysclk_p| PRIMARY        |  TL BL
   O_psram_reset_n_d[1]| LW             |  -
+  board_demonstration_inst/n1018_5| LW             |  -
+  board_demonstration_inst/i_uart_tx_buf_100_8| LW             |  -
   pad_clk_27Mhz_d| HCLK           | BANK4_BANK5_HCLK0
   ===========================================
 
@@ -122,22 +126,22 @@ pad_leds_n[2]          | -         | 14/3          | Y          | io    | IOL22[
 pad_leds_n[3]          | -         | 13/3          | Y          | io    | IOL21[B] | -               | LVCMOS18   | 8     | UP        | NA        | NA         | OFF        | NA         | OFF             | NA            | 1.8       
 pad_leds_n[4]          | -         | 11/3          | Y          | io    | IOL16[B] | -               | LVCMOS18   | 8     | UP        | NA        | NA         | OFF        | NA         | OFF             | NA            | 1.8       
 pad_leds_n[5]          | -         | 10/3          | Y          | io    | IOL15[A] | GCLKT_6         | LVCMOS18   | 8     | UP        | NA        | NA         | OFF        | NA         | OFF             | NA            | 1.8       
-pad_io[1]              | -         | 25/2          | Y          | io    | IOB8[A]  | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[2]              | -         | 26/2          | Y          | io    | IOB8[B]  | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[3]              | -         | 27/2          | Y          | io    | IOB11[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[4]              | -         | 28/2          | Y          | io    | IOB11[B] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[5]              | -         | 29/2          | Y          | io    | IOB13[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[6]              | -         | 30/2          | Y          | io    | IOB13[B] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[7]              | -         | 33/2          | Y          | io    | IOB23[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[8]              | -         | 34/2          | Y          | io    | IOB23[B] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[9]              | -         | 35/2          | Y          | io    | IOB29[A] | GCLKT_4         | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[10]             | -         | 36/2          | Y          | io    | IOB29[B] | GCLKC_4         | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[11]             | -         | 37/2          | Y          | io    | IOB31[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[12]             | -         | 38/2          | Y          | io    | IOB31[B] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[13]             | -         | 39/2          | Y          | io    | IOB33[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[14]             | -         | 40/2          | Y          | io    | IOB33[B] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[15]             | -         | 41/2          | Y          | io    | IOB41[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
-pad_io[16]             | -         | 42/2          | Y          | io    | IOB41[B] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[1]              | -         | 25/2          | Y          | io    | IOB8[A]  | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[2]              | -         | 26/2          | Y          | io    | IOB8[B]  | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[3]              | -         | 27/2          | Y          | io    | IOB11[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[4]              | -         | 28/2          | Y          | io    | IOB11[B] | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[5]              | -         | 29/2          | Y          | io    | IOB13[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[6]              | -         | 30/2          | Y          | io    | IOB13[B] | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[7]              | -         | 33/2          | Y          | io    | IOB23[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[8]              | -         | 34/2          | Y          | io    | IOB23[B] | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[9]              | -         | 35/2          | Y          | io    | IOB29[A] | GCLKT_4         | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[10]             | -         | 36/2          | Y          | io    | IOB29[B] | GCLKC_4         | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[11]             | -         | 37/2          | Y          | io    | IOB31[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[12]             | -         | 38/2          | Y          | io    | IOB31[B] | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[13]             | -         | 39/2          | Y          | io    | IOB33[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[14]             | -         | 40/2          | Y          | io    | IOB33[B] | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[15]             | -         | 41/2          | Y          | io    | IOB41[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
+pad_io[16]             | -         | 42/2          | Y          | io    | IOB41[B] | -               | LVCMOS33   | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3       
 pad_io[17]             | -         | 77/1          | Y          | io    | IOT37[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | OFF             | NA            | 3.3       
 pad_io[18]             | -         | 76/1          | Y          | io    | IOT37[B] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | OFF             | NA            | 3.3       
 pad_io[19]             | -         | 75/1          | Y          | io    | IOT38[A] | -               | LVCMOS33   | 8     | DOWN      | NA        | NA         | OFF        | NA         | OFF             | NA            | 3.3       
@@ -210,24 +214,24 @@ Loc./Bank| Signal                 | Dir.  | Site     | CFG             | IO Type
 18/2     | pad_ser_rx             | in    | IOB2[B]  | -               | LVCMOS33 | NA    | UP        | ON        | NONE       | NA         | NA         | NA              | NA            | 3.3  
 19/2     | -                      | in    | IOB4[A]  | -               | LVCMOS33 | NA    | UP        | ON        | NONE       | NA         | NA         | NA              | NA            | 3.3  
 20/2     | -                      | in    | IOB4[B]  | -               | LVCMOS33 | NA    | UP        | ON        | NONE       | NA         | NA         | NA              | NA            | 3.3  
-25/2     | pad_io[1]              | out   | IOB8[A]  | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-26/2     | pad_io[2]              | out   | IOB8[B]  | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-27/2     | pad_io[3]              | out   | IOB11[A] | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-28/2     | pad_io[4]              | out   | IOB11[B] | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-29/2     | pad_io[5]              | out   | IOB13[A] | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-30/2     | pad_io[6]              | out   | IOB13[B] | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
+25/2     | pad_io[1]              | io    | IOB8[A]  | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+26/2     | pad_io[2]              | io    | IOB8[B]  | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+27/2     | pad_io[3]              | io    | IOB11[A] | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+28/2     | pad_io[4]              | io    | IOB11[B] | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+29/2     | pad_io[5]              | io    | IOB13[A] | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+30/2     | pad_io[6]              | io    | IOB13[B] | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
 31/2     | -                      | in    | IOB15[A] | -               | LVCMOS33 | NA    | UP        | ON        | NONE       | NA         | NA         | NA              | NA            | 3.3  
 32/2     | -                      | in    | IOB15[B] | -               | LVCMOS33 | NA    | UP        | ON        | NONE       | NA         | NA         | NA              | NA            | 3.3  
-33/2     | pad_io[7]              | out   | IOB23[A] | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-34/2     | pad_io[8]              | out   | IOB23[B] | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-35/2     | pad_io[9]              | out   | IOB29[A] | GCLKT_4         | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-36/2     | pad_io[10]             | out   | IOB29[B] | GCLKC_4         | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-37/2     | pad_io[11]             | out   | IOB31[A] | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-38/2     | pad_io[12]             | out   | IOB31[B] | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-39/2     | pad_io[13]             | out   | IOB33[A] | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-40/2     | pad_io[14]             | out   | IOB33[B] | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-41/2     | pad_io[15]             | out   | IOB41[A] | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
-42/2     | pad_io[16]             | out   | IOB41[B] | -               | LVCMOS33 | 8     | DOWN      | NA        | NA         | OFF        | NA         | NA              | NA            | 3.3  
+33/2     | pad_io[7]              | io    | IOB23[A] | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+34/2     | pad_io[8]              | io    | IOB23[B] | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+35/2     | pad_io[9]              | io    | IOB29[A] | GCLKT_4         | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+36/2     | pad_io[10]             | io    | IOB29[B] | GCLKC_4         | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+37/2     | pad_io[11]             | io    | IOB31[A] | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+38/2     | pad_io[12]             | io    | IOB31[B] | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+39/2     | pad_io[13]             | io    | IOB33[A] | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+40/2     | pad_io[14]             | io    | IOB33[B] | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+41/2     | pad_io[15]             | io    | IOB41[A] | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
+42/2     | pad_io[16]             | io    | IOB41[B] | -               | LVCMOS33 | 8     | DOWN      | NA        | NONE       | OFF        | NA         | NA              | NA            | 3.3  
 47/2     | -                      | in    | IOB43[B] | -               | LVCMOS33 | NA    | UP        | ON        | NONE       | NA         | NA         | NA              | NA            | 3.3  
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 p1-14/3  | O_psram_reset_n[0]     | out   | IOL2[A]  | -               | LVCMOS18 | -     | UP        | -         | -          | -          | -          | -               | -             | -    

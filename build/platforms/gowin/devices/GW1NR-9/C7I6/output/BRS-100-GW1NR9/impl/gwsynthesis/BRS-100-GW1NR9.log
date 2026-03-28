@@ -36,7 +36,7 @@ Analyzing architecture 'rtl'("C:\github repo\BRS-100-GW1NR9\proj\common\vhdl\axi
 Compiling module 'autogen_top_wrapper'("C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":37)
 WARN  (EX3073) : Port 'xip_fifo_almost_full' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":201)
 WARN  (EX3073) : Port 'cfg_mode_enabled' remains unconnected for this instance("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":279)
-Compiling module 'top(VERSION="W: e2503fd-dirty|2026-03-28 18:46:53",CLK_FREQUENCY_MHZ=66,UART_BAUD=115200,PUSHBUTTON0_AS_RESET=1)'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":28)
+Compiling module 'top(VERSION="W: c4a664e-dirty|2026-03-28 22:26:18",CLK_FREQUENCY_MHZ=66,UART_BAUD=115200,PUSHBUTTON0_AS_RESET=1)'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":28)
 Compiling module 'uart(OUTPUT_BUFFER_ENABLE=1,INPUT_BUFFER_ENABLE=1,INC_RX_ESC_SEQUENCE_FILTER=0)'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":26)
 WARN  (EX3791) : Expression size 17 truncated to fit in target size 16("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":156)
 WARN  (EX3791) : Expression size 5 truncated to fit in target size 4("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\uart.sv":196)
@@ -91,21 +91,10 @@ WARN  (EX1998) : Net 'i_mbus_spimemxip_addr[31]' does not have a driver("C:\gith
 WARN  (EX1998) : Net 'i_mbus_spimemxip_wdata[31]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":126)
 WARN  (EX1998) : Net 'i_mbus_spimemxip_wstrb[3]' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":127)
 WARN  (EX1998) : Net 'i_mbus_spimemxip_valid' does not have a driver("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\top.sv":129)
-Compiling module 'user'("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":28)
+Compiling module 'board_demonstration(VERSION="FW: c4a664e-dirty|2026-03-28 22:26:18")'("C:\github repo\BRS-100-GW1NR9\proj\foreign\gowin\GW1NR-9\C7I6\systemverilog\board_demonstration.sv":28)
 NOTE  (EX0101) : Current top module is "autogen_top_wrapper"
-WARN  (EX0211) : The output port "uart_tx_valid" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":40)
-WARN  (EX0211) : The output port "uart_tx_data[7]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
-WARN  (EX0211) : The output port "uart_tx_data[6]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
-WARN  (EX0211) : The output port "uart_tx_data[5]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
-WARN  (EX0211) : The output port "uart_tx_data[4]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
-WARN  (EX0211) : The output port "uart_tx_data[3]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
-WARN  (EX0211) : The output port "uart_tx_data[2]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
-WARN  (EX0211) : The output port "uart_tx_data[1]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
-WARN  (EX0211) : The output port "uart_tx_data[0]" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":42)
-WARN  (EX0211) : The output port "uart_rx_ready" of module "user" has no driver, assigning undriven bits to Z, simulation mismatch possible("C:\github repo\BRS-100-GW1NR9\proj\common\systemverilog\user.sv":44)
 [5%] Running netlist conversion ...
 WARN  (CV0018) : Input pad_user_buttons_n[1] is unused("C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":48)
-WARN  (CV0016) : Input pad_ser_rx is unused("C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\autogen_top_wrapper.sv":50)
 Running device independent optimization ...
 [10%] Optimizing Phase 0 completed
 [15%] Optimizing Phase 1 completed
