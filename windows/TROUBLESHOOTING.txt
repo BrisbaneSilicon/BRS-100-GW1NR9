@@ -10,15 +10,19 @@ Symptom:
     ...and then hangs indefinitely with no further output.
 
 Cause:
-    programmer_cli.exe (GOWIN's tool) can hang during embFlash erase if the
-    ftd2xx USB driver has stale handle state from a previous run. The script
-    calls FT_CyclePort via ftd2xx.dll before each programming attempt to
-    clear this state (equivalent to a physical USB unplug/replug), but this
-    does not fully prevent the issue on all machines.
+    The FTDI FT2232H chip on the board accumulates internal state (incomplete
+    USB transfers, pending URBs in the Windows USB host controller) across
+    rapid back-to-back programmer_cli.exe invocations. After several cycles,
+    the chip stops responding to new JTAG commands.
 
-    The flash controller inside the GW1NR-9C chip also needs a small recovery
-    window between rapid erase/program cycles. Programming the board multiple
-    times in quick succession increases the chance of a freeze.
+    The script calls FT_CyclePort via ftd2xx.dll before each programming
+    attempt to clear stale state, but this operates above the hardware level
+    where the issue occurs — no ftd2xx API call fully prevents it.
+
+    This is a hardware-level limitation of the FTDI interface, not a software
+    bug. The freeze is non-deterministic: it may occur after 3-6 rapid runs,
+    or sometimes not at all for 10+ runs. The GOWIN Programmer GUI avoids
+    this because manual button clicks are naturally slower than scripted runs.
 
 Recovery steps:
     1. Press Ctrl+C in the terminal to stop the script.
@@ -27,7 +31,10 @@ Recovery steps:
        Alternatively, run in a new PowerShell window:
            Stop-Process -Name programmer_cli -Force -ErrorAction SilentlyContinue
     3. Unplug the USB-C cable from the board.
-    4. Wait 5 seconds.
+    4. Wait at least 5 seconds before reconnecting. The FTDI chip's internal
+       microcontroller needs time to fully power down and clear its state.
+       If you replug too quickly (<3 seconds), the chip resumes with stale
+       state and the first programming attempt will likely fail again.
     5. Plug the USB-C cable back in.
     6. Wait for Windows to finish enumerating the device (Device Manager will
        show "USB Debugger A" again — usually takes 2-3 seconds).
