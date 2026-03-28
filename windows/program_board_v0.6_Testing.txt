@@ -1187,7 +1187,997 @@ PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -jtag_frequen
 PS C:\github repo\BRS-100-GW1NR9\windows> 
 
 
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
 
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+Erasing embFlash ...: [                         ] 0%                  Status Code is: 0x00039020
+Erasing embFlash ...: [#########################] 100%
+Programing...: [#########################] 100%
+ Status Code is: 0x0003F020
+ User Code: 0x00003B1F
+ Program Finished!
+ Finished.
+ Cost 7.52 second(s)
+
+
+=====================================
+ PROGRAMMING SUCCESS
+=====================================
+Board programmed successfully.
+The design will auto-load on every power-on.
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -jtag_frequency 0.012MHz
+ERROR: Invalid JTAG frequency '0.012MHz'.
+Valid values: 2.5MHz, 2MHz, 15MHz, 10MHz, 1.5MHz, 1.1MHz, 0.9MHz, 0.75MHz, 0.5MHz, 0.3MHz, 0.4MHz, 0.1MHz, 0.02MHz
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -jtag_frequency 0.012MHz^C
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1                          
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+WARNING: No FTDI devices found for reset.
+FTDI USB reset skipped - proceeding anyway.
+
+Scanning for connected cables (ftd2xx)...
+ Cost 0.02 second(s)   
+
+ERROR: Could not find JTAG interface (USB Debugger A, index 0).
+
+Common causes:
+  1. Board not plugged in via USB-C
+  2. Wrong USB cable (must support data, not just power)
+  3. Driver issue - try unplugging and replugging the board
+PS C:\github repo\BRS-100-GW1NR9\windows> ^C
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.19 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Detected firmware already built - reusing.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+Erasing embFlash ...: [                         ] 0%                  Status Code is: 0x00039020
+Erasing embFlash ...: [#########################] 100%
+Programing...: [#########################] 100%
+ Status Code is: 0x0003F020
+ User Code: 0x00003B1F
+ Program Finished!
+ Finished.
+ Cost 7.57 second(s)
+
+
+=====================================
+ PROGRAMMING SUCCESS
+=====================================
+Board programmed successfully.
+The design will auto-load on every power-on.
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+ERROR: GOWIN Programmer GUI (programmer.exe) is currently running.
+       The GUI holds an exclusive lock on the USB cable and will
+       prevent programmer_cli.exe from accessing the board.
+
+Please close the Programmer GUI and try again.
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+ERROR: GOWIN Programmer GUI (programmer.exe) is currently running.
+       The GUI holds an exclusive lock on the USB cable and will
+       prevent programmer_cli.exe from accessing the board.
+
+Please close the Programmer GUI and try again.
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1; Write-Host "Exit code: $LASTEXITCODE"
+>>
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.13 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Detected firmware already built - reusing.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+
+=====================================
+ PROGRAMMING FAILED (exit code: 1)
+=====================================
+
+Common causes:
+  1. Board not plugged in via USB-C
+  2. Wrong USB cable (must support data, not just power)
+  3. GOWIN Programmer GUI is open - close it and try again
+  4. Driver issue - try unplugging and replugging the board
+  5. License issue - check GOWIN license via IDE: Help > Manage License
+
+If the script froze and you had to Ctrl+C, see:
+  windows\TROUBLESHOOTING.txt
+Exit code: 1
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1; Write-Host "Exit code: $LASTEXITCODE"
+>>
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.07 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Detected firmware already built - reusing.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+Erasing embFlash ...: [                         ] 0%                  Status Code is: 0x00039020
+Erasing embFlash ...: [#########################] 100%
+Programing...: [#########################] 100%
+ Status Code is: 0x0003F020
+ User Code: 0x00003B1F
+ Program Finished!
+ Finished.
+ Cost 7.56 second(s)
+
+
+=====================================
+ PROGRAMMING SUCCESS
+=====================================
+Board programmed successfully.
+The design will auto-load on every power-on.
+Exit code: 0
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1; Write-Host "Exit code: $LASTEXITCODE"
+>> 
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+WARNING: No FTDI devices found for reset.
+FTDI USB reset skipped - proceeding anyway.
+
+Scanning for connected cables (ftd2xx)...
+ Cost 0.02 second(s)   
+
+ERROR: Could not find JTAG interface (USB Debugger A, index 0).
+
+Common causes:
+  1. Board not plugged in via USB-C
+  2. Wrong USB cable (must support data, not just power)
+  3. Driver issue - try unplugging and replugging the board
+Exit code: 1
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1; Write-Host "Exit code: 1"            
+>> 
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.11 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Detected firmware already built - reusing.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+Erasing embFlash ...: [                         ] 0%                  Status Code is: 0x00039020
+Erasing embFlash ...: [#########################] 100%
+Programing...: [#########################] 100%
+ Status Code is: 0x0003F020
+ User Code: 0x00003B1F
+ Program Finished!
+ Finished.
+ Cost 7.57 second(s)
+
+
+=====================================
+ PROGRAMMING SUCCESS
+=====================================
+Board programmed successfully.
+The design will auto-load on every power-on.
+Exit code: 1
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1; Write-Host "Exit code: $LAS"
+>> ^C
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1; Write-Host "Exit code: $LASTEXITCODE"
+>> 
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+WARNING: No FTDI devices found for reset.
+FTDI USB reset skipped - proceeding anyway.
+
+Scanning for connected cables (ftd2xx)...
+ Cost 0.03 second(s)   
+
+ERROR: Could not find JTAG interface (USB Debugger A, index 0).
+
+Common causes:
+  1. Board not plugged in via USB-C
+  2. Wrong USB cable (must support data, not just power)
+  3. Driver issue - try unplugging and replugging the board
+Exit code: 1
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1; Write-Host "Exit code: $LASTEXITCODE"
+>>
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.08 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Detected firmware already built - reusing.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+
+=====================================
+ PROGRAMMING FAILED (exit code: 1)
+=====================================
+
+Common causes:
+  1. Board not plugged in via USB-C
+  2. Wrong USB cable (must support data, not just power)
+  3. GOWIN Programmer GUI is open - close it and try again
+  4. Driver issue - try unplugging and replugging the board
+  5. License issue - check GOWIN license via IDE: Help > Manage License
+
+If the script froze and you had to Ctrl+C, see:
+  windows\TROUBLESHOOTING.txt
+Exit code: 1
+PS C:\github repo\BRS-100-GW1NR9\windows> ^C
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1; Write-Host "Exit code: $LASTEXITCODE"
+>>
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.13 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Detected firmware already built - reusing.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+
+=====================================
+ PROGRAMMING FAILED (exit code: 1)
+=====================================
+
+Common causes:
+  1. Board not plugged in via USB-C
+  2. Wrong USB cable (must support data, not just power)
+  3. GOWIN Programmer GUI is open - close it and try again
+  4. Driver issue - try unplugging and replugging the board
+  5. License issue - check GOWIN license via IDE: Help > Manage License
+
+If the script froze and you had to Ctrl+C, see:
+  windows\TROUBLESHOOTING.txt
+Exit code: 1
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1; Write-Host "Exit code: $LASTEXITCODE"
+>>
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 1 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.11 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Detected firmware already built - reusing.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+
+=====================================
+ PROGRAMMING FAILED (exit code: 1)
+=====================================
+
+Common causes:
+  1. Board not plugged in via USB-C
+  2. Wrong USB cable (must support data, not just power)
+  3. GOWIN Programmer GUI is open - close it and try again
+  4. Driver issue - try unplugging and replugging the board
+  5. License issue - check GOWIN license via IDE: Help > Manage License
+
+If the script froze and you had to Ctrl+C, see:
+  windows\TROUBLESHOOTING.txt
+Exit code: 1
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1; Write-Host "Exit code: $LASTEXITCODE"
+>>
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.1 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Detected firmware already built - reusing.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+
+=====================================
+ PROGRAMMING FAILED (exit code: 1)
+=====================================
+
+Common causes:
+  1. Board not plugged in via USB-C
+  2. Wrong USB cable (must support data, not just power)
+  3. GOWIN Programmer GUI is open - close it and try again
+  4. Driver issue - try unplugging and replugging the board
+  5. License issue - check GOWIN license via IDE: Help > Manage License
+
+If the script froze and you had to Ctrl+C, see:
+  windows\TROUBLESHOOTING.txt
+Exit code: 1
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1; Write-Host "Exit code: $LASTEXITCODE"
+>>
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.13 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+Detected firmware already built - reusing.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\build\platforms\gowin\devices\GW1NR-9\C7I6\output\.artifacts\BRS-100-GW1NR9.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+Erasing embFlash ...: [                         ] 0%                  Status Code is: 0x00039020
+Erasing embFlash ...: [#########################] 100%
+Programing...: [#########################] 100%
+ Status Code is: 0x0003F020
+ User Code: 0x00003B1F
+ Program Finished!
+ Finished.
+ Cost 7.57 second(s)
+
+
+=====================================
+ PROGRAMMING SUCCESS
+=====================================
+Board programmed successfully.
+The design will auto-load on every power-on.
+Exit code: 0
+PS C:\github repo\BRS-100-GW1NR9\windows> .\program_board_v0.6.ps1 -h                                    
+   
+PROGRAM_BOARD
+
+NAME
+    program_board - program the BRS-100-GW1NR9 board with FPGA firmware
+
+SYNOPSIS
+    .\program_board_v0.6.ps1 [OPTIONS]
+
+DESCRIPTION
+    Program the BRS-100-GW1NR9 board via JTAG using programmer_cli.exe.
+    If firmware is not yet built, automatically triggers a build first.
+
+OPTIONS
+    -h, --help
+        Display this help and exit.
+
+    -d, --list_default_target
+        Print the default target board name and exit.
+
+    -c, --clean_target_prior
+        Clean the build output before building and programming.
+
+    -f, --update_flash_only  <MCS_FILE_PATH>
+        [NOT IMPLEMENTED] Update flash with provided MCS file.
+        This flag exists for compatibility with the Linux script.
+        Flash update is only supported on Xilinx boards (ARTYS7-25/50).
+
+    -m, --custom_bitfile  <PATH>
+        Program the board with a custom .fs file instead of the default
+        build output. Path must be the full path to a .fs file.
+
+    -l, --list_supported_targets
+        List all supported target boards and exit.
+
+    -s, --check_if_target_supported
+        Print whether the current target board is supported and exit.
+
+    -b, --check_if_target_built
+        Print firmware built status of the target board and exit.
+
+    -t, --custom_target  <TARGET>
+        [NOT IMPLEMENTED] Instead of the default target, target CUSTOM_TARGET.
+        This flag exists for compatibility with the Linux script.
+        Currently only one target (BRS-100-GW1NR9) is supported.
+
+    -k, --clock_frequency  <MHz>
+        System clock frequency in MHz passed to the build script when
+        auto-triggering a build. Ignored when using -m (custom bitfile).
+        Valid values: 51, 66, 75, 81, 87 (default: 51)
+
+    -jtag_frequency  <freq>
+        Override the JTAG programming clock frequency (default: 0.5MHz).
+        Valid values: 2.5MHz, 2MHz, 15MHz, 10MHz, 1.5MHz, 1.1MHz, 0.9MHz, 0.75MHz, 0.5MHz, 0.3MHz, 0.4MHz, 0.1MHz, 0.02MHz
+        (Windows-only flag, no short form to avoid collision with -f)
+
+EXAMPLES
+    .\program_board_v0.6.ps1
+        Build (if needed) and program the board.
+
+    .\program_board_v0.6.ps1 -c
+        Clean, rebuild, and program the board.
+
+    .\program_board_v0.6.ps1 -b
+        Check whether firmware is built without programming.
+
+    .\program_board_v0.6.ps1 -m C:\path\to\custom.fs
+        Program the board with a custom bitstream file.
+
+    .\program_board_v0.6.ps1 -k 66
+        Build at 66 MHz and program the board.
+
+    .\program_board_v0.6.ps1 -c -k 75
+        Clean, rebuild at 75 MHz, and program the board.
+
+    .\program_board_v0.6.ps1 -jtag_frequency 2.5MHz
+        Program at 2.5MHz JTAG speed (faster, less reliable).
+
+IMPORTANT NOTICE
+    The Windows ftd2xx driver may cause the script to freeze during programming.
+    If the script freezes at the following line:
+
+        Operation "embFlash Erase,Program" for device#1...
+
+    Manually kill programmer_cli.exe in Task Manager and disconnect the USB-C
+    cable for 3-5 seconds before reconnecting. See detailed troubleshooting
+    steps in windows\TROUBLESHOOTING.txt.
+
+AUTHOR
+    Written by Bruce Mao
+
+COPYRIGHT
+    (C) Brisbane Silicon, Pty Ltd. All rights reserved.
+
+    The source code contained herein is provided on an "as is" basis. Brisbane Silicon, Pty Ltd.
+    disclaims any and all warranties, whether express, implied, or statutory, including any implied
+    warranties of merchantability or of fitness for a particular purpose. In no event shall Brisbane
+    Silicon, Pty Ltd. be liable for any incidental, punitive, or consequential damages of any kind
+    whatsoever arising from the use of this source code.
+
+    This disclaimer of warranty extends to the user of this source code and user's customers,
+    employees, agents, transferees, successors and assigns.
+
+    This is not a grant of patent rights.
+
+PS C:\github repo\BRS-100-GW1NR9\windows> ^C
+PS C:\github repo\BRS-100-GW1NR9\windows>  .\program_board_v0.6.ps1 -m 'C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9 - 副本 (2).fs'
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9 - 副本 (2).fs (custom)
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.06 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9 - 副本 (2).fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9 - 副本 (2).fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+
+=====================================
+ PROGRAMMING FAILED (exit code: 1)
+=====================================
+
+Common causes:
+  1. Board not plugged in via USB-C
+  2. Wrong USB cable (must support data, not just power)
+  3. GOWIN Programmer GUI is open - close it and try again
+  4. Driver issue - try unplugging and replugging the board
+  5. License issue - check GOWIN license via IDE: Help > Manage License
+
+If the script froze and you had to Ctrl+C, see:
+  windows\TROUBLESHOOTING.txt
+PS C:\github repo\BRS-100-GW1NR9\windows>  .\program_board_v0.6.ps1 -m 'C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9 - 副本 (2).fs'
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9 - 副本 (2).fs (custom)
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.12 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9 - 副本 (2).fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9 - 副本 (2).fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+
+=====================================
+ PROGRAMMING FAILED (exit code: 1)
+=====================================
+
+Common causes:
+  1. Board not plugged in via USB-C
+  2. Wrong USB cable (must support data, not just power)
+  3. GOWIN Programmer GUI is open - close it and try again
+  4. Driver issue - try unplugging and replugging the board
+  5. License issue - check GOWIN license via IDE: Help > Manage License
+
+If the script froze and you had to Ctrl+C, see:
+  windows\TROUBLESHOOTING.txt
+PS C:\github repo\BRS-100-GW1NR9\windows>  .\program_board_v0.6.ps1 -m 'C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9 - 副本 (2).fs'
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9 - 副本 (2).fs (custom)
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.08 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9 - 副本 (2).fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\windows\output\BRS-100-GW1NR9 - 副本 (2).fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+Erasing embFlash ...: [                         ] 0%                  Status Code is: 0x00039020
+Erasing embFlash ...: [#########################] 100%
+Programing...: [#########################] 100%
+ Status Code is: 0x0003F020
+ User Code: 0x00003B1F
+ Program Finished!
+ Finished.
+ Cost 7.23 second(s)
+
+
+=====================================
+ PROGRAMMING SUCCESS
+=====================================
+Board programmed successfully.
+The design will auto-load on every power-on.
+PS C:\github repo\BRS-100-GW1NR9\windows>  .\program_board_v0.6.ps1 -m 'C:\github repo\BRS-100-GW1NR9\windows\output\asdf.fs'                  
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\windows\output\asdf.fs (custom)
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.08 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\windows\output\asdf.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\windows\output\asdf.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+
+=====================================
+ PROGRAMMING FAILED (exit code: 1)
+=====================================
+
+Common causes:
+  1. Board not plugged in via USB-C
+  2. Wrong USB cable (must support data, not just power)
+  3. GOWIN Programmer GUI is open - close it and try again
+  4. Driver issue - try unplugging and replugging the board
+  5. License issue - check GOWIN license via IDE: Help > Manage License
+
+If the script froze and you had to Ctrl+C, see:
+  windows\TROUBLESHOOTING.txt
+PS C:\github repo\BRS-100-GW1NR9\windows>  .\program_board_v0.6.ps1 -m 'C:\github repo\BRS-100-GW1NR9\windows\output\asdf.fs'
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: C:\github repo\BRS-100-GW1NR9\windows\output\asdf.fs (custom)
+
+Resetting 2 FTDI device(s) to clear stale USB state...
+Waiting for USB re-enumeration...
+FTDI USB reset complete.
+
+Scanning for connected cables (ftd2xx)...
+ Cable found:  USB Debugger A/0/529/null (USB location:529)  Cable found:  USB Debugger A/1/530/null (USB location:530)  Cost 0.05 second(s)   
+JTAG interface found at USB location: 529 - proceeding.
+
+=====================================
+ BRS-100-GW1NR9 Windows Programmer
+=====================================
+Device    : GW1NR-9C
+Cable     : USB Debugger A (cable-index 4, location 529 - JTAG)
+Frequency : 0.02MHz
+Operation : embFlash Erase, Program (index 5)
+Bitstream : C:\github repo\BRS-100-GW1NR9\windows\output\asdf.fs
+Programmer: C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe
+=====================================
+
+  [i] NOTE
+  If the script freezes below, kill programmer_cli.exe in Task Manager
+  and replug USB. See TROUBLESHOOTING.txt for details.
+
+Program command line: 'C:\Gowin\Gowin_V1.9.12.02_x64\Programmer\bin\programmer_cli.exe --device GW1NR-9C --cable-index 4 --location 529 --frequency 0.02MHz --operation_index 5 --fsFile C:\github repo\BRS-100-GW1NR9\windows\output\asdf.fs'
+
+*** GOWIN programmer_cli Command Line Console ***
+
+ Target Cable: USB Debugger A/0/529/null@0.02MHz
+ Target Device: GW1NR-9C(0x1100481B)
+ Operation "embFlash Erase,Program" for device#1...
+Erasing embFlash ...: [                         ] 0%                  Status Code is: 0x00039020
+Erasing embFlash ...: [#########################] 100%
+Programing...: [#########################] 100%
+ Status Code is: 0x0003F020
+ User Code: 0x00003B1F
+ Program Finished!
+ Finished.
+ Cost 7.52 second(s)
+
+
+=====================================
+ PROGRAMMING SUCCESS
+=====================================
+Board programmed successfully.
+The design will auto-load on every power-on.
+PS C:\github repo\BRS-100-GW1NR9\windows> ^C
+PS C:\github repo\BRS-100-GW1NR9\windows> ^C
+PS C:\github repo\BRS-100-GW1NR9\windows> 
 
 
 

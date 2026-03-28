@@ -7,19 +7,20 @@ INTERMITTENT FREEZE DURING PROGRAMMING
 Symptom:
     The script prints:
         Operation "embFlash Erase,Program" for device#1...
-    ...and then hangs indefinitely with no further output.
+    
+    and then hangs indefinitely with no further output.
 
 Cause:
-    The FTDI FT2232H chip on the board accumulates internal state (incomplete
+    The FTDI chip on the board accumulates internal state (incomplete
     USB transfers, pending URBs in the Windows USB host controller) across
     rapid back-to-back programmer_cli.exe invocations. After several cycles,
     the chip stops responding to new JTAG commands.
 
     The script calls FT_CyclePort via ftd2xx.dll before each programming
     attempt to clear stale state, but this operates above the hardware level
-    where the issue occurs — no ftd2xx API call fully prevents it.
+    where the issue occurs, no ftd2xx API call fully prevents it.
 
-    This is a hardware-level limitation of the FTDI interface, not a software
+    This is a hardware level limitation of the FTDI interface, not a software
     bug. The freeze is non-deterministic: it may occur after 3-6 rapid runs,
     or sometimes not at all for 10+ runs. The GOWIN Programmer GUI avoids
     this because manual button clicks are naturally slower than scripted runs.
@@ -45,6 +46,13 @@ Prevention:
     - Do not run the script while GOWIN Programmer GUI is open — it holds an
       exclusive lock on the USB cable and will cause immediate failure.
     - The script already detects if programmer.exe is running and will warn you.
+
+Note:
+    The GOWIN Programmer GUI has also been observed to hang occasionally after
+    manually clicking Program/Configure button, requiring the same recovery steps
+     (kill programmer.exe in Task Manager and reconnecting USB). This suggests the root
+    cause is either a hardware limitation of the board's FTDI interface or an
+    issue within programmer_cli.exe itself.
 
 
 CABLE FAILED TO OPEN
@@ -100,7 +108,7 @@ SCRIPT EXECUTION POLICY ERROR
 -------------------------------
 
 Symptom:
-    .\program_board_v0.4.1.ps1 cannot be loaded because running scripts is
+    .\program_board_v0.6.ps1 cannot be loaded because running scripts is
     disabled on this system.
 
 Fix:
