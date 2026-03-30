@@ -224,6 +224,9 @@ if (-not $GowinInstallDir) {
     Write-Host "     (Run this once in PowerShell, then reopen PowerShell)"
     Write-Host "     [System.Environment]::SetEnvironmentVariable('GOWIN_INSTALL_DIR', 'C:\your\gowin\path', 'User')"
     Write-Host ""
+    Write-Host "  NOTE: Only GOWIN EDA V1.9.12.02 is tested and verified for this script. "
+    Write-Host "        Older versions may have compatibility issues. Please install V1.9.12.02."  
+    Write-Host ""
     exit 1
 }
 

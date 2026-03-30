@@ -135,10 +135,10 @@ KERNEL SECURITY CHECK FAILURE (BSOD 0x139)
 ---------------------------------------------
 
 Symptom:
-    Windows crashes with a blue screen showing:
+    Windows crashes with a blue/black screen showing:
         KERNEL_SECURITY_CHECK_FAILURE (bug check 0x139)
     This occurs after several successful programming cycles, or during
-    programming with GOWIN EDA V1.9.12.01.
+    programming with script. 
 
 Cause:
     The ftd2xx.sys kernel-mode driver (FTDI's USB driver) has a bug where
@@ -150,27 +150,67 @@ Cause:
     to this crash. V1.9.12.02 is more stable but not fully immune.
 
 Fix:
-    1. The v1.0 scripts no longer call any ftd2xx.dll API functions
-       (FT_CyclePort, FT_ResetDevice, etc.). All P/Invoke code has been
-       removed to avoid triggering the kernel driver bug.
+    1. Remove all FTDI devices and drivers
+    Open Device Manager (devmgmt.msc), then enable hidden devices via View > Show hidden devices. Look under:
 
-    2. Do NOT use GOWIN EDA V1.9.12.01 — it has a buggier FTDI kernel driver.
-       Install V1.9.12.02 from:
-           https://www.gowinsemi.com/en/support/download_eda/
+    "Universal Serial Bus controllers" — any FTDI entries
+    "Ports (COM & LPT)" — any "USB Serial Port" entries
+    "USB Debugger A" entries
+    "USB Serial Converter" entries
+    Right-click each device > Uninstall device > check "Attempt to remove the driver for this device" (important).
 
-    3. If crashes persist, update the FTDI driver independently of GOWIN:
-       Download the latest D2XX driver from:
-           https://ftdichip.com/drivers/d2xx-drivers/
+    2. Clear ghost devices
 
-    4. Avoid rapid back-to-back programming runs. Wait a few seconds between
-       runs to give the kernel driver time to fully settle.
+    With the board unplugged, open an admin PowerShell:
+
+    pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5
+
+    This lists any FTDI drivers still in the driver store. For each one, note the published name (e.g. oem12.inf) and remove it:
+
+    pnputil /delete-driver oem12.inf /force
+
+    3. Clean leftover files
+
+    Check for stale copies:
+
+    Get-ChildItem C:\Windows\System32\drivers\ftd*.sys
+    Get-ChildItem C:\Windows\System32\ftd2xx*.dll
+    Get-ChildItem C:\Windows\SysWOW64\ftd2xx*.dll
+
+    These should be gone after step 2. If any remain, note the versions (Right-click > Properties > Details > File version) before deleting — this tells you what was installed.
+
+    4. Reboot
+
+    Reboot before reinstalling anything. This ensures the kernel fully unloads the old drivers.
+
+    5. Reinstall clean
+
+    Download the latest D2XX driver from FTDI (not from GOWIN):
+    https://ftdichip.com/drivers/d2xx-drivers/
+
+    Run the installer. Then plug in the board — Windows should pick up the new drivers.
+
+    6. Verify versions match
+
+    After reinstall, check that the kernel driver and GOWIN's bundled DLL are compatible:
+
+    # System kernel driver
+    (Get-Item C:\Windows\System32\drivers\ftd2xx.sys).VersionInfo.FileVersion
+
+    # GOWIN's bundled user-mode DLL
+    (Get-Item "$env:GOWIN_INSTALL_DIR\Programmer\bin\ftd2xx.dll").VersionInfo.FileVersion
+
+    If these are wildly different versions (e.g. 2.12.x vs 2.08.x) or version dates (2017 vs 2024)
+    that would be what's causing the problem. If dates and versions match means it's fixed. 
+
+
 
 
 SCRIPT EXECUTION POLICY ERROR
 -------------------------------
 
 Symptom:
-    .\program_board_v0.6.ps1 cannot be loaded because running scripts is
+    .\program_board.ps1 cannot be loaded because running scripts is
     disabled on this system.
 
 Fix:
