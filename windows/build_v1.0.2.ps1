@@ -136,6 +136,7 @@ if ($h) {
     Write-Host ""
     Write-Host "AUTHOR"
     Write-Host "    Written by Bruce Mao"
+    Write-Host "    Adapted from linux build.sh by Craig Haywood"
     Write-Host ""
     Write-Host "COPYRIGHT"
     Write-Host "    (C) Brisbane Silicon, Pty Ltd. All rights reserved."
