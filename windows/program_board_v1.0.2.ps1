@@ -1,8 +1,9 @@
 # =============================================================
-# program_board_v0.6.ps1
+# program_board_v1.0.2.ps1
 # Windows programming script for BRS-100-GW1NR9
 #
 # Author:    Bruce Mao
+# Adapted from linux program_board.sh by Craig Haywood
 # Copyright: (C) Brisbane Silicon, Pty Ltd. All rights reserved.
 #
 # The source code contained herein is provided on an "as is" basis.
@@ -62,6 +63,7 @@
 #               -jtag_frequency                   renamed from -f (no short flag, avoids -f collision)
 # version 0.6 - add author and copyright statement
 #               update help text references to v0.6
+# version 1.0.2 - added detailed help message, cleaned up code, added comments, added more error handling and user feedback
 # =============================================================
 
 param(
@@ -202,6 +204,7 @@ function Show-Help {
     Write-Host ""
     Write-Host "AUTHOR"
     Write-Host "    Written by Bruce Mao"
+    write-Host "    Adapted from linux program_board.sh by Craig Haywood"
     Write-Host ""
     Write-Host "COPYRIGHT"
     Write-Host "    (C) Brisbane Silicon, Pty Ltd. All rights reserved."

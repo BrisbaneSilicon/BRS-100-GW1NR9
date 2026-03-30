@@ -1,8 +1,9 @@
 # =============================================================
-# build_v0.6.ps1
+# build_v1.0.2.ps1
 # Windows build script for BRS-100-GW1NR9
 #
 # Author:    Bruce Mao
+# Adapted from linux build.sh by Craig Haywood
 # Copyright: (C) Brisbane Silicon, Pty Ltd. All rights reserved.
 #
 # The source code contained herein is provided on an "as is" basis.
@@ -35,6 +36,7 @@
 # version 0.7 - implemented setup_build_output_directory — clean before build
 #               implemented is_supported_platform — validate platform exists
 #               note: xilinx not yet implemented. This script is currently only for GOWIN builds.
+# version 1.0.2 - added detailed help message, cleaned up code, added comments, added more error handling and user feedback
 # =============================================================
 
 param (
