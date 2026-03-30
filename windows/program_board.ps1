@@ -382,7 +382,7 @@ if ($versionNumber -like "1.9.12*" -and $versionNumber -notlike "1.9.12.01*") {
 # ---- PATHS ----
 $ProgrammerCli  = "$GowinInstallDir\Programmer\bin\programmer_cli.exe"
 $ProgrammerGui  = "$GowinInstallDir\Programmer\bin\programmer.exe"
-$BuildScript    = "$RepoRoot\windows\build_v1.0.2.ps1"
+$BuildScript    = "$RepoRoot\windows\build.ps1"
 $DevicesCsvPath = "$RepoRoot\build\platforms\gowin\gowin_supported_devices_information.csv"
 $BoardsCsvPath  = "$RepoRoot\prog\supported_boards.csv"
 
