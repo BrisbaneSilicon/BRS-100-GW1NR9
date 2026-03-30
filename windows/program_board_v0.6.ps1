@@ -332,7 +332,7 @@ Write-Host "Found GOWIN programmer at: $GowinInstallDir"
 
 if ($installFolderName -like "*1.9.12.01*" -or
     $installFolderName -like "*1.9.12.02*") {
-    Write-Host "GOWIN version: $installFolderName (verified compatible)"
+    Write-Host "GOWIN version: $installFolderName (verified compatible)1"
 
 } elseif ($installFolderName -like "*1.9.12*") {
     Write-Host ""
