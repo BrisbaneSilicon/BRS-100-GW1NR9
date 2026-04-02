@@ -370,16 +370,19 @@ OUTPUT:
 TEST 27: program_board.ps1 -t 'BRS-100-GW1NR9' (valid default target)
 --------------------------------------------------------------------------------
 COMMAND:  .\program_board.ps1 -t 'BRS-100-GW1NR9'
-RESULT:   PASS (with hang recovery)
-EXIT CODE: 0 (after retry)
+RESULT:   PASS
+EXIT CODE: 0
 OUTPUT:
   Target 'BRS-100-GW1NR9' is already the default target - continuing.
-  [FTDI reset, cable scan, programming initiated]
-  programmer_cli.exe hung at "Operation embFlash Erase,Program"
-  -> Killed programmer_cli.exe via Stop-Process, waited 3 seconds
-  -> On next test (default run), programming succeeded.
-NOTES: First attempt hung (known FTDI issue). After killing programmer_cli
-       and waiting, subsequent runs succeeded.
+  [FTDI reset, cable scan succeeded]
+  Detected firmware already built - reusing.
+  [Programming 0%..100% completed]
+  Status Code is: 0x0003F020
+  User Code: 0x0000BF3B
+  Cost 8.28 second(s)
+  PROGRAMMING SUCCESS
+NOTES: Retested cleanly - no hang. Previously noted a hang on first attempt;
+       re-run confirms clean PASS without needing kill/retry.
 
 --------------------------------------------------------------------------------
 TEST 28: program_board.ps1 (default - no arguments, program board)
@@ -502,29 +505,33 @@ OUTPUT:
 NOTES: Clean + rebuild at 75 MHz + program flow worked correctly.
   The -k 75 parameter was correctly passed through to build.ps1,
   confirmed by timing_75mhz.sdc and CLK_FREQUENCY_MHZ=75 in build output.
+  Re-verified from a fully empty build dir (after build.ps1 -clean_all_platforms).
+  The -c clean step reported "Nothing to clean" (already clean), then built fresh.
 
 
 --------------------------------------------------------------------------------
-TEST 33: program_board.ps1 -k 66 (program with clock freq - firmware already exists) [MANUAL TEST]
+TEST 33: program_board.ps1 -k 66 (program with clock freq - firmware already exists) [MANUAL TEST - REDO]
 --------------------------------------------------------------------------------
 COMMAND:  .\program_board.ps1 -k 66
 RESULT:   PASS
 EXIT CODE: 0
 OUTPUT:
+  Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
   [FTDI reset, cable scan succeeded]
   Detected firmware already built - reusing.
   [Programming 0%..100% completed]
   Status Code is: 0x0003F020
   User Code: 0x0000BF3B
-  Cost 8.19 second(s)
+  Cost 7.56 second(s)
   PROGRAMMING SUCCESS
-NOTES: The -k 66 flag was provided but firmware already existed (from the
-  prior -c -k 75 test). The script detected "firmware already built" and
-  reused the existing 75 MHz bitstream WITHOUT rebuilding at 66 MHz.
-  The -k parameter is only effective when a build is triggered (i.e., when
-  no .fs file exists or when -c is also used). When firmware already exists,
-  -k is silently ignored. This behavior may be unexpected to users - consider
-  warning when -k is specified but no build occurs.
+  Board programmed successfully.
+NOTES: Re-verified cleanly. The -k 66 flag was provided but firmware already existed
+  (75 MHz bitstream from prior -c -k 75 test). The script detected "firmware already
+  built" and reused it WITHOUT rebuilding at 66 MHz. The -k parameter is only
+  effective when a build is triggered (i.e., when no .fs file exists or when -c
+  is also used). When firmware already exists, -k is silently ignored.
+  This behavior may be unexpected to users - consider warning when -k is specified
+  but no build occurs.
 
 ================================================================================
  SUMMARY
@@ -570,7 +577,7 @@ SCRIPT: program_board.ps1
     -m  (nonexistent custom bitfile)            PASS (correctly rejected)
     -t  (invalid custom target)                 PASS (correctly rejected)
     -f  (flash only - not implemented)          PASS (correctly reported)
-    -t  (valid default target)                  PASS (with hang recovery)
+    -t  (valid default target)                  PASS (re-verified, no hang)
     (default, no args, program board)           PASS
     -jtag_frequency '0.5MHz' (valid override)   PASS
     -m  (relative path custom bitfile)          FAIL (BUG)**

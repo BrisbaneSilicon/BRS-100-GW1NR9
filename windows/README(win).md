@@ -263,7 +263,7 @@ For all available options:
 | `-l`, `--list_supported_targets` | List all supported target boards and exit |
 | `-c`, `--clean_target_prior` | Clean the build output before rebuilding and programming |
 | `-k <MHz>`, `--clock_frequency` | Clock frequency passed to the build script when auto-building (default: `51`) |
-| `-m <path>`, `--custom_bitfile` | Program a custom `.fs` file instead of the default build output |
+| `-m "<full path to custom bitfile>"` | Program a custom `.fs` file instead of the default build output (ensure file full path is inside `""`) |
 | `-jtag_frequency <freq>` | Override JTAG programming clock frequency (default: `0.02MHz`). Valid values: `0.02MHz`, `0.1MHz`, `0.3MHz`, `0.4MHz`, `0.5MHz`, `0.75MHz`, `0.9MHz`, `1.1MHz`, `1.5MHz`, `2MHz`, `2.5MHz`, `10MHz`, `15MHz` |
 | `-t`, `--custom_target` | Not yet implemented — placeholder for future multi-board support |
 | `-f`, `--update_flash_only` | Not yet implemented — Xilinx only |
@@ -281,7 +281,7 @@ For all available options:
 .\windows\program_board.ps1 -b
 
 # Program with a custom bitstream file
-.\windows\program_board.ps1 -m C:\path\to\custom.fs
+.\windows\program_board.ps1 -m "C:\path\to\custom.fs"
 
 # Build at 66 MHz and program
 .\windows\program_board.ps1 -k 66
