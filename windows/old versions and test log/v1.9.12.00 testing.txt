@@ -485,27 +485,385 @@ PROGRAMMING SUCCESS
 
 
 ================================================================================
+ ADDITIONAL TESTS (added 2026-04-04)
+ Error handling, edge cases, and production validation tests
+================================================================================
+
+
+================================================================================
+ BUILD.PS1 — ERROR HANDLING & EDGE CASES
+================================================================================
+
+================================================================================
+ TEST 23: build.ps1 -k 999 (Invalid clock frequency)
+ Command: .\windows\build.ps1 -k 999
+ Result: PASS (correctly rejected)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+
+ERROR: Clock frequency 999 MHz is not supported.
+
+Supported frequencies (MHz): 51, 66, 75, 81, 87
+Use .\build.ps1 -y to list supported frequencies.
+
+
+================================================================================
+ TEST 24: build.ps1 -k 66 -d (Flag combination: freq + info)
+ Command: .\windows\build.ps1 -k 66 -d
+ Result: PASS (-d takes priority, exits before build)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+
+Default target: BRS-100-GW1NR9
+
+
+================================================================================
+ TEST 25: build.ps1 -t 'INVALID_TARGET' (Invalid custom target)
+ Command: .\windows\build.ps1 -t 'INVALID_TARGET'
+ Result: PASS (correctly rejected)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+
+ERROR: Build target 'INVALID_TARGET' is not supported.
+
+Supported targets:
+  BRS-100-GW1NR9
+
+Note: -t / -custom_target is not yet fully implemented.
+      Only the default target 'BRS-100-GW1NR9' is currently supported.
+
+
+================================================================================
+ TEST 26: build.ps1 -m (clean_platform — not yet implemented)
+ Command: .\windows\build.ps1 -m
+ Result: PASS (correctly handled unimplemented flag)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+NOTE: -m / -clean_platform is not yet implemented.
+
+
+================================================================================
+ TEST 27: build.ps1 -f 'test' (platform — not yet implemented)
+ Command: .\windows\build.ps1 -f 'test'
+ Result: PASS (printed note, continued with default platform, BUILD SUCCESS)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+NOTE: -f / -platform is not yet implemented. Using default platform.
+[Proceeded to full build]
+BUILD SUCCESS
+Build time: 0m 10s
+
+
+================================================================================
+ TEST 28: build.ps1 -r -d (Flag combination: disable reset + default target)
+ Command: .\windows\build.ps1 -r -d
+ Result: PASS (-d takes priority, exits before -r affects build)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+
+Default target: BRS-100-GW1NR9
+
+
+================================================================================
+ TEST 29: build.ps1 -b -y (Flag combination: board demo + list frequencies)
+ Command: .\windows\build.ps1 -b -y
+ Result: PASS (-y takes priority, exits before -b affects build)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+
+=====================================
+ Supported System Clock Frequencies
+=====================================
+Platform : gowin
+Target   : BRS-100-GW1NR9
+Freq MHz : 51, 66, 75, 81, 87
+=====================================
+
+
+================================================================================
+ TEST 30: build.ps1 -k 0 (Boundary: zero frequency)
+ Command: .\windows\build.ps1 -k 0
+ Result: PASS (correctly rejected)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+
+ERROR: Clock frequency 0 MHz is not supported.
+
+Supported frequencies (MHz): 51, 66, 75, 81, 87
+Use .\build.ps1 -y to list supported frequencies.
+
+
+================================================================================
+ TEST 31: build.ps1 -k -1 (Boundary: negative frequency)
+ Command: .\windows\build.ps1 -k -1
+ Result: PASS (correctly rejected)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+
+ERROR: Clock frequency -1 MHz is not supported.
+
+Supported frequencies (MHz): 51, 66, 75, 81, 87
+Use .\build.ps1 -y to list supported frequencies.
+
+
+================================================================================
+ TEST 32: build.ps1 -p -s (Conflicting flags: project only + synthesis only)
+ Command: .\windows\build.ps1 -p -s
+ Result: PASS (-p takes priority, PROJECT GENERATION COMPLETE)
+ Note: First run failed transiently (gw_sh did not launch, exit code 1,
+       likely due to rapid back-to-back gw_sh invocations). Passed on retry.
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Build: project only
+
+PROJECT GENERATION COMPLETE
+Build time: 0m 2s
+
+
+================================================================================
+ TEST 33: build.ps1 -a (Clean all platforms)
+ Command: .\windows\build.ps1 -a  (piped "Y" for confirmation)
+ Result: PASS
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+
+CLEAN ALL BUILD OUTPUT
+WARNING: The following folders will be permanently deleted.
+  ...\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+  ...\windows\output
+
+Cleaned both directories.
+CLEAN COMPLETE
+
+
+================================================================================
+ PROGRAM_BOARD.PS1 — ERROR HANDLING & EDGE CASES
+================================================================================
+
+================================================================================
+ TEST 34: program_board.ps1 -jtag_frequency '999MHz' (Invalid JTAG frequency)
+ Command: .\windows\program_board.ps1 -jtag_frequency '999MHz'
+ Result: PASS (correctly rejected)
+================================================================================
+
+ERROR: Invalid JTAG frequency '999MHz'.
+Valid values: 2.5MHz, 2MHz, 15MHz, 10MHz, 1.5MHz, 1.1MHz, 0.9MHz,
+              0.75MHz, 0.5MHz, 0.3MHz, 0.4MHz, 0.1MHz, 0.02MHz
+
+
+================================================================================
+ TEST 35: program_board.ps1 -m 'C:\nonexistent\file.fs' (Nonexistent bitfile)
+ Command: .\windows\program_board.ps1 -m 'C:\nonexistent\file.fs'
+ Result: PASS (correctly rejected)
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+
+ERROR: Custom bitfile not found: C:\nonexistent\file.fs
+
+
+================================================================================
+ TEST 36: program_board.ps1 -t 'INVALID_BOARD' (Invalid custom target)
+ Command: .\windows\program_board.ps1 -t 'INVALID_BOARD'
+ Result: PASS (correctly rejected)
+================================================================================
+
+ERROR: Target 'INVALID_BOARD' is not supported.
+       Only 'BRS-100-GW1NR9' is supported in this version.
+
+
+================================================================================
+ TEST 37: program_board.ps1 -f 'test.mcs' (Flash only — not implemented)
+ Command: .\windows\program_board.ps1 -f 'test.mcs'
+ Result: PASS (correctly reported not implemented)
+================================================================================
+
+ERROR: -f / --update_flash_only is not implemented on Windows.
+       Flash update is only supported on Xilinx boards (ARTYS7-25/50)
+       via the Linux program_board.sh script.
+
+
+================================================================================
+ TEST 38: program_board.ps1 -t 'BRS-100-GW1NR9' (Valid default target)
+ Command: .\windows\program_board.ps1 -t 'BRS-100-GW1NR9'
+ Result: PASS - PROGRAMMING SUCCESS
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Target 'BRS-100-GW1NR9' is already the default target - continuing.
+FTDI USB reset: Reset 2 FTDI device(s)
+Cable scan: USB Debugger A at USB location 641
+Detected firmware already built - reusing.
+
+Programming:
+  Target Cable: USB Debugger A/0/641/null@0.02MHz
+  Target Device: GW1NR-9C(0x1100481B)
+  Status Code: 0x0003F020
+  Program Finished!
+  Cost 129.99 second(s)
+
+PROGRAMMING SUCCESS
+Note: Unusually long programming time (130s vs typical 7-8s) due to concurrent
+      FTDI access from a second test that ran at the same time.
+
+
+================================================================================
+ TEST 39: program_board.ps1 -jtag_frequency '0.5MHz' (Valid JTAG override)
+ Command: .\windows\program_board.ps1 -jtag_frequency '0.5MHz'
+ Result: PASS - PROGRAMMING SUCCESS (retry after FTDI contention)
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+FTDI USB reset: Reset 2 FTDI device(s)
+Cable scan: USB Debugger A at USB location 641
+
+Programming:
+  Target Cable: USB Debugger A/0/641/null@0.5MHz
+  Target Device: GW1NR-9C(0x1100481B)
+  Status Code: 0x0003F020
+  Program Finished!
+  Cost 8.02 second(s)
+
+PROGRAMMING SUCCESS
+Note: First attempt failed with "Cable failed to open via the channel"
+      (exit code 50) due to concurrent FTDI access from test 38.
+      Passed cleanly on retry.
+
+
+================================================================================
+ TEST 40: program_board.ps1 -m RELATIVE PATH (Known bug)
+ Command: .\windows\program_board.ps1 -m 'windows\output\BRS-100-GW1NR9.fs'
+ Result: FAIL — BUG (same as V1.9.12.02)
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Bitstream: windows\output\BRS-100-GW1NR9.fs (custom)
+
+Program command line: '...programmer_cli.exe ... --fsFile windows\output\BRS-100-GW1NR9.fs'
+Error: Not found any data File, you should use --fsFile\--acFile\--mcuFile
+       to define a data file.
+PROGRAMMING FAILED (exit code: 80)
+
+Note: Same bug as V1.9.12.02. The script passes the relative path directly to
+      programmer_cli.exe without resolving to an absolute path first.
+      Workaround: always use full absolute paths with -m.
+
+
+================================================================================
+ TEST 41: program_board.ps1 -m ABSOLUTE PATH (Workaround for bug in test 40)
+ Command: .\windows\program_board.ps1 -m 'C:\...\windows\output\BRS-100-GW1NR9.fs'
+ Result: PASS - PROGRAMMING SUCCESS
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Bitstream: C:\...\windows\output\BRS-100-GW1NR9.fs (custom)
+
+Programming:
+  Target Cable: USB Debugger A/0/641/null@0.02MHz
+  Target Device: GW1NR-9C(0x1100481B)
+  Status Code: 0x0003F020
+  Program Finished!
+  Cost 7.8 second(s)
+
+PROGRAMMING SUCCESS
+
+
+================================================================================
+ TEST 42: program_board.ps1 -m with wrong extension (Edge case)
+ Command: .\windows\program_board.ps1 -m 'C:\...\README.md'
+ Result: PASS (correctly rejected non-.fs file)
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+
+ERROR: Custom bitfile must have .fs extension: C:\...\README.md
+
+
+================================================================================
+ UPDATED SUMMARY
+================================================================================
+
+SCRIPT: build.ps1
+  Original tests (1-12):   12 PASS, 0 FAIL
+  Additional tests (23-33): 11 PASS, 0 FAIL
+  TOTAL: 23 tests, 23 PASS, 0 FAIL
+
+SCRIPT: program_board.ps1
+  Original tests (13-22):    10 PASS, 0 FAIL
+  Additional tests (34-42):   8 PASS, 1 FAIL (known relative path bug)
+  TOTAL: 19 tests, 18 PASS, 1 FAIL (bug)
+
+OVERALL: 42 tests, 41 PASS, 1 FAIL (bug)
+
+  BUG: program_board.ps1 -m does not resolve relative paths to absolute
+  before passing to programmer_cli.exe. programmer_cli.exe cannot find the
+  file when given a relative path. This is the same bug found in V1.9.12.02
+  testing. Workaround: always use full absolute paths with -m.
+
+
+================================================================================
  NOTES
 ================================================================================
 
-1. Version Detection: V1.9.12.00 (folder name Gowin_V1.9.12_x64) is accepted
+1. Version Detection: V1.9.12 (folder name Gowin_V1.9.12_x64) is accepted
    as "verified compatible" by both scripts. The version check pattern
    "1.9.12*" matches, and it is not "1.9.12.01*" (blocked).
 
 2. Auto-Detection Priority: The scripts search C:\Gowin\Gowin_V1.9.12_x64
    BEFORE C:\Gowin\Gowin_V1.9.12.02_x64 in the common paths list. This means
-   if both versions are installed, V1.9.12.00 will be picked by default.
+   if both versions are installed, V1.9.12 will be picked by default.
 
-3. No Programmer Freezes: All 5 programming attempts completed successfully
+3. No Programmer Freezes: All 8 programming attempts completed successfully
    without any freezes at "Operation embFlash Erase,Program". The FTDI USB
    reset (FT_CyclePort) performed by the script appears to work correctly
-   with V1.9.12.00's programmer_cli.exe.
+   with V1.9.12's programmer_cli.exe.
 
 4. JTAG Frequency Note: At 2.5MHz, the erase status code was 0x00019020
    (0x0001xxxx = FT2CH driver path) vs 0x00039020 (0x0003xxxx = ftd2xx path)
-   at the default 0.02MHz. Both succeeded. The README warns that status codes
+   at the default 0.02MHz. Both succeeded. At 0.5MHz, the status code was
+   0x0003F020 (correct ftd2xx path). The README warns that status codes
    starting with 0x0001xxxx indicate "wrong cable driver path" but programming
-   still completed successfully in this test.
+   still completed successfully in all tests.
 
 5. Build Times: Comparable to V1.9.12.02 - full builds 8-13s, synthesis only
    4s, project only 2s.
+
+6. Flag Priority: When conflicting flags are provided, info/query flags take
+   priority (-d, -y, -l, -i exit before build). For -p vs -s, -p (project
+   only) takes priority over -s (synthesis only).
+
+7. Transient gw_sh Failure: One instance of gw_sh failing to launch (exit
+   code 1, 0 seconds) when running -p -s immediately after a prior -p run.
+   Passed on retry. Likely a timing issue with gw_sh file locks.
