@@ -799,7 +799,7 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "  4. Driver issue - try unplugging and replugging the board"
     Write-Host "  5. License issue - check GOWIN license via IDE: Help > Manage License"
     Write-Host ""
-    Write-Host "If the script froze and you had to Ctrl+C, see:"
-    Write-Host "  windows\TROUBLESHOOTING.txt"
+    Write-Host "If the script froze and you had to Ctrl+C or kill programmer_cli.exe, see:"
+    Write-Host "  windows\TROUBLESHOOTING.txt for more details."
     exit 1
 }
