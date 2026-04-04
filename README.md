@@ -600,9 +600,9 @@ For developing with the project, we recommend [Sublime Text](https://www.sublime
 If you like this project, follow us on X [here](https://x.com/brisbanesilicon)!
 <br>
 
-## Notes on Windows Scripts
+## Troubleshooting Windows Script errors
 
-### Script freezes at `Operation "embFlash Erase,Program" for device#1...`
+#### Script freezes at `Operation "embFlash Erase,Program" for device#1...`
 
 The most common issue. The FTDI chip accumulates stale USB state across rapid programming attempts and stops responding.
 
@@ -620,25 +620,25 @@ You may need to attempt this 2–3 times.
 
 **Prevention:** Wait a few seconds between programming runs. Do not run the script while the GOWIN Programmer GUI is open as it holds an exclusive lock on the cable.
 
-### `Cable failed to open via the location`
+#### `Cable failed to open via the location`
 
 The USB device is in a bad state from a previously killed `programmer_cli` process. Follow the same recovery steps above.
 
-### `PROGRAMMING FAILED (exit code: 1)` with status `0x00015421`
+#### `PROGRAMMING FAILED (exit code: 1)` with status `0x00015421`
 
 The wrong cable driver path was selected internally. Unplug and replug the board, then retry. Status codes starting with `0x0001xxxx` indicate the wrong (FT2CH) driver path; `0x0003xxxx` is the correct (ftd2xx) path. Also double check the GOWIN EDA version (V1.9.12.02 or V1.9.12), as this error is also commonly seen when the wrong version is installed.
 
-### `KERNEL_SECURITY_CHECK_FAILURE` (BSOD 0x139)
+#### `KERNEL_SECURITY_CHECK_FAILURE` (BSOD 0x139)
 
 Windows crashes with a blue screen after repeated programming cycles. This is caused by a bug in the FTDI `ftd2xx.sys` kernel driver.
 
 **Fix:** Fully remove and reinstall the FTDI D2XX driver. See [FTDI Driver Setup](#ftdi-driver-setup) for the complete step-by-step procedure, including how to clear ghost devices from the driver store and verify driver version consistency.
 
-### GOWIN EDA not found
+#### GOWIN EDA not found
 
 The scripts search common install paths automatically. If GOWIN EDA is installed elsewhere, follow steps in [Prerequisites](#prerequisites) to change where the script looks for the installation.
 
-### `cannot be loaded because running scripts is disabled on this system`
+#### `cannot be loaded because running scripts is disabled on this system`
 
 Set the PowerShell execution policy:
 
@@ -652,7 +652,7 @@ Or:
 Set-ExecutionPolicy RemoteSigned
 ```
 
-### GOWIN version warnings
+#### GOWIN version warnings
 
 - **V1.9.8–V1.9.11** — scripts will warn and continue, but these versions are untested.
 - **V1.9.11.01** — blocked by the scripts. Known broken release.
@@ -660,7 +660,7 @@ Set-ExecutionPolicy RemoteSigned
 - **V1.9.12.01** — blocked by the scripts. Do not use; the programmer component is broken.
 - **V1.9.12.02** — also compatible (Windows only).
 
-### Build triggered automatically by `program_board.ps1`
+#### Build triggered automatically by `program_board.ps1`
 
 If no `.fs` file exists, the program script will automatically run a full build before programming. To avoid this triggering an unwanted default build, pre-build with your desired options first:
 
