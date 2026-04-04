@@ -140,7 +140,6 @@ function Show-Help {
     Write-Host "    -f, --update_flash_only  <MCS_FILE_PATH>"
     Write-Host "        [NOT IMPLEMENTED] Update flash with provided MCS file."
     Write-Host "        This flag exists for compatibility with the Linux script."
-    Write-Host "        Flash update is only supported on Xilinx boards (ARTYS7-25/50)."
     Write-Host ""
     Write-Host "    -m, --custom_bitfile  <PATH>"
     Write-Host "        Program the board with a custom .fs file instead of the default"
@@ -535,9 +534,9 @@ if ($boards.Count -eq 0) {
 # ---- -l / --list_supported_targets ----
 # list all unique board names from the CSV, comma-separated, and exit.
 # matches Linux: list_supported_targets()
+# note: csv contain xilinx but it's not implemented in the project yet, so this will just return "BRS-100-GW1NR9"
 if ($ListSupportedTargets) {
-    $uniqueBoards = $boards | ForEach-Object { $_.Board.Trim() } | Select-Object -Unique
-    Write-Host ($uniqueBoards -join ", ")
+    Write-Host "BRS-100-GW1NR9"
     exit 0
 }
 
