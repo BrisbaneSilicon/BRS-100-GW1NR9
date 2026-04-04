@@ -62,8 +62,10 @@ To run the Windows version of this project:
 3. An installation of GOWIN EDA V1.9.12 or V1.9.12.02. 
    - You can download from the official [GOWIN EDA download page](https://www.gowinsemi.com/en/support/download_eda/).
    - You may need to register as a GOWIN member first.
-   > [!WARNING]
-   > **Do NOT install V1.9.12.01.** It has a known bug that prevents programming to the board. The scripts will refuse to run if this version is detected.
+
+> [!WARNING]
+> **Do NOT install V1.9.12.01.** It has a known bug that prevents programming to the board. The scripts will refuse to run if this version is detected.
+
    - Make sure you install GOWIN EDA in the default location or any of the following:
    ```
    C:\Gowin\Gowin_V1.9.12_x64
