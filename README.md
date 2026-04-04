@@ -600,7 +600,7 @@ For developing with the project, we recommend [Sublime Text](https://www.sublime
 If you like this project, follow us on X [here](https://x.com/brisbanesilicon)!
 <br>
 
-## Troubleshooting Windows Script errors
+## Troubleshooting Windows Script Errors
 
 #### Script freezes at `Operation "embFlash Erase,Program" for device#1...`
 
