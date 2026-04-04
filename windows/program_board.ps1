@@ -264,8 +264,7 @@ if (-not $RepoRoot -or $RepoRoot.Trim() -eq '') {
 }
 
 # ---- AUTO-DETECT GOWIN INSTALL PATH ----
-# checks for programmer_cli.exe specifically - different from build script
-# which checks for gw_sh.exe
+# checks for programmer_cli.exe  
 $GowinInstallDir = $null
 
 $commonPaths = @(
@@ -329,7 +328,7 @@ if (-not $GowinInstallDir) {
 $installFolderName = Split-Path $GowinInstallDir -Leaf
 Write-Host "Found GOWIN programmer at: $GowinInstallDir"
 
-# Extract version number from folder name (e.g., "Gowin_V1.9.12.02_x64" -> "1.9.12.02")
+# Extract version number from folder name 
 if ($installFolderName -match 'V(\d+\.\d+\.\d+(?:\.\d+)?)') {
     $versionNumber = $matches[1]
 } else {
@@ -390,9 +389,7 @@ $BoardsCsvPath  = "$RepoRoot\prog\supported_boards.csv"
 # release the USB handle between invocations. calling FT_CyclePort forces the
 # FTDI chip to USB re-enumerate (equivalent to physical unplug/replug), clearing
 # any stale driver state that would cause the next programmer_cli call to deadlock.
-#
-# ftd2xx API reference: https://ftdichip.com/wp-content/uploads/2024/09/D2XX_Programmers_Guide.pdf
-# FT_STATUS values: FT_OK=0, FT_INVALID_HANDLE=1, FT_DEVICE_NOT_FOUND=2, etc.
+
 $Ftd2xxDll = "$GowinInstallDir\Programmer\bin\ftd2xx.dll"
 
 if (Test-Path $Ftd2xxDll) {
@@ -513,7 +510,6 @@ $ProjectName    = "BRS-100-GW1NR9"
 
 # ---- -d / --list_default_target ----
 # print the default target board name and exit.
-# matches Linux: echo "$target_board"
 if ($ListDefaultTarget) {
     Write-Host $ProjectName
     exit 0
@@ -534,7 +530,7 @@ if ($boards.Count -eq 0) {
 # ---- -l / --list_supported_targets ----
 # list all unique board names from the CSV, comma-separated, and exit.
 # matches Linux: list_supported_targets()
-# note: csv contain xilinx but it's not implemented in the project yet, so this will just return "BRS-100-GW1NR9"
+# Note: csv contain xilinx but it's not implemented in the project yet, so this will just return "BRS-100-GW1NR9"
 if ($ListSupportedTargets) {
     Write-Host "BRS-100-GW1NR9"
     exit 0
@@ -550,7 +546,6 @@ if (-not $board) {
 
 # ---- -s / --check_if_target_supported ----
 # print whether the current target board is in the supported_boards.csv and exit.
-# matches Linux: check_if_target_supported flag
 if ($CheckIfTargetSupported) {
     Write-Host "Target '$ProjectName' is supported."
     exit 0
@@ -584,8 +579,6 @@ $ArtifactsDir = "$RepoRoot\build\platforms\gowin\devices\$DeviceId\$SpeedGrade\o
 $DefaultFsFile = "$ArtifactsDir\$ProjectName.$BitstreamExt"
 
 # ---- BUILD DEVICE ARGUMENT FOR PROGRAMMER ----
-# matches Linux: speed_grade_category=${speed_grade:0:1}
-# "C7I6" -> "C", combined with "GW1NR-9" -> "GW1NR-9C"
 $SpeedGradeCategory = $SpeedGrade.Substring(0, 1)
 $DeviceArg          = "$DeviceId$SpeedGradeCategory"
 
@@ -662,7 +655,7 @@ $scanOutput = & $ProgrammerCli --scan-cables F 2>&1
 Write-Host $scanOutput
 
 # extract JTAG cable location from scan output
-# scan output format: "USB Debugger A/0/529/null (USB location:529)"
+# scan output format example: "USB Debugger A/0/529/null (USB location:529)"
 $locationMatch = ($scanOutput | Out-String)
 $regexMatch    = [regex]::Match($locationMatch, "USB Debugger A/0/(\d+)/null")
 
@@ -682,10 +675,6 @@ Write-Host "JTAG interface found at USB location: $cableLocation - proceeding."
 
 # ---- BUILD IF NEEDED (skipped when -m custom bitfile is provided) ----
 if (-not $CustomBitfile) {
-    # match Linux program_board.sh flow:
-    #   1. if -c flag, clean build output first (separate step)
-    #   2. then check if firmware exists
-    #   3. if not, trigger a normal build (without -c)
     if (-not (Test-Path $BuildScript)) {
         Write-Host "ERROR: Cannot find build script at: $BuildScript"
         Write-Host "Please check the build script exists at that location."
@@ -750,7 +739,7 @@ if (-not $CustomBitfile) {
 #   --location <loc> : targets the specific USB device (from --scan-cables F)
 #   --frequency      : JTAG clock speed (default 0.5MHz, configurable via -jtag_frequency)
 # without all three, programmer_cli falls back to FT2CH and fails with CRC errors.
-# operation_index 5 = embFlash Erase,Program (matches Linux build.sh behaviour)
+# operation_index 5 = embFlash Erase,Program 
 Write-Host ""
 Write-Host "====================================="
 Write-Host " BRS-100-GW1NR9 Windows Programmer"
@@ -768,7 +757,7 @@ Write-Host "  If the script freezes below, kill programmer_cli.exe in Task Manag
 Write-Host "  and replug USB. See TROUBLESHOOTING.txt for details."
 Write-Host ""
 
-# echo exact command line before executing (matches Linux behaviour)
+# echo exact command line before executing 
 Write-Host "Program command line: '$ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile'"
 Write-Host ""
 Write-Host "*** GOWIN programmer_cli Command Line Console ***"
