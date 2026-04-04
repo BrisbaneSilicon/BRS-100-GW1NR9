@@ -192,16 +192,10 @@ Fix:
 
     6. Verify versions match
 
-    After reinstall, check that the kernel driver and GOWIN's bundled DLL are compatible:
-
-    # System kernel driver
-    (Get-Item C:\Windows\System32\drivers\ftd2xx.sys).VersionInfo.FileVersion
-
-    # GOWIN's bundled user-mode DLL
-    (Get-Item "$env:GOWIN_INSTALL_DIR\Programmer\bin\ftd2xx.dll").VersionInfo.FileVersion
-
-    If these are wildly different versions (e.g. 2.12.x vs 2.08.x) or version dates (2017 vs 2024)
-    that would be what's causing the problem. If dates and versions match means it's fixed. 
+    After reinstall, check if the driver versions match by running: 
+    ```
+    pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5
+    ``` 
 
 
 
