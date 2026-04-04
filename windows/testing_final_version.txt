@@ -1,0 +1,630 @@
+================================================================================
+ BRS-100-GW1NR9 Windows Scripts - Command Line Options Testing
+ Date: 2026-03-31
+ Scripts tested: build.ps1 (v1.0.2), program_board.ps1 (v1.0.2)
+ Environment: Windows 11 Home, PowerShell, GOWIN EDA V1.9.12.02_x64
+================================================================================
+
+================================================================================
+ BUILD.PS1 TESTS
+================================================================================
+
+--------------------------------------------------------------------------------
+TEST 1: build.ps1 -h (help)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -h
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Displayed full help text including:
+  - Usage line
+  - All core build options (-b, -k, -u, -r, -p, -s, -a, -c, -y, -d, -i, -l, -h)
+  - Not-yet-implemented flags (-t, -f, -m)
+  - Examples section
+  - Author and copyright information
+
+--------------------------------------------------------------------------------
+TEST 2: build.ps1 -d (list default target)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -d
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12.02_x64
+  GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+  Device settings loaded from CSV:
+    Part Number    : GW1NR-LV9QN88PC7/I6
+    Device Version : C
+    Speed Grade    : C7I6
+    Device ID      : GW1NR-9
+
+  Default target: BRS-100-GW1NR9
+
+--------------------------------------------------------------------------------
+TEST 3: build.ps1 -i (list supported platforms)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -i
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  =====================================
+   Supported Platforms
+  =====================================
+    gowin
+    xilinx
+  =====================================
+
+--------------------------------------------------------------------------------
+TEST 4: build.ps1 -l (list supported targets)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -l
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  =====================================
+   Supported Targets
+  =====================================
+    BRS-100-GW1NR9
+  =====================================
+
+--------------------------------------------------------------------------------
+TEST 5: build.ps1 -y (list supported clock frequencies)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -y
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  =====================================
+   Supported System Clock Frequencies
+  =====================================
+  Platform : gowin
+  Target   : BRS-100-GW1NR9
+  Freq MHz : 51, 66, 75, 81, 87
+  =====================================
+
+--------------------------------------------------------------------------------
+TEST 6: build.ps1 -c (clean current target build output)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -c
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  =====================================
+   CLEAN TARGET BUILD OUTPUT
+  =====================================
+  Cleaned: C:\...\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+  =====================================
+   CLEAN COMPLETE
+  =====================================
+
+--------------------------------------------------------------------------------
+TEST 7: build.ps1 -k 999 (invalid clock frequency)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -k 999
+RESULT:   PASS (correctly rejected invalid frequency)
+EXIT CODE: 1
+OUTPUT:
+  ERROR: Clock frequency 999 MHz is not supported.
+
+  Supported frequencies (MHz): 51, 66, 75, 81, 87
+  Use .\build.ps1 -y to list supported frequencies.
+
+--------------------------------------------------------------------------------
+TEST 8: build.ps1 -k 66 -d (valid clock frequency + default target)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -k 66 -d
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Default target: BRS-100-GW1NR9
+NOTES: -d flag takes priority and exits before build, -k is accepted but unused.
+
+--------------------------------------------------------------------------------
+TEST 9: build.ps1 -t 'INVALID_TARGET' (invalid custom target)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -t 'INVALID_TARGET'
+RESULT:   PASS (correctly rejected invalid target)
+EXIT CODE: 1
+OUTPUT:
+  ERROR: Build target 'INVALID_TARGET' is not supported.
+
+  Supported targets:
+    BRS-100-GW1NR9
+
+  Note: -t / -custom_target is not yet fully implemented.
+        Only the default target 'BRS-100-GW1NR9' is currently supported.
+
+--------------------------------------------------------------------------------
+TEST 10: build.ps1 -m (clean_platform - not yet implemented)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -m
+RESULT:   PASS (correctly handled unimplemented flag)
+EXIT CODE: 0
+OUTPUT:
+  NOTE: -m / -clean_platform is not yet implemented.
+
+--------------------------------------------------------------------------------
+TEST 11: build.ps1 -f 'test' (platform - not yet implemented)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -f 'test'
+RESULT:   PASS (correctly handled unimplemented flag, continued with default)
+EXIT CODE: 0
+OUTPUT:
+  NOTE: -f / -platform is not yet implemented. Using default platform.
+  [Proceeded to full build which completed successfully]
+  BUILD SUCCESS
+  Build time: 0m 9s
+
+--------------------------------------------------------------------------------
+TEST 12: build.ps1 -r -d (disable pushbutton reset + default target)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -r -d
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Default target: BRS-100-GW1NR9
+NOTES: Both flags accepted. -d exits early before -r affects the build.
+
+--------------------------------------------------------------------------------
+TEST 13: build.ps1 -b -y (board demo + list frequencies)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -b -y
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  =====================================
+   Supported System Clock Frequencies
+  =====================================
+  Platform : gowin
+  Target   : BRS-100-GW1NR9
+  Freq MHz : 51, 66, 75, 81, 87
+  =====================================
+NOTES: -y flag takes priority and exits before -b affects the build.
+
+--------------------------------------------------------------------------------
+TEST 14: build.ps1 -p (project generation only)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -p
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Build    : project only
+  [Project generation output...]
+  =====================================
+   PROJECT GENERATION COMPLETE
+  =====================================
+  Project files at: ...\output\BRS-100-GW1NR9
+  Project copied to: ...\windows\output\BRS-100-GW1NR9
+  Open GOWIN IDE and load the project from: ...\windows\output\BRS-100-GW1NR9
+  Build time: 0m 1s
+NOTES: Correctly stopped after project generation without running synthesis or PnR.
+
+--------------------------------------------------------------------------------
+TEST 15: build.ps1 -s (synthesis only)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -s
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Build    : synthesis only
+  [Synthesis output...]
+  =====================================
+   SYNTHESIS COMPLETE
+  =====================================
+  Synthesis report at: ...\BRS-100-GW1NR9_syn.rpt.html
+  Report copied to: ...\windows\output\BRS-100-GW1NR9_syn.rpt.html
+  Build time: 0m 3s
+NOTES: Correctly stopped after synthesis without running place-and-route.
+
+--------------------------------------------------------------------------------
+TEST 16: build.ps1 -b -k 66 (board demonstration at 66 MHz - full build)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1 -b -k 66
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Clock    : 66 MHz
+  Mode     : board demonstration
+  Build    : full build
+  [Full synthesis + PnR output, used timing_66mhz.sdc and clk66mhz module]
+  =====================================
+   BUILD SUCCESS
+  =====================================
+  .fs file ready at: ...\output\.artifacts\BRS-100-GW1NR9.fs
+  .fs file copied to: ...\windows\output\BRS-100-GW1NR9.fs
+  Build time: 0m 11s
+NOTES: Board demonstration mode correctly selected, 66 MHz clock used.
+
+--------------------------------------------------------------------------------
+TEST 17: build.ps1 (default - no arguments, full build)
+--------------------------------------------------------------------------------
+COMMAND:  .\build.ps1
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Clock    : 51 MHz
+  UART     : 115200 baud
+  Reset    : enabled
+  Mode     : LED blink (user.sv)
+  Build    : full build
+  [Full synthesis + PnR output]
+  =====================================
+   BUILD SUCCESS
+  =====================================
+  .fs file ready at: ...\output\.artifacts\BRS-100-GW1NR9.fs
+  .fs file copied to: ...\windows\output\BRS-100-GW1NR9.fs
+  Build time: 0m 7s
+NOTES: All defaults correctly applied.
+
+
+================================================================================
+ PROGRAM_BOARD.PS1 TESTS
+================================================================================
+
+--------------------------------------------------------------------------------
+TEST 18: program_board.ps1 -h (help)
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -h
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Displayed full help including:
+  - NAME, SYNOPSIS, DESCRIPTION sections
+  - All options (-h, -d, -c, -f, -m, -l, -s, -b, -t, -k, -jtag_frequency)
+  - EXAMPLES section
+  - IMPORTANT NOTICE about freezing
+  - AUTHOR and COPYRIGHT
+
+--------------------------------------------------------------------------------
+TEST 19: program_board.ps1 -d (list default target)
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -d
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+  GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+  BRS-100-GW1NR9
+
+--------------------------------------------------------------------------------
+TEST 20: program_board.ps1 -l (list supported targets)
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -l
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+  GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+  BRS-100-GW1NR9, ARTYS7-25, ARTYS7-50
+
+--------------------------------------------------------------------------------
+TEST 21: program_board.ps1 -s (check if target supported)
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -s
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+  GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+  Target 'BRS-100-GW1NR9' is supported.
+
+--------------------------------------------------------------------------------
+TEST 22: program_board.ps1 -b (check if target built)
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -b
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+  GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+  Board    : BRS-100-GW1NR9 (gowin)
+  Device   : GW1NR-9C
+  Bitstream: ...\output\.artifacts\BRS-100-GW1NR9.fs
+  Target 'BRS-100-GW1NR9' firmware built status: true
+
+--------------------------------------------------------------------------------
+TEST 23: program_board.ps1 -jtag_frequency '999MHz' (invalid JTAG frequency)
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -jtag_frequency '999MHz'
+RESULT:   PASS (correctly rejected invalid frequency)
+EXIT CODE: 1
+OUTPUT:
+  ERROR: Invalid JTAG frequency '999MHz'.
+  Valid values: 2.5MHz, 2MHz, 15MHz, 10MHz, 1.5MHz, 1.1MHz, 0.9MHz,
+                0.75MHz, 0.5MHz, 0.3MHz, 0.4MHz, 0.1MHz, 0.02MHz
+
+--------------------------------------------------------------------------------
+TEST 24: program_board.ps1 -m 'C:\nonexistent\file.fs' (nonexistent custom bitfile)
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -m 'C:\nonexistent\file.fs'
+RESULT:   PASS (correctly rejected nonexistent file)
+EXIT CODE: 1
+OUTPUT:
+  Board    : BRS-100-GW1NR9 (gowin)
+  Device   : GW1NR-9C
+
+  ERROR: Custom bitfile not found: C:\nonexistent\file.fs
+
+--------------------------------------------------------------------------------
+TEST 25: program_board.ps1 -t 'INVALID_BOARD' (invalid custom target)
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -t 'INVALID_BOARD'
+RESULT:   PASS (correctly rejected invalid target)
+EXIT CODE: 1
+OUTPUT:
+  ERROR: Target 'INVALID_BOARD' is not supported.
+         Only 'BRS-100-GW1NR9' is supported in this version.
+
+--------------------------------------------------------------------------------
+TEST 26: program_board.ps1 -f 'test.mcs' (flash only - not implemented)
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -f 'test.mcs'
+RESULT:   PASS (correctly reported not implemented)
+EXIT CODE: 1
+OUTPUT:
+  ERROR: -f / --update_flash_only is not implemented on Windows.
+         Flash update is only supported on Xilinx boards (ARTYS7-25/50)
+         via the Linux program_board.sh script.
+
+--------------------------------------------------------------------------------
+TEST 27: program_board.ps1 -t 'BRS-100-GW1NR9' (valid default target)
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -t 'BRS-100-GW1NR9'
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Target 'BRS-100-GW1NR9' is already the default target - continuing.
+  [FTDI reset, cable scan succeeded]
+  Detected firmware already built - reusing.
+  [Programming 0%..100% completed]
+  Status Code is: 0x0003F020
+  User Code: 0x0000BF3B
+  Cost 8.28 second(s)
+  PROGRAMMING SUCCESS
+NOTES: Retested cleanly - no hang. Previously noted a hang on first attempt;
+       re-run confirms clean PASS without needing kill/retry.
+
+--------------------------------------------------------------------------------
+TEST 28: program_board.ps1 (default - no arguments, program board)
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+  GOWIN version: Gowin_V1.9.12.02_x64 (verified compatible)
+  Board    : BRS-100-GW1NR9 (gowin)
+  Device   : GW1NR-9C
+  Bitstream: ...\output\.artifacts\BRS-100-GW1NR9.fs
+
+  Resetting 2 FTDI device(s) to clear stale USB state...
+  Waiting for USB re-enumeration...
+  FTDI USB reset complete.
+
+  Scanning for connected cables (ftd2xx)...
+  Cable found: USB Debugger A/0/641/null (USB location:641)
+  Cable found: USB Debugger A/1/642/null (USB location:642)
+  JTAG interface found at USB location: 641 - proceeding.
+
+  Detected firmware already built - reusing.
+
+  =====================================
+   BRS-100-GW1NR9 Windows Programmer
+  =====================================
+  Device    : GW1NR-9C
+  Frequency : 0.02MHz
+  Operation : embFlash Erase, Program (index 5)
+  =====================================
+
+  [Programming 0%..100% completed]
+  Status Code is: 0x0003F020
+  Cost 7.58 second(s)
+
+  =====================================
+   PROGRAMMING SUCCESS
+  =====================================
+  Board programmed successfully.
+  The design will auto-load on every power-on.
+
+--------------------------------------------------------------------------------
+TEST 29: program_board.ps1 -jtag_frequency '0.5MHz' (valid JTAG frequency override)
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -jtag_frequency '0.5MHz'
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Frequency : 0.5MHz
+  [Programming 0%..100% completed]
+  Status Code is: 0x0003F020
+  Cost 7.85 second(s)
+
+  =====================================
+   PROGRAMMING SUCCESS
+  =====================================
+  Board programmed successfully.
+NOTES: 0.5MHz JTAG frequency correctly applied. Programming succeeded.
+
+--------------------------------------------------------------------------------
+TEST 30: program_board.ps1 -m with RELATIVE path (custom bitfile - BUG FOUND)
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -m output\BRS-100-GW1NR9.fs
+RESULT:   FAIL - BUG: relative path not resolved to absolute before passing to programmer_cli
+EXIT CODE: 80
+OUTPUT:
+  Board    : BRS-100-GW1NR9 (gowin)
+  Device   : GW1NR-9C
+  Bitstream: output\BRS-100-GW1NR9.fs (custom)
+  [FTDI reset, cable scan succeeded]
+  Program command line: '...programmer_cli.exe ... --fsFile output\BRS-100-GW1NR9.fs'
+  Error: Not found any data File, you should use --fsFile\--acFile\--mcuFile
+         to define a data file.
+  PROGRAMMING FAILED (exit code: 80)
+NOTES: The script accepted the relative path and passed it directly to
+  programmer_cli.exe, which could not resolve it. The script should convert
+  relative paths to absolute paths before passing to the programmer.
+  This is a BUG in program_board.ps1.
+
+--------------------------------------------------------------------------------
+TEST 31: program_board.ps1 -c (clean + rebuild + program) [MANUAL TEST]
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -c
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  [FTDI reset, cable scan succeeded]
+  Clean build requested - cleaning build output first...
+  [build.ps1 -c ran: cleaned output directory]
+  Rebuilding firmware...
+  [build.ps1 ran: full build at 51 MHz, BUILD SUCCESS, 0m 7s]
+  [Programming 0%..100% completed]
+  Status Code is: 0x0003F020
+  Cost 7.52 second(s)
+  PROGRAMMING SUCCESS
+NOTES: Clean + rebuild + program flow worked correctly end-to-end.
+  The script properly: (1) cleaned build output via build.ps1 -c,
+  (2) triggered a fresh build via build.ps1, (3) programmed the board.
+
+--------------------------------------------------------------------------------
+TEST 32: program_board.ps1 -c -k 75 (clean + rebuild at 75 MHz + program) [MANUAL TEST]
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -c -k 75
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  [FTDI reset, cable scan succeeded]
+  Clean build requested - cleaning build output first...
+  [build.ps1 -c ran: cleaned output directory]
+  Rebuilding firmware...
+  [build.ps1 -k 75 ran: full build at 75 MHz, used timing_75mhz.sdc
+   and clk75mhz module, BUILD SUCCESS, 0m 9s]
+  [Programming 0%..100% completed]
+  Status Code is: 0x0003F020
+  User Code: 0x0000BF3B
+  Cost 8.23 second(s)
+  PROGRAMMING SUCCESS
+NOTES: Clean + rebuild at 75 MHz + program flow worked correctly.
+  The -k 75 parameter was correctly passed through to build.ps1,
+  confirmed by timing_75mhz.sdc and CLK_FREQUENCY_MHZ=75 in build output.
+  Re-verified from a fully empty build dir (after build.ps1 -clean_all_platforms).
+  The -c clean step reported "Nothing to clean" (already clean), then built fresh.
+
+
+--------------------------------------------------------------------------------
+TEST 33: program_board.ps1 -k 66 (program with clock freq - firmware already exists) [MANUAL TEST - REDO]
+--------------------------------------------------------------------------------
+COMMAND:  .\program_board.ps1 -k 66
+RESULT:   PASS
+EXIT CODE: 0
+OUTPUT:
+  Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12.02_x64
+  [FTDI reset, cable scan succeeded]
+  Detected firmware already built - reusing.
+  [Programming 0%..100% completed]
+  Status Code is: 0x0003F020
+  User Code: 0x0000BF3B
+  Cost 7.56 second(s)
+  PROGRAMMING SUCCESS
+  Board programmed successfully.
+NOTES: Re-verified cleanly. The -k 66 flag was provided but firmware already existed
+  (75 MHz bitstream from prior -c -k 75 test). The script detected "firmware already
+  built" and reused it WITHOUT rebuilding at 66 MHz. The -k parameter is only
+  effective when a build is triggered (i.e., when no .fs file exists or when -c
+  is also used). When firmware already exists, -k is silently ignored.
+  This behavior may be unexpected to users - consider warning when -k is specified
+  but no build occurs.
+
+================================================================================
+ SUMMARY
+================================================================================
+
+SCRIPT: build.ps1
+  Total tests:  17
+  Passed:       17
+  Failed:       0
+
+  Flags tested:
+    -h  (help)                                  PASS
+    -d  (list default target)                   PASS
+    -i  (list supported platforms)              PASS
+    -l  (list supported targets)                PASS
+    -y  (list supported clock frequencies)      PASS
+    -c  (clean current target)                  PASS
+    -k  (clock frequency - valid)               PASS
+    -k  (clock frequency - invalid)             PASS (correctly rejected)
+    -t  (custom target - invalid)               PASS (correctly rejected)
+    -m  (clean platform - not implemented)      PASS
+    -f  (platform - not implemented)            PASS
+    -r  (disable pushbutton reset)              PASS
+    -b  (board demonstration)                   PASS
+    -p  (project only)                          PASS
+    -s  (synthesis only)                        PASS
+    -b -k 66 (board demo at 66 MHz, full build) PASS
+    (default, no args, full build)              PASS
+
+SCRIPT: program_board.ps1
+  Total tests:  16
+  Passed:       14
+  Failed:       1 (BUG: -m with relative path)
+  Partial:      1 (USB state issue, not a script bug)
+
+  Flags tested:
+    -h  (help)                                  PASS
+    -d  (list default target)                   PASS
+    -l  (list supported targets)                PASS
+    -s  (check if target supported)             PASS
+    -b  (check if target built)                 PASS
+    -jtag_frequency (invalid)                   PASS (correctly rejected)
+    -m  (nonexistent custom bitfile)            PASS (correctly rejected)
+    -t  (invalid custom target)                 PASS (correctly rejected)
+    -f  (flash only - not implemented)          PASS (correctly reported)
+    -t  (valid default target)                  PASS (re-verified, no hang)
+    (default, no args, program board)           PASS
+    -jtag_frequency '0.5MHz' (valid override)   PASS
+    -m  (relative path custom bitfile)          FAIL (BUG)**
+    -c  (clean + rebuild + program)             PASS
+    -c -k 75 (clean + rebuild 75MHz + program)  PASS
+    -k 66 (reuse existing firmware, -k ignored)  PASS *
+
+  * NOTE: -k is silently ignored when firmware already exists (no rebuild triggered).
+
+  ** BUG: program_board.ps1 -m does not resolve relative paths to absolute
+    before passing to programmer_cli.exe. The programmer cannot find the file
+    when given a relative path like "output\BRS-100-GW1NR9.fs".
+    Workaround: always use full absolute paths with -m.
+
+OVERALL: 33 tests, 31 PASS, 1 FAIL (bug), 1 PARTIAL PASS (hardware limitation)
+
+================================================================================
+ BUGS FOUND
+================================================================================
+
+1. program_board.ps1 -m RELATIVE PATH BUG
+   - SEVERITY: Medium
+   - DESCRIPTION: When -m is given a relative path (e.g., "output\BRS-100-GW1NR9.fs"),
+     the script passes it directly to programmer_cli.exe without resolving to an
+     absolute path. programmer_cli.exe cannot find the file and fails with exit
+     code 80: "Not found any data File".
+   - EXPECTED: The script should resolve relative paths to absolute paths using
+     (Resolve-Path $CustomBitfile).Path or similar before passing to programmer_cli.
+   - WORKAROUND: Use full absolute paths with -m flag.
+   - REPRO: .\program_board.ps1 -m output\BRS-100-GW1NR9.fs
+
+================================================================================
+ KNOWN ISSUES ENCOUNTERED DURING TESTING
+================================================================================
+
+1. FTDI USB STATE CORRUPTION
+   - After programmer_cli.exe hangs and is killed, the FTDI USB device enters
+     a bad state (USB location shows as 0, FT_Open returns status=3).
+   - Recovery requires physical USB cable unplug/replug (3+ seconds).
+   - The FT_CyclePort mechanism in the script helps prevent hangs on subsequent
+     runs when the USB state is still clean, but cannot recover from a
+     fully corrupted state.
+   - This is documented in windows\TROUBLESHOOTING.txt.
+
+2. EXECUTION POLICY
+   - Scripts require PowerShell execution policy to be set to RemoteSigned
+     or run with -ExecutionPolicy Bypass flag.
+   - Without this, scripts fail with "UnauthorizedAccess" error.
+   - This is documented in windows\README.md.
+================================================================================
