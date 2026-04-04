@@ -62,7 +62,7 @@
 #               -t / --custom_target              dummy flag (single target, not implemented)
 #               -jtag_frequency                   renamed from -f (no short flag, avoids -f collision)
 # version 0.6 - add author and copyright statement
-#               update help text references to v0.6
+#               update help text references to v1.0.2
 # version 1.0.2 - added detailed help message, cleaned up code, added comments, added more error handling and user feedback
 # =============================================================
 
@@ -121,7 +121,7 @@ function Show-Help {
     Write-Host "    program_board - program the BRS-100-GW1NR9 board with FPGA firmware"
     Write-Host ""
     Write-Host "SYNOPSIS"
-    Write-Host "    .\program_board_v0.6.ps1 [OPTIONS]"
+    Write-Host "    .\program_board_v1.0.2.ps1 [OPTIONS]"
     Write-Host ""
     Write-Host "DESCRIPTION"
     Write-Host "    Program the BRS-100-GW1NR9 board via JTAG using programmer_cli.exe."
@@ -171,25 +171,25 @@ function Show-Help {
     Write-Host "        (Windows-only flag, no short form to avoid collision with -f)"
     Write-Host ""
     Write-Host "EXAMPLES"
-    Write-Host "    .\program_board_v0.6.ps1"
+    Write-Host "    .\program_board_v1.0.2.ps1"
     Write-Host "        Build (if needed) and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.6.ps1 -c"
+    Write-Host "    .\program_board_v1.0.2.ps1 -c"
     Write-Host "        Clean, rebuild, and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.6.ps1 -b"
+    Write-Host "    .\program_board_v1.0.2.ps1 -b"
     Write-Host "        Check whether firmware is built without programming."
     Write-Host ""
-    Write-Host "    .\program_board_v0.6.ps1 -m C:\path\to\custom.fs"
+    Write-Host "    .\program_board_v1.0.2.ps1 -m C:\path\to\custom.fs"
     Write-Host "        Program the board with a custom bitstream file."
     Write-Host ""
-    Write-Host "    .\program_board_v0.6.ps1 -k 66"
+    Write-Host "    .\program_board_v1.0.2.ps1 -k 66"
     Write-Host "        Build at 66 MHz and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.6.ps1 -c -k 75"
+    Write-Host "    .\program_board_v1.0.2.ps1 -c -k 75"
     Write-Host "        Clean, rebuild at 75 MHz, and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.6.ps1 -jtag_frequency 2.5MHz"
+    Write-Host "    .\program_board_v1.0.2.ps1 -jtag_frequency 2.5MHz"
     Write-Host "        Program at 2.5MHz JTAG speed (faster, less reliable)."
     Write-Host ""
     Write-Host "IMPORTANT NOTICE"

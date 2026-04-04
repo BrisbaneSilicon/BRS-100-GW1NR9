@@ -45,7 +45,7 @@ Built output (`.fs` file) is placed in `windows\output\`.
    - Download from [git-scm.com](https://git-scm.com/).
    - Ensure `git` is on your system PATH.
 
-3. **GOWIN EDA V1.9.12.02** — see [GOWIN EDA Installation](#gowin-eda-installation) below.
+3. **GOWIN EDA V1.9.12.02 or V1.9.12** — see [GOWIN EDA Installation](#gowin-eda-installation) below.
 
 4. **A free GOWIN EDA license** — see [License Setup](#license-setup) below.
 
@@ -59,7 +59,7 @@ Built output (`.fs` file) is placed in `windows\output\`.
 
 ### GOWIN EDA Installation
 
-Download GOWIN EDA **V1.9.12.02** from the official [GOWIN EDA download page](https://www.gowinsemi.com/en/support/download_eda/). You may need to register as a GOWIN member first.
+Download GOWIN EDA **V1.9.12.02 or V1.9.12** from the official [GOWIN EDA download page](https://www.gowinsemi.com/en/support/download_eda/). You may need to register as a GOWIN member first.
 
 > [!WARNING]
 > **Do NOT install V1.9.12.01.** It has a known bug that prevents programming to the board. The scripts will refuse to run if this version is detected.
@@ -264,7 +264,7 @@ For all available options:
 | `-c`, `--clean_target_prior` | Clean the build output before rebuilding and programming |
 | `-k <MHz>`, `--clock_frequency` | Clock frequency passed to the build script when auto-building (default: `51`) |
 | `-m "<full path to custom bitfile>"` | Program a custom `.fs` file instead of the default build output (ensure file full path is inside `""`) |
-| `-jtag_frequency <freq>` | Override JTAG programming clock frequency (default: `0.02MHz`). Valid values: `0.02MHz`, `0.1MHz`, `0.3MHz`, `0.4MHz`, `0.5MHz`, `0.75MHz`, `0.9MHz`, `1.1MHz`, `1.5MHz`, `2MHz`, `2.5MHz`, `10MHz`, `15MHz` |
+| `-jtag_frequency <freq>` | Override JTAG programming clock frequency (default: `0.5MHz`). Valid values: `0.02MHz`, `0.1MHz`, `0.3MHz`, `0.4MHz`, `0.5MHz`, `0.75MHz`, `0.9MHz`, `1.1MHz`, `1.5MHz`, `2MHz`, `2.5MHz`, `10MHz`, `15MHz` |
 | `-t`, `--custom_target` | Not yet implemented — placeholder for future multi-board support |
 | `-f`, `--update_flash_only` | Not yet implemented — Xilinx only |
 
@@ -369,7 +369,7 @@ The USB device is in a bad state from a previously killed `programmer_cli` proce
 
 ### `PROGRAMMING FAILED (exit code: 1)` with status `0x00015421`
 
-The wrong cable driver path was selected internally. Unplug and replug the board, then retry. Status codes starting with `0x0001xxxx` indicate the wrong (FT2CH) driver path; `0x0003xxxx` is the correct (ftd2xx) path. Also double check the GOWIN EDA version (V1.9.12.02), as this error is also commonly seen when the wrong version is installed.
+The wrong cable driver path was selected internally. Unplug and replug the board, then retry. Status codes starting with `0x0001xxxx` indicate the wrong (FT2CH) driver path; `0x0003xxxx` is the correct (ftd2xx) path. Also double check the GOWIN EDA version (V1.9.12.02 or V1.9.12), as this error is also commonly seen when the wrong version is installed.
 
 ### `KERNEL_SECURITY_CHECK_FAILURE` (BSOD 0x139)
 
@@ -397,10 +397,11 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ### GOWIN version warnings
 
-- **V1.9.12.02** — recommended and verified.
 - **V1.9.8–V1.9.11** — scripts will warn and continue, but these versions are untested.
 - **V1.9.11.01** — blocked by the scripts. Known broken release.
+- **V1.9.12** — verified compatible and tested.
 - **V1.9.12.01** — blocked by the scripts. Do not use; the programmer component is broken.
+- **V1.9.12.02** — recommended and verified.
 
 ### Build triggered automatically by `program_board.ps1`
 

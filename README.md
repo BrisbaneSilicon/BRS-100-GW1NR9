@@ -53,19 +53,21 @@ To run the Linux version of this project:
    - Navigate to the directory in which you wish to host the BRS-100-GW1NR9 repository.
    - `git clone https://github.com/BrisbaneSilicon/BRS-100-GW1NR9.git`<br>
 
-To run the Windows version of this project: 
+To run the Windows version of this project:
 
 1. Windows 11 x64 PC
 2. Git for Windows — required for the scripts to auto-detect the repository root.
    - Download from [git-scm.com](https://git-scm.com/).
    - Ensure `git` is on your system PATH.
-3. GOWIN EDA V1.9.12.02. 
-   - You can download from the official [GOWIN EDA download page](https://www.gowinsemi.com/en/support/download_eda/). 
-   - You may need to register as a GOWIN member first. 
+3. An installation of GOWIN EDA V1.9.12 or V1.9.12.02. 
+   - You can download from the official [GOWIN EDA download page](https://www.gowinsemi.com/en/support/download_eda/).
+   - You may need to register as a GOWIN member first.
    > [!WARNING]
    > **Do NOT install V1.9.12.01.** It has a known bug that prevents programming to the board. The scripts will refuse to run if this version is detected.
-   - Make sure you install GOWIN EDA in the default location or any of the following: 
+   - Make sure you install GOWIN EDA in the default location or any of the following:
    ```
+   C:\Gowin\Gowin_V1.9.12_x64
+   C:\Gowin\Gowin_V1.9.12
    C:\Gowin\Gowin_V1.9.12.02_x64
    C:\Gowin\Gowin_V1.9.12.02
    C:\Program Files\Gowin\Gowin_V1.9.12.02_x64
@@ -73,15 +75,14 @@ To run the Windows version of this project:
    %LOCALAPPDATA%\Gowin\Gowin_V1.9.12.02_x64
    %LOCALAPPDATA%\Gowin\Gowin_V1.9.12.02
    ```
-   - If you install GOWIN EDA outside of the listed locations, you will need to edit the `build.ps1` to include your custom installation path.   
+   - If you install GOWIN EDA outside of the listed locations, set the `GOWIN_INSTALL_DIR` environment variable to your install path — see [Environment Variables](#environment-variables) below.
 4. A free GOWIN EDA license — see [License Setup](#license-setup) below.
 5. PowerShell Execution Policy set to `RemoteSigned` or higher — see [Windows PowerShell Execution Policy](#powershell-execution-policy).
-
 6. FTDI drivers with no conflicts — see [FTDI Driver Setup](#ftdi-driver-setup) below.
 
 ### FTDI Driver Setup
 
-1. An FTDI driver is required if you wish to communicate with the BRS-100-GW1NR9 via UART. On most Linux distributions they are part of the default installation of the OS. If you with to install FTDI drivers manually, see their installation guides [here](https://ftdichip.com/document/installation-guides/).
+1. An FTDI driver is required if you wish to communicate with the BRS-100-GW1NR9 via UART. On most Linux distributions they are part of the default installation of the OS. If you wish to install FTDI drivers manually, see their installation guides [here](https://ftdichip.com/document/installation-guides/).
 
 
 2. Windows version require matching FTDI driver versions, if you already have FTDI installed earlier. Mismatched FTDI driver versions can cause Windows to crash with `KERNEL_SECURITY_CHECK_FAILURE (0x139)`.
@@ -256,8 +257,8 @@ If it does not return `RemoteSigned` or `Unrestricted`, open PowerShell as Admin
 Set-ExecutionPolicy RemoteSigned
 ```
 
-Or for current user only: 
-```
+Or for current user only:
+```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
@@ -305,7 +306,7 @@ Open PowerShell (Admin not required), `cd` into the repository root, then run:
 .\windows\build.ps1
 ```
 
-The default build produces a LED-blink bitstream. On success, the `.fs` file is copied to `windows\output\BRS-100-GW1NR9.fs`.
+The default build produces an LED-blink bitstream. On success, the `.fs` file is copied to `windows\output\BRS-100-GW1NR9.fs`.
 
 For all available options:
 
@@ -448,16 +449,15 @@ For all available options:
 ```
 
 > [!NOTE]
-> The script may freeze during programming at ``` Operation "embFlash Erase,Program" for device#1... ``` line and then hangs indefinitely with no further output. Typically occurs after 3-6 rapid programming commands.  
->This is due to the FTDI chip accumulating internal states across rapid programmer_cli.exe calls. After a few cycles, the chip stops responding to new JTAG commands. 
-> This may take a few tries depending on the state of the FTDI chip. 
+> The script may freeze during programming at ``` Operation "embFlash Erase,Program" for device#1... ``` line and then hangs indefinitely with no further output. Typically occurs after 3-6 rapid programming commands.
+> This is due to the FTDI chip accumulating internal states across rapid programmer_cli.exe calls. After a few cycles, the chip stops responding to new JTAG commands.
+> This may take a few tries depending on the state of the FTDI chip.
 
 Recovery steps:
 1. Press Ctrl+C in the terminal to stop the script.
 2. Open Task Manager (Ctrl+Shift+Esc) and check if programmer_cli.exe is still running. If it is, right-click it and select End Task. Alternatively, run in a new PowerShell window: ```Stop-Process -Name programmer_cli -Force -ErrorAction SilentlyContinue```
 3. Unplug the USB-C cable from the board.
-4. Wait at least 5 seconds before reconnecting. The FTDI chip's internal microcontroller needs time to fully power down and clear its state. If you replug too quickly (<3 seconds), the chip resumes with stale
-state and the first programming attempt will likely fail again.
+4. Wait at least 3 seconds before reconnecting. The FTDI chip's internal microcontroller needs time to fully power down and clear its state. If you replug too quickly (<3 seconds), the chip resumes with stale state and the first programming attempt will likely fail again.
 5. Plug the USB-C cable back in.
 6. Wait for Windows to finish enumerating the device (Device Manager will show "USB Debugger A" again — usually takes 2-3 seconds).
 7. Run the programming script again.
@@ -474,7 +474,7 @@ state and the first programming attempt will likely fail again.
 | `-c`, `--clean_target_prior` | Clean the build output before rebuilding and programming |
 | `-k <MHz>`, `--clock_frequency` | Clock frequency passed to the build script when auto-building (default: `51`) |
 | `-m "<full path to custom bitfile>"` | Program a custom `.fs` file instead of the default build output (ensure file full path is inside `""`) |
-| `-jtag_frequency <freq>` | Override JTAG programming clock frequency (default: `0.02MHz`). Valid values: `0.02MHz`, `0.1MHz`, `0.3MHz`, `0.4MHz`, `0.5MHz`, `0.75MHz`, `0.9MHz`, `1.1MHz`, `1.5MHz`, `2MHz`, `2.5MHz`, `10MHz`, `15MHz` |
+| `-jtag_frequency <freq>` | Override JTAG programming clock frequency (default: `0.5MHz`). Valid values: `0.02MHz`, `0.1MHz`, `0.3MHz`, `0.4MHz`, `0.5MHz`, `0.75MHz`, `0.9MHz`, `1.1MHz`, `1.5MHz`, `2MHz`, `2.5MHz`, `10MHz`, `15MHz` |
 | `-t`, `--custom_target` | Not yet implemented — placeholder for future multi-board support |
 | `-f`, `--update_flash_only` | Not yet implemented — Xilinx only |
 
@@ -600,7 +600,7 @@ For developing with the project, we recommend [Sublime Text](https://www.sublime
 If you like this project, follow us on X [here](https://x.com/brisbanesilicon)!
 <br>
 
-Notes on Windows Script:
+## Notes on Windows Scripts
 
 ### Script freezes at `Operation "embFlash Erase,Program" for device#1...`
 
@@ -626,7 +626,7 @@ The USB device is in a bad state from a previously killed `programmer_cli` proce
 
 ### `PROGRAMMING FAILED (exit code: 1)` with status `0x00015421`
 
-The wrong cable driver path was selected internally. Unplug and replug the board, then retry. Status codes starting with `0x0001xxxx` indicate the wrong (FT2CH) driver path; `0x0003xxxx` is the correct (ftd2xx) path. Also double check the GOWIN EDA version (V1.9.12.02), as this error is also commonly seen when the wrong version is installed.
+The wrong cable driver path was selected internally. Unplug and replug the board, then retry. Status codes starting with `0x0001xxxx` indicate the wrong (FT2CH) driver path; `0x0003xxxx` is the correct (ftd2xx) path. Also double check the GOWIN EDA version (V1.9.12.02 or V1.9.12), as this error is also commonly seen when the wrong version is installed.
 
 ### `KERNEL_SECURITY_CHECK_FAILURE` (BSOD 0x139)
 
@@ -636,25 +636,29 @@ Windows crashes with a blue screen after repeated programming cycles. This is ca
 
 ### GOWIN EDA not found
 
-The scripts search common install paths automatically. If GOWIN EDA is installed elsewhere. Follow steps in [Prerequisites](#prerequisites) to change where the script looks for the installtion. 
+The scripts search common install paths automatically. If GOWIN EDA is installed elsewhere, follow steps in [Prerequisites](#prerequisites) to change where the script looks for the installation.
 
 ### `cannot be loaded because running scripts is disabled on this system`
 
-Set the PowerShell execution policy with 
+Set the PowerShell execution policy:
+
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
-Or
+
+Or:
+
 ```powershell
 Set-ExecutionPolicy RemoteSigned
 ```
 
 ### GOWIN version warnings
 
-- **V1.9.12.02** — recommended and verified.
 - **V1.9.8–V1.9.11** — scripts will warn and continue, but these versions are untested.
 - **V1.9.11.01** — blocked by the scripts. Known broken release.
+- **V1.9.12** — recommended and verified (Windows and Linux).
 - **V1.9.12.01** — blocked by the scripts. Do not use; the programmer component is broken.
+- **V1.9.12.02** — also compatible (Windows only).
 
 ### Build triggered automatically by `program_board.ps1`
 

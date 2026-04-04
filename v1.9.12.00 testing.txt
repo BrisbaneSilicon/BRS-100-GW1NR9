@@ -1,0 +1,511 @@
+================================================================================
+ GOWIN EDA V1.9.12.00 (Gowin_V1.9.12_x64) - Windows Script Testing
+ Date: 2026-04-04
+ Detected install path: C:\Gowin\Gowin_V1.9.12_x64
+ Version check result: "verified compatible" (matches 1.9.12* pattern)
+================================================================================
+
+
+================================================================================
+ TEST 1: build.ps1 -h (Help)
+ Command: .\windows\build.ps1 -h
+ Result: PASS
+================================================================================
+
+Usage: .\build.ps1 [OPTIONS]
+
+  Core Build Options:
+  -b, -board_demonstration            Board demonstration mode (default: LED blink)
+  -k, -clock_frequency <MHz>          System clock frequency in MHz (default: 51)
+  -u, -uart_baud <baud>               UART baud rate (default: 115200)
+  -r, -disable_pushbutton_reset       Disable pushbutton 1 as reset (default: enabled)
+  -p, -proj_only                      Generate project file only, then exit
+  -s, -synth_only                     Stop after synthesis, then exit
+  -a, -clean_all_platforms            Delete all build output and exit
+  -c, -clean                          Delete current target build output and exit
+  -y, -list_supported_system_clock_frequencies   List valid clock frequencies and exit
+  -d, -list_default_target            Print default target and exit
+  -i, -list_supported_platforms       List supported platforms and exit
+  -l, -list_supported_targets         List supported targets and exit
+  -h, -help                           Show this help and exit
+
+  Not Yet Implemented:
+  -t, -custom_target <TARGET>         Target a different board
+  -f, -platform <PLATFORM>            Specify platform explicitly
+  -m, -clean_platform                 Clean all devices for platform and exit
+
+  Examples:
+  .\build.ps1                         Default LED blink build
+  .\build.ps1 -b                      Board demonstration build
+  .\build.ps1 -k 66                   LED blink at 66 MHz
+  .\build.ps1 -b -k 66                Board demo at 66 MHz
+  .\build.ps1 -u 9600                 LED blink with 9600 baud UART
+  .\build.ps1 -r                      Disable pushbutton reset
+  .\build.ps1 -p                      Generate project file only
+  .\build.ps1 -s                      Run synthesis only
+  .\build.ps1 -a                      Clean all build output
+  .\build.ps1 -c                      Clean current target build output
+  .\build.ps1 -y                      List supported clock frequencies
+  .\build.ps1 -d                      Print default target
+  .\build.ps1 -i                      List supported platforms
+  .\build.ps1 -l                      List supported targets
+
+AUTHOR
+    Written by Bruce Mao
+    Adapted from linux build.sh by Craig Haywood
+
+COPYRIGHT
+    (C) Brisbane Silicon, Pty Ltd. All rights reserved.
+
+
+================================================================================
+ TEST 2: build.ps1 -y (List supported clock frequencies)
+ Command: .\windows\build.ps1 -y
+ Result: PASS
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ Supported System Clock Frequencies
+=====================================
+Platform : gowin
+Target   : BRS-100-GW1NR9
+Freq MHz : 51, 66, 75, 81, 87
+=====================================
+
+
+================================================================================
+ TEST 3: build.ps1 -d (List default target)
+ Command: .\windows\build.ps1 -d
+ Result: PASS
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+Default target: BRS-100-GW1NR9
+
+
+================================================================================
+ TEST 4: build.ps1 -i (List supported platforms)
+ Command: .\windows\build.ps1 -i
+ Result: PASS
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ Supported Platforms
+=====================================
+  gowin
+  xilinx
+=====================================
+
+
+================================================================================
+ TEST 5: build.ps1 -l (List supported targets)
+ Command: .\windows\build.ps1 -l
+ Result: PASS
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Device settings loaded from CSV:
+  Part Number    : GW1NR-LV9QN88PC7/I6
+  Device Version : C
+  Speed Grade    : C7I6
+  Device ID      : GW1NR-9
+
+=====================================
+ Supported Targets
+=====================================
+  BRS-100-GW1NR9
+=====================================
+
+
+================================================================================
+ TEST 6: build.ps1 (Default LED blink build)
+ Command: .\windows\build.ps1
+ Result: PASS - BUILD SUCCESS (11s)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Settings: Clock 51 MHz, UART 115200, Reset enabled, Mode: LED blink (user.sv)
+Build: full build
+
+GowinSynthesis start ... GowinSynthesis finish
+Synthesis complete
+Place-and-Route completed
+Bitstream generation completed
+
+BUILD SUCCESS
+.fs file copied to: windows\output\BRS-100-GW1NR9.fs
+Build time: 0m 11s
+
+
+================================================================================
+ TEST 7: build.ps1 -b (Board demonstration build)
+ Command: .\windows\build.ps1 -b
+ Result: PASS - BUILD SUCCESS (13s)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Settings: Clock 51 MHz, UART 115200, Reset enabled, Mode: board demonstration
+Build: full build
+
+GowinSynthesis start ... GowinSynthesis finish
+Synthesis complete
+Place-and-Route completed
+Bitstream generation completed
+
+BUILD SUCCESS
+.fs file copied to: windows\output\BRS-100-GW1NR9.fs
+Build time: 0m 13s
+
+
+================================================================================
+ TEST 8: build.ps1 -k 66 (Build at 66 MHz)
+ Command: .\windows\build.ps1 -k 66
+ Result: PASS - BUILD SUCCESS (8s)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Settings: Clock 66 MHz, UART 115200, Reset enabled, Mode: LED blink (user.sv)
+Build: full build
+Timing constraint: timing_66mhz.sdc
+
+GowinSynthesis start ... GowinSynthesis finish
+Synthesis complete
+Place-and-Route completed
+Bitstream generation completed
+
+BUILD SUCCESS
+.fs file copied to: windows\output\BRS-100-GW1NR9.fs
+Build time: 0m 8s
+
+
+================================================================================
+ TEST 9: build.ps1 -b -k 75 -u 9600 (Board demo at 75 MHz, 9600 baud)
+ Command: .\windows\build.ps1 -b -k 75 -u 9600
+ Result: PASS - BUILD SUCCESS (12s)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Settings: Clock 75 MHz, UART 9600, Reset enabled, Mode: board demonstration
+Build: full build
+Timing constraint: timing_75mhz.sdc
+
+GowinSynthesis start ... GowinSynthesis finish
+Synthesis complete
+Place-and-Route completed
+Bitstream generation completed
+
+BUILD SUCCESS
+.fs file copied to: windows\output\BRS-100-GW1NR9.fs
+Build time: 0m 12s
+
+
+================================================================================
+ TEST 10: build.ps1 -p (Project only)
+ Command: .\windows\build.ps1 -p
+ Result: PASS - PROJECT GENERATION COMPLETE (2s)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Settings: Clock 51 MHz, UART 115200, Reset enabled, Mode: LED blink (user.sv)
+Build: project only
+
+Project generation complete
+
+PROJECT GENERATION COMPLETE
+Project copied to: windows\output\BRS-100-GW1NR9
+Build time: 0m 2s
+
+
+================================================================================
+ TEST 11: build.ps1 -s (Synthesis only)
+ Command: .\windows\build.ps1 -s
+ Result: PASS - SYNTHESIS COMPLETE (4s)
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Settings: Clock 51 MHz, UART 115200, Reset enabled, Mode: LED blink (user.sv)
+Build: synthesis only
+
+GowinSynthesis start ... GowinSynthesis finish
+Synthesis complete
+
+SYNTHESIS COMPLETE
+Report copied to: windows\output\BRS-100-GW1NR9_syn.rpt.html
+Build time: 0m 4s
+
+
+================================================================================
+ TEST 12: build.ps1 -c (Clean current target)
+ Command: .\windows\build.ps1 -c
+ Result: PASS - CLEAN COMPLETE
+================================================================================
+
+Found GOWIN EDA at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+
+CLEAN TARGET BUILD OUTPUT
+Cleaned: ...\build\platforms\gowin\devices\GW1NR-9\C7I6\output
+CLEAN COMPLETE
+
+
+================================================================================
+ TEST 13: program_board.ps1 -h (Help)
+ Command: .\windows\program_board.ps1 -h
+ Result: PASS
+================================================================================
+
+PROGRAM_BOARD
+
+NAME
+    program_board - program the BRS-100-GW1NR9 board with FPGA firmware
+
+SYNOPSIS
+    .\program_board_v1.0.2.ps1 [OPTIONS]
+
+OPTIONS
+    -h, --help                     Display this help and exit.
+    -d, --list_default_target      Print the default target board name and exit.
+    -c, --clean_target_prior       Clean the build output before building and programming.
+    -m, --custom_bitfile <PATH>    Program custom .fs file instead of default.
+    -l, --list_supported_targets   List all supported target boards and exit.
+    -s, --check_if_target_supported  Check whether target is supported and exit.
+    -b, --check_if_target_built    Print firmware built status and exit.
+    -k, --clock_frequency <MHz>    Clock freq passed to build script (default: 51).
+    -jtag_frequency <freq>         Override JTAG clock (default: 0.5MHz).
+    -t, --custom_target            [NOT IMPLEMENTED]
+    -f, --update_flash_only        [NOT IMPLEMENTED]
+
+
+================================================================================
+ TEST 14: program_board.ps1 -d (List default target)
+ Command: .\windows\program_board.ps1 -d
+ Result: PASS
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+BRS-100-GW1NR9
+
+
+================================================================================
+ TEST 15: program_board.ps1 -l (List supported targets)
+ Command: .\windows\program_board.ps1 -l
+ Result: PASS
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+BRS-100-GW1NR9, ARTYS7-25, ARTYS7-50
+
+
+================================================================================
+ TEST 16: program_board.ps1 -s (Check if target supported)
+ Command: .\windows\program_board.ps1 -s
+ Result: PASS
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Target 'BRS-100-GW1NR9' is supported.
+
+
+================================================================================
+ TEST 17: program_board.ps1 -b (Check if target built)
+ Command: .\windows\program_board.ps1 -b
+ Result: PASS
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+Board    : BRS-100-GW1NR9 (gowin)
+Device   : GW1NR-9C
+Bitstream: ...\output\.artifacts\BRS-100-GW1NR9.fs
+Target 'BRS-100-GW1NR9' firmware built status: false
+
+
+================================================================================
+ TEST 18: program_board.ps1 (Default - auto-build + program)
+ Command: .\windows\program_board.ps1
+ Result: PASS - PROGRAMMING SUCCESS (no freeze)
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+FTDI USB reset: Reset 2 FTDI device(s)
+Cable scan: USB Debugger A at USB location 641
+Auto-build triggered (firmware not found)
+Build: BUILD SUCCESS (51 MHz default, LED blink)
+
+Programming:
+  Target Cable: USB Debugger A/0/641/null@0.02MHz
+  Target Device: GW1NR-9C(0x1100481B)
+  Operation "embFlash Erase,Program" for device#1...
+  Erasing embFlash: 100%
+  Programming: 100%
+  Status Code: 0x0003F020
+  Program Finished!
+  Cost 7.82 second(s)
+
+PROGRAMMING SUCCESS
+
+
+================================================================================
+ TEST 19: program_board.ps1 -c (Clean, rebuild, program)
+ Command: .\windows\program_board.ps1 -c
+ Result: PASS - PROGRAMMING SUCCESS (no freeze)
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+FTDI USB reset: Reset 2 FTDI device(s)
+Cable scan: USB Debugger A at USB location 641
+Clean build requested - cleaned output first
+Rebuild: BUILD SUCCESS (51 MHz default, LED blink)
+
+Programming:
+  Target Cable: USB Debugger A/0/641/null@0.02MHz
+  Target Device: GW1NR-9C(0x1100481B)
+  Operation "embFlash Erase,Program" for device#1...
+  Erasing embFlash: 100%
+  Programming: 100%
+  Status Code: 0x0003F020
+  Program Finished!
+  Cost 7.83 second(s)
+
+PROGRAMMING SUCCESS
+
+
+================================================================================
+ TEST 20: program_board.ps1 -k 66 (Build at 66 MHz and program)
+ Command: .\windows\program_board.ps1 -k 66
+ Result: PASS - PROGRAMMING SUCCESS (no freeze)
+ Note: Firmware already built from previous test - reused existing .fs
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+FTDI USB reset: Reset 2 FTDI device(s)
+Cable scan: USB Debugger A at USB location 641
+Detected firmware already built - reusing.
+
+Programming:
+  Target Cable: USB Debugger A/0/641/null@0.02MHz
+  Target Device: GW1NR-9C(0x1100481B)
+  Operation "embFlash Erase,Program" for device#1...
+  Erasing embFlash: 100%
+  Programming: 100%
+  Status Code: 0x0003F020
+  Program Finished!
+  Cost 7.88 second(s)
+
+PROGRAMMING SUCCESS
+
+
+================================================================================
+ TEST 21: program_board.ps1 -c -k 75 (Clean, rebuild at 75 MHz, program)
+ Command: .\windows\program_board.ps1 -c -k 75
+ Result: PASS - PROGRAMMING SUCCESS (no freeze)
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+FTDI USB reset: Reset 2 FTDI device(s)
+Cable scan: USB Debugger A at USB location 641
+Clean build requested - cleaned output first
+Rebuild at 75 MHz: BUILD SUCCESS
+
+Programming:
+  Target Cable: USB Debugger A/0/641/null@0.02MHz
+  Target Device: GW1NR-9C(0x1100481B)
+  Operation "embFlash Erase,Program" for device#1...
+  Erasing embFlash: 100%
+  Programming: 100%
+  Status Code: 0x0003F020
+  Program Finished!
+  Cost 7.79 second(s)
+
+PROGRAMMING SUCCESS
+
+
+================================================================================
+ TEST 22: program_board.ps1 -jtag_frequency 2.5MHz (Faster JTAG speed)
+ Command: .\windows\program_board.ps1 -jtag_frequency 2.5MHz
+ Result: PASS - PROGRAMMING SUCCESS (no freeze)
+ Note: Status code 0x0001F020 (FT2CH path) vs 0x0003F020 (ftd2xx path)
+       at default 0.02MHz. Programming still succeeded.
+================================================================================
+
+Found GOWIN programmer at: C:\Gowin\Gowin_V1.9.12_x64
+GOWIN version: Gowin_V1.9.12_x64 (verified compatible)
+FTDI USB reset: Reset 2 FTDI device(s)
+Cable scan: USB Debugger A at USB location 641
+Detected firmware already built - reusing.
+
+Programming:
+  Target Cable: USB Debugger A/0/641/null@2.5MHz
+  Target Device: GW1NR-9C(0x1100481B)
+  Operation "embFlash Erase,Program" for device#1...
+  Erasing embFlash: 100% (Status Code: 0x00019020)
+  Programming: 100%
+  Status Code: 0x0001F020
+  Program Finished!
+  Cost 10.69 second(s)
+
+PROGRAMMING SUCCESS
+
+
+================================================================================
+ NOTES
+================================================================================
+
+1. Version Detection: V1.9.12.00 (folder name Gowin_V1.9.12_x64) is accepted
+   as "verified compatible" by both scripts. The version check pattern
+   "1.9.12*" matches, and it is not "1.9.12.01*" (blocked).
+
+2. Auto-Detection Priority: The scripts search C:\Gowin\Gowin_V1.9.12_x64
+   BEFORE C:\Gowin\Gowin_V1.9.12.02_x64 in the common paths list. This means
+   if both versions are installed, V1.9.12.00 will be picked by default.
+
+3. No Programmer Freezes: All 5 programming attempts completed successfully
+   without any freezes at "Operation embFlash Erase,Program". The FTDI USB
+   reset (FT_CyclePort) performed by the script appears to work correctly
+   with V1.9.12.00's programmer_cli.exe.
+
+4. JTAG Frequency Note: At 2.5MHz, the erase status code was 0x00019020
+   (0x0001xxxx = FT2CH driver path) vs 0x00039020 (0x0003xxxx = ftd2xx path)
+   at the default 0.02MHz. Both succeeded. The README warns that status codes
+   starting with 0x0001xxxx indicate "wrong cable driver path" but programming
+   still completed successfully in this test.
+
+5. Build Times: Comparable to V1.9.12.02 - full builds 8-13s, synthesis only
+   4s, project only 2s.
