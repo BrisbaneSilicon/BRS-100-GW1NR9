@@ -73,44 +73,98 @@ module user (
     //  Definitions
     // ----------------------------------------------
 
-    // NOTE: put your typedefs here!
+    localparam S_WRITE   = 2'd0;
+    localparam S_READ    = 2'd1;
+    localparam S_COMPARE = 2'd2;
+    localparam S_DONE    = 2'd3;
 
 
     // ----------------------------------------------
     //  Internal signals
     // ----------------------------------------------
 
-    // NOTE: put your internal signal
-    // definitions here!
+    reg [1:0]  state;
+    reg [31:0] readback;
 
 
     // ----------------------------------------------
     //  Implementation
     // ----------------------------------------------
 
-    // NOTE: your time to shine!
-
-
-    // NOTE: delete me!
     always @(posedge sysclk) begin
-        if (second_tick == 1'b1) begin
-            leds <= ~leds;
-        end
 
+        // Default: keep memory buses idle
+        ram_valid       <= 0;
+        ram_addr        <= 0;
+        ram_wdata       <= 0;
+        ram_wstrb       <= 0;
+        flash_cfg_valid <= 0;
+        flash_cfg_addr  <= 0;
+        flash_cfg_wdata <= 0;
+        flash_cfg_wstrb <= 0;
+        flash_xip_valid <= 0;
+        flash_xip_addr  <= 0;
+        flash_xip_wdata <= 0;
+        flash_xip_wstrb <= 0;
+
+        case (state)
+
+            S_WRITE: begin
+                // Write "TEST" (0x54455354) to SRAM address 0
+                ram_valid <= 1;
+                ram_addr  <= 32'h0000_0000;
+                ram_wdata <= 32'h5445_5354;
+                ram_wstrb <= 4'hF;
+                if (ram_ready) begin
+                    state <= S_READ;
+                end
+            end
+
+            S_READ: begin
+                // Read back from SRAM address 0
+                ram_valid <= 1;
+                ram_addr  <= 32'h0000_0000;
+                ram_wstrb <= 4'h0;
+                if (ram_ready) begin
+                    readback <= ram_rdata;
+                    state    <= S_COMPARE;
+                end
+            end
+
+            S_COMPARE: begin
+                // Compare and light LEDs
+                leds[0] <= 1;   // test done
+                if (readback == 32'h5445_5354) begin
+                    leds[1] <= 1;   // PASS
+                end else begin
+                    leds[2] <= 1;   // FAIL
+                end
+                state <= S_DONE;
+            end
+
+            S_DONE: begin
+                // Hold LEDs, do nothing
+            end
+
+        endcase
+
+        // Reset overrides everything above
         if (sysclk_resetn == 1'b0) begin
-            leds           <= 0;
-            ram_addr       <= 0;
-            ram_wdata      <= 0;
-            ram_wstrb      <= 0;
-            ram_valid      <= 0;
+            state           <= S_WRITE;
+            readback        <= 0;
+            leds            <= 0;
+            ram_valid       <= 0;
+            ram_addr        <= 0;
+            ram_wdata       <= 0;
+            ram_wstrb       <= 0;
+            flash_cfg_valid <= 0;
             flash_cfg_addr  <= 0;
             flash_cfg_wdata <= 0;
             flash_cfg_wstrb <= 0;
-            flash_cfg_valid <= 0;
+            flash_xip_valid <= 0;
             flash_xip_addr  <= 0;
             flash_xip_wdata <= 0;
             flash_xip_wstrb <= 0;
-            flash_xip_valid <= 0;
         end
     end
 
