@@ -71,7 +71,30 @@ module top #(
     input       [7:0]           uart_tx_data,
     output  reg                 uart_rx_valid,
     input                       uart_rx_ready,
-    output  reg  [7:0]          uart_rx_data
+    output  reg  [7:0]          uart_rx_data,
+
+    // -------------- memory fabric --------------
+
+    input       [31:0]          ram_addr,
+    input       [31:0]          ram_wdata,
+    input       [3:0]           ram_wstrb,
+    output  reg [31:0]          ram_rdata,
+    input                       ram_valid,
+    output  reg                 ram_ready,
+
+    input       [31:0]          flash_cfg_addr,
+    input       [31:0]          flash_cfg_wdata,
+    input       [3:0]           flash_cfg_wstrb,
+    output  reg [31:0]          flash_cfg_rdata,
+    input                       flash_cfg_valid,
+    output  reg                 flash_cfg_ready,
+
+    input       [31:0]          flash_xip_addr,
+    input       [31:0]          flash_xip_wdata,
+    input       [3:0]           flash_xip_wstrb,
+    output  reg [31:0]          flash_xip_rdata,
+    input                       flash_xip_valid,
+    output  reg                 flash_xip_ready
 );
 localparam int DQ_WIDTH         = 16;
 localparam int CS_WIDTH         = 2;
@@ -101,18 +124,18 @@ localparam int UART_DIVIDER     = (CLK_FREQUENCY_HZ / UART_BAUD)-1;
 
     reg     [5:0]           i_leds;
 
-    reg     [0:0] [31:0]    i_mbus_sram_addr;
-    reg     [0:0] [31:0]    i_mbus_sram_wdata;
-    reg     [0:0] [3:0]     i_mbus_sram_wstrb;
+    wire    [0:0] [31:0]    i_mbus_sram_addr;
+    wire    [0:0] [31:0]    i_mbus_sram_wdata;
+    wire    [0:0] [3:0]     i_mbus_sram_wstrb;
     reg     [0:0] [31:0]    i_mbus_sram_rdata;
-    reg     [0:0]           i_mbus_sram_valid;
+    wire    [0:0]           i_mbus_sram_valid;
     reg     [0:0]           i_mbus_sram_ready;
 
-    reg     [31:0]          i_mbus_spimemcfg_addr;
-    reg     [31:0]          i_mbus_spimemcfg_wdata;
-    reg     [3:0]           i_mbus_spimemcfg_wstrb;
+    wire    [31:0]          i_mbus_spimemcfg_addr;
+    wire    [31:0]          i_mbus_spimemcfg_wdata;
+    wire    [3:0]           i_mbus_spimemcfg_wstrb;
     reg     [31:0]          i_mbus_spimemcfg_rdata;
-    reg                     i_mbus_spimemcfg_valid;
+    wire                    i_mbus_spimemcfg_valid;
     reg                     i_mbus_spimemcfg_ready;
 
     reg     [31:0]          i_mbus_saxisce_spimemcfg_addr;
@@ -122,11 +145,11 @@ localparam int UART_DIVIDER     = (CLK_FREQUENCY_HZ / UART_BAUD)-1;
     reg                     i_mbus_saxisce_spimemcfg_valid;
     reg                     i_mbus_saxisce_spimemcfg_ready;
 
-    reg     [31:0]          i_mbus_spimemxip_addr;
-    reg     [31:0]          i_mbus_spimemxip_wdata;
-    reg     [3:0]           i_mbus_spimemxip_wstrb;
+    wire    [31:0]          i_mbus_spimemxip_addr;
+    wire    [31:0]          i_mbus_spimemxip_wdata;
+    wire    [3:0]           i_mbus_spimemxip_wstrb;
     reg     [31:0]          i_mbus_spimemxip_rdata;
-    reg                     i_mbus_spimemxip_valid;
+    wire                    i_mbus_spimemxip_valid;
     reg                     i_mbus_spimemxip_ready;
 
     reg     [8:0]           i_microsecond_div_counter;
@@ -442,5 +465,31 @@ localparam int UART_DIVIDER     = (CLK_FREQUENCY_HZ / UART_BAUD)-1;
 
     assign sysclk        = i_sysclk;
     assign sysclk_resetn = i_soft_reset_n;
+
+    // -------------- memory fabric assignments --------------
+
+    // SRAM/HyperRAM — flatten [0:0][31:0] to [31:0]
+    assign i_mbus_sram_addr[0]  = ram_addr;
+    assign i_mbus_sram_wdata[0] = ram_wdata;
+    assign i_mbus_sram_wstrb[0] = ram_wstrb;
+    assign ram_rdata             = i_mbus_sram_rdata[0];
+    assign i_mbus_sram_valid[0] = ram_valid;
+    assign ram_ready             = i_mbus_sram_ready[0];
+
+    // Flash config
+    assign i_mbus_spimemcfg_addr  = flash_cfg_addr;
+    assign i_mbus_spimemcfg_wdata = flash_cfg_wdata;
+    assign i_mbus_spimemcfg_wstrb = flash_cfg_wstrb;
+    assign flash_cfg_rdata         = i_mbus_spimemcfg_rdata;
+    assign i_mbus_spimemcfg_valid = flash_cfg_valid;
+    assign flash_cfg_ready         = i_mbus_spimemcfg_ready;
+
+    // Flash XIP
+    assign i_mbus_spimemxip_addr  = flash_xip_addr;
+    assign i_mbus_spimemxip_wdata = flash_xip_wdata;
+    assign i_mbus_spimemxip_wstrb = flash_xip_wstrb;
+    assign flash_xip_rdata         = i_mbus_spimemxip_rdata;
+    assign i_mbus_spimemxip_valid = flash_xip_valid;
+    assign flash_xip_ready         = i_mbus_spimemxip_ready;
 
 endmodule
