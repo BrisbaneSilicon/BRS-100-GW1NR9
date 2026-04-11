@@ -42,7 +42,30 @@ module user (
     output  reg [7:0]   uart_tx_data,
     input               uart_rx_valid,
     output  reg         uart_rx_ready,
-    input       [7:0]   uart_rx_data
+    input       [7:0]   uart_rx_data,
+
+    // -------------- memory fabric --------------
+
+    output  reg [31:0]  ram_addr,
+    output  reg [31:0]  ram_wdata,
+    output  reg [3:0]   ram_wstrb,
+    input       [31:0]  ram_rdata,
+    output  reg         ram_valid,
+    input               ram_ready,
+
+    output  reg [31:0]  flash_cfg_addr,
+    output  reg [31:0]  flash_cfg_wdata,
+    output  reg [3:0]   flash_cfg_wstrb,
+    input       [31:0]  flash_cfg_rdata,
+    output  reg         flash_cfg_valid,
+    input               flash_cfg_ready,
+
+    output  reg [31:0]  flash_xip_addr,
+    output  reg [31:0]  flash_xip_wdata,
+    output  reg [3:0]   flash_xip_wstrb,
+    input       [31:0]  flash_xip_rdata,
+    output  reg         flash_xip_valid,
+    input               flash_xip_ready
 );
 
 
@@ -75,7 +98,19 @@ module user (
         end
 
         if (sysclk_resetn == 1'b0) begin
-            leds <= 0;
+            leds           <= 0;
+            ram_addr       <= 0;
+            ram_wdata      <= 0;
+            ram_wstrb      <= 0;
+            ram_valid      <= 0;
+            flash_cfg_addr  <= 0;
+            flash_cfg_wdata <= 0;
+            flash_cfg_wstrb <= 0;
+            flash_cfg_valid <= 0;
+            flash_xip_addr  <= 0;
+            flash_xip_wdata <= 0;
+            flash_xip_wstrb <= 0;
+            flash_xip_valid <= 0;
         end
     end
 
