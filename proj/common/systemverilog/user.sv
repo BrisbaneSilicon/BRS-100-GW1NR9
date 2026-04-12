@@ -73,25 +73,42 @@ module user (
     //  Definitions
     // ----------------------------------------------
 
-    localparam S_WRITE   = 2'd0;
-    localparam S_READ    = 2'd1;
-    localparam S_COMPARE = 2'd2;
-    localparam S_DONE    = 2'd3;
+    localparam S_WRITE        = 3'd0;
+    localparam S_READ         = 3'd1;
+    localparam S_COMPARE      = 3'd2;
+    localparam S_HRAM_WRITE   = 3'd3;
+    localparam S_HRAM_READ    = 3'd4;
+    localparam S_HRAM_COMPARE = 3'd5;
+    localparam S_DONE         = 3'd6;
+    localparam S_PRINT        = 3'd7;
 
 
     // ----------------------------------------------
     //  Internal signals
     // ----------------------------------------------
 
-    reg [1:0]  state;
+    reg [2:0]  state;
     reg [31:0] readback;
+
+    reg [7:0]  print_buf [0:23];
+    reg [4:0]  print_idx;
+    reg [4:0]  print_len;
+    reg [2:0]  return_state;
 
 
     // ----------------------------------------------
     //  Implementation
     // ----------------------------------------------
 
+    function automatic [7:0] hex_nibble;
+        input [3:0] n;
+        hex_nibble = (n < 4'd10) ? (8'h30 + {4'h0, n}) : (8'h37 + {4'h0, n});
+    endfunction
+
     always @(posedge sysclk) begin
+
+        uart_tx_valid <= 1'b0;
+        uart_rx_ready <= 1'b0;
 
         // Default: keep memory buses idle
         ram_valid       <= 0;
@@ -132,14 +149,96 @@ module user (
             end
 
             S_COMPARE: begin
-                // Compare and light LEDs
-                leds[0] <= 1;   // test done
+                leds[0] <= 1;
+                print_buf[0] <= "S"; print_buf[1] <= "R"; print_buf[2] <= "A";
+                print_buf[3] <= "M"; print_buf[4] <= ":"; print_buf[5] <= " ";
+                print_buf[6]  <= hex_nibble(readback[31:28]);
+                print_buf[7]  <= hex_nibble(readback[27:24]);
+                print_buf[8]  <= hex_nibble(readback[23:20]);
+                print_buf[9]  <= hex_nibble(readback[19:16]);
+                print_buf[10] <= hex_nibble(readback[15:12]);
+                print_buf[11] <= hex_nibble(readback[11:8]);
+                print_buf[12] <= hex_nibble(readback[7:4]);
+                print_buf[13] <= hex_nibble(readback[3:0]);
+                print_buf[14] <= " ";
                 if (readback == 32'h5445_5354) begin
-                    leds[1] <= 1;   // PASS
+                    leds[1] <= 1;
+                    print_buf[15] <= "P"; print_buf[16] <= "A";
+                    print_buf[17] <= "S"; print_buf[18] <= "S";
                 end else begin
-                    leds[2] <= 1;   // FAIL
+                    leds[2] <= 1;
+                    print_buf[15] <= "F"; print_buf[16] <= "A";
+                    print_buf[17] <= "I"; print_buf[18] <= "L";
                 end
-                state <= S_DONE;
+                print_buf[19] <= "\r";
+                print_buf[20] <= "\n";
+                print_len    <= 5'd21;
+                return_state <= S_HRAM_WRITE;
+                state        <= S_PRINT;
+            end
+
+            S_HRAM_WRITE: begin
+                ram_valid <= 1;
+                ram_addr  <= 32'h0000_8000;
+                ram_wdata <= 32'h5445_5354;
+                ram_wstrb <= 4'hF;
+                if (ram_ready) begin
+                    state <= S_HRAM_READ;
+                end
+            end
+
+            S_HRAM_READ: begin
+                ram_valid <= 1;
+                ram_addr  <= 32'h0000_8000;
+                ram_wstrb <= 4'h0;
+                if (ram_ready) begin
+                    readback <= ram_rdata;
+                    state    <= S_HRAM_COMPARE;
+                end
+            end
+
+            S_HRAM_COMPARE: begin
+                leds[3] <= 1;
+                print_buf[0] <= "H"; print_buf[1] <= "R"; print_buf[2] <= "A";
+                print_buf[3] <= "M"; print_buf[4] <= ":"; print_buf[5] <= " ";
+                print_buf[6]  <= hex_nibble(readback[31:28]);
+                print_buf[7]  <= hex_nibble(readback[27:24]);
+                print_buf[8]  <= hex_nibble(readback[23:20]);
+                print_buf[9]  <= hex_nibble(readback[19:16]);
+                print_buf[10] <= hex_nibble(readback[15:12]);
+                print_buf[11] <= hex_nibble(readback[11:8]);
+                print_buf[12] <= hex_nibble(readback[7:4]);
+                print_buf[13] <= hex_nibble(readback[3:0]);
+                print_buf[14] <= " ";
+                if (readback == 32'h5445_5354) begin
+                    leds[4] <= 1;
+                    print_buf[15] <= "P"; print_buf[16] <= "A";
+                    print_buf[17] <= "S"; print_buf[18] <= "S";
+                end else begin
+                    leds[5] <= 1;
+                    print_buf[15] <= "F"; print_buf[16] <= "A";
+                    print_buf[17] <= "I"; print_buf[18] <= "L";
+                end
+                print_buf[19] <= "\r";
+                print_buf[20] <= "\n";
+                print_len    <= 5'd21;
+                return_state <= S_DONE;
+                state        <= S_PRINT;
+            end
+
+            S_PRINT: begin
+                uart_tx_valid <= 1'b1;
+                uart_tx_data  <= print_buf[print_idx];
+                if (uart_tx_ready) begin
+                    if (print_idx == print_len - 1) begin
+                        uart_tx_valid <= 1'b0;
+                        print_idx     <= 5'd0;
+                        state         <= return_state;
+                    end else begin
+                        print_idx    <= print_idx + 5'd1;
+                        uart_tx_data <= print_buf[print_idx + 5'd1];
+                    end
+                end
             end
 
             S_DONE: begin
@@ -153,6 +252,9 @@ module user (
             state           <= S_WRITE;
             readback        <= 0;
             leds            <= 0;
+            uart_tx_valid   <= 1'b0;
+            uart_rx_ready   <= 1'b0;
+            print_idx       <= 5'd0;
             ram_valid       <= 0;
             ram_addr        <= 0;
             ram_wdata       <= 0;
