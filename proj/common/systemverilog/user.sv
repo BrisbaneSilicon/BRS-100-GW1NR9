@@ -73,27 +73,30 @@ module user (
     //  Definitions
     // ----------------------------------------------
 
-    localparam S_WRITE        = 3'd0;
-    localparam S_READ         = 3'd1;
-    localparam S_COMPARE      = 3'd2;
-    localparam S_HRAM_WRITE   = 3'd3;
-    localparam S_HRAM_READ    = 3'd4;
-    localparam S_HRAM_COMPARE = 3'd5;
-    localparam S_DONE         = 3'd6;
-    localparam S_PRINT        = 3'd7;
+    localparam S_WRITE        = 4'd0;
+    localparam S_READ         = 4'd1;
+    localparam S_COMPARE      = 4'd2;
+    localparam S_HRAM_WAIT    = 4'd3;   // wait for HyperRAM controller init (~160us)
+    localparam S_HRAM_WRITE   = 4'd4;
+    localparam S_HRAM_READ    = 4'd5;
+    localparam S_HRAM_COMPARE = 4'd6;
+    localparam S_DONE         = 4'd7;
+    localparam S_PRINT        = 4'd8;
 
 
     // ----------------------------------------------
     //  Internal signals
     // ----------------------------------------------
 
-    reg [2:0]  state;
+    reg [3:0]  state;
     reg [31:0] readback;
 
     reg [7:0]  print_buf [0:23];
     reg [4:0]  print_idx;
     reg [4:0]  print_len;
-    reg [2:0]  return_state;
+    reg [3:0]  return_state;
+
+    reg [7:0]  hram_init_us;    // counts microsecond ticks during HyperRAM init wait
 
 
     // ----------------------------------------------
@@ -173,8 +176,19 @@ module user (
                 print_buf[19] <= "\r";
                 print_buf[20] <= "\n";
                 print_len    <= 5'd21;
-                return_state <= S_HRAM_WRITE;
+                return_state <= S_HRAM_WAIT;
                 state        <= S_PRINT;
+            end
+
+            S_HRAM_WAIT: begin
+                // HyperRAM controller needs ~160us after reset before it accepts
+                // transactions. Wait 250us (safe margin) before first access.
+                if (microsecond_tick) begin
+                    hram_init_us <= hram_init_us + 8'd1;
+                    if (hram_init_us == 8'd249) begin
+                        state <= S_HRAM_WRITE;
+                    end
+                end
             end
 
             S_HRAM_WRITE: begin
@@ -255,6 +269,7 @@ module user (
             uart_tx_valid   <= 1'b0;
             uart_rx_ready   <= 1'b0;
             print_idx       <= 5'd0;
+            hram_init_us    <= 8'd0;
             ram_valid       <= 0;
             ram_addr        <= 0;
             ram_wdata       <= 0;
