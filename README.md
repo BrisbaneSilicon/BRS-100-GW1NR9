@@ -41,11 +41,14 @@ Fulfill the below prerequisites.
    - Other flavours of Linux may work but aren't officially supported.
    - We recommend [Ubuntu](https://ubuntu.com/).
    - Support for Windows is coming soon! See section [roadmap](#roadmap) below.
+2. An installation of [GIT](https://git-scm.com/).
 3. An installation of GOWIN EDA V1.9.12.
-   - Available from the official GOWIN EDA [download page](https://www.gowinsemi.com/en/support/download_eda/) or direct link to [V1.9.12](https://cdn.gowinsemi.com.cn/Gowin_V1.9.12_linux.tar.gz).
+   - Available from the official GOWIN EDA [download page](https://www.gowinsemi.com/en/support/download_eda/) or via direct links, [Linux](https://cdn.gowinsemi.com.cn/Gowin_V1.9.12_linux.tar.gz) [Windows](https://cdn.gowinsemi.com.cn/Gowin_V1.9.12_x64_win.zip).
    - You may need to first register as a GOWIN member [here](https://www.gowinsemi.com/en/member/).
    - On Linux, please ensure that GOWIN EDA is installed to one of the following directories (or be prepared to modify the build script):
      - `$HOME/Applications` `/opt/gowin` `/opt/GOWIN` `/opt/Gowin` `$HOME/Documents/Applications/`
+   - On Windows, please ensure that GOWIN EDA is installed to one of the following directories (or be prepared to modify the build script):
+      - `C:\Gowin`, `C:\Program Files\Gowin`
 4. A free license for GOWIN EDA. See section [License Setup](#license-setup) below.
 5. A copy of this repository.
    - Launch a terminal program.
