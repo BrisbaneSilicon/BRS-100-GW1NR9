@@ -100,6 +100,9 @@ module user (
 
     reg [7:0]  hram_init_us;    // counts microsecond ticks during HyperRAM init wait
 
+    reg [1:0]  flash_test_idx;  // which flash read we're on (0, 1, 2)
+    reg [31:0] flash_test_addr; // current flash address to read
+
 
     // ----------------------------------------------
     //  Implementation
@@ -244,7 +247,7 @@ module user (
 
             S_FLASH_READ: begin
                 flash_xip_valid <= 1;
-                flash_xip_addr  <= 32'h0000_0000;
+                flash_xip_addr  <= flash_test_addr;
                 if (flash_xip_ready) begin
                     readback <= flash_xip_rdata;
                     state    <= S_FLASH_RESULT;
@@ -252,25 +255,44 @@ module user (
             end
 
             S_FLASH_RESULT: begin
-                print_buf[0] <= "F"; print_buf[1] <= "L"; print_buf[2] <= "A";
-                print_buf[3] <= "S"; print_buf[4] <= "H"; print_buf[5] <= ":";
-                print_buf[6] <= " ";
-                print_buf[7]  <= hex_nibble(readback[31:28]);
-                print_buf[8]  <= hex_nibble(readback[27:24]);
-                print_buf[9]  <= hex_nibble(readback[23:20]);
-                print_buf[10] <= hex_nibble(readback[19:16]);
-                print_buf[11] <= hex_nibble(readback[15:12]);
-                print_buf[12] <= hex_nibble(readback[11:8]);
-                print_buf[13] <= hex_nibble(readback[7:4]);
-                print_buf[14] <= hex_nibble(readback[3:0]);
-                print_buf[15] <= " ";
-                print_buf[16] <= "P"; print_buf[17] <= "A";
-                print_buf[18] <= "S"; print_buf[19] <= "S";
-                print_buf[20] <= 8'h0D;
-                print_buf[21] <= 8'h0A;
-                print_len    <= 5'd22;
-                return_state <= S_DONE;
+                // Format: "FL@XXXXXX:YYYYYYYY\r\n" (20 chars)
+                print_buf[0]  <= "F"; print_buf[1] <= "L"; print_buf[2] <= "@";
+                print_buf[3]  <= hex_nibble(flash_test_addr[23:20]);
+                print_buf[4]  <= hex_nibble(flash_test_addr[19:16]);
+                print_buf[5]  <= hex_nibble(flash_test_addr[15:12]);
+                print_buf[6]  <= hex_nibble(flash_test_addr[11:8]);
+                print_buf[7]  <= hex_nibble(flash_test_addr[7:4]);
+                print_buf[8]  <= hex_nibble(flash_test_addr[3:0]);
+                print_buf[9]  <= ":";
+                print_buf[10] <= hex_nibble(readback[31:28]);
+                print_buf[11] <= hex_nibble(readback[27:24]);
+                print_buf[12] <= hex_nibble(readback[23:20]);
+                print_buf[13] <= hex_nibble(readback[19:16]);
+                print_buf[14] <= hex_nibble(readback[15:12]);
+                print_buf[15] <= hex_nibble(readback[11:8]);
+                print_buf[16] <= hex_nibble(readback[7:4]);
+                print_buf[17] <= hex_nibble(readback[3:0]);
+                print_buf[18] <= 8'h0D;
+                print_buf[19] <= 8'h0A;
+                print_len    <= 5'd20;
                 state        <= S_PRINT;
+
+                // Advance to next flash address or finish
+                case (flash_test_idx)
+                    2'd0: begin
+                        flash_test_idx  <= 2'd1;
+                        flash_test_addr <= 32'h0000_0100;
+                        return_state    <= S_FLASH_READ;
+                    end
+                    2'd1: begin
+                        flash_test_idx  <= 2'd2;
+                        flash_test_addr <= 32'h0008_0000;
+                        return_state    <= S_FLASH_READ;
+                    end
+                    default: begin
+                        return_state <= S_DONE;
+                    end
+                endcase
             end
 
             S_PRINT: begin
@@ -303,6 +325,8 @@ module user (
             uart_rx_ready   <= 1'b0;
             print_idx       <= 5'd0;
             hram_init_us    <= 8'd0;
+            flash_test_idx  <= 2'd0;
+            flash_test_addr <= 32'h0000_0000;
             ram_valid       <= 0;
             ram_addr        <= 0;
             ram_wdata       <= 0;
