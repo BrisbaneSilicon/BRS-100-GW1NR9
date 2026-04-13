@@ -82,6 +82,8 @@ module user (
     localparam S_HRAM_COMPARE = 4'd6;
     localparam S_DONE         = 4'd7;
     localparam S_PRINT        = 4'd8;
+    localparam S_FLASH_READ   = 4'd9;
+    localparam S_FLASH_RESULT = 4'd10;
 
 
     // ----------------------------------------------
@@ -173,8 +175,8 @@ module user (
                     print_buf[15] <= "F"; print_buf[16] <= "A";
                     print_buf[17] <= "I"; print_buf[18] <= "L";
                 end
-                print_buf[19] <= "\r";
-                print_buf[20] <= "\n";
+                print_buf[19] <= 8'h0D;
+                print_buf[20] <= 8'h0A;
                 print_len    <= 5'd21;
                 return_state <= S_HRAM_WAIT;
                 state        <= S_PRINT;
@@ -233,9 +235,40 @@ module user (
                     print_buf[15] <= "F"; print_buf[16] <= "A";
                     print_buf[17] <= "I"; print_buf[18] <= "L";
                 end
-                print_buf[19] <= "\r";
-                print_buf[20] <= "\n";
+                print_buf[19] <= 8'h0D;
+                print_buf[20] <= 8'h0A;
                 print_len    <= 5'd21;
+                return_state <= S_FLASH_READ;
+                state        <= S_PRINT;
+            end
+
+            S_FLASH_READ: begin
+                flash_xip_valid <= 1;
+                flash_xip_addr  <= 32'h0000_0000;
+                if (flash_xip_ready) begin
+                    readback <= flash_xip_rdata;
+                    state    <= S_FLASH_RESULT;
+                end
+            end
+
+            S_FLASH_RESULT: begin
+                print_buf[0] <= "F"; print_buf[1] <= "L"; print_buf[2] <= "A";
+                print_buf[3] <= "S"; print_buf[4] <= "H"; print_buf[5] <= ":";
+                print_buf[6] <= " ";
+                print_buf[7]  <= hex_nibble(readback[31:28]);
+                print_buf[8]  <= hex_nibble(readback[27:24]);
+                print_buf[9]  <= hex_nibble(readback[23:20]);
+                print_buf[10] <= hex_nibble(readback[19:16]);
+                print_buf[11] <= hex_nibble(readback[15:12]);
+                print_buf[12] <= hex_nibble(readback[11:8]);
+                print_buf[13] <= hex_nibble(readback[7:4]);
+                print_buf[14] <= hex_nibble(readback[3:0]);
+                print_buf[15] <= " ";
+                print_buf[16] <= "P"; print_buf[17] <= "A";
+                print_buf[18] <= "S"; print_buf[19] <= "S";
+                print_buf[20] <= 8'h0D;
+                print_buf[21] <= 8'h0A;
+                print_len    <= 5'd22;
                 return_state <= S_DONE;
                 state        <= S_PRINT;
             end
@@ -243,7 +276,7 @@ module user (
             S_PRINT: begin
                 uart_tx_valid <= 1'b1;
                 uart_tx_data  <= print_buf[print_idx];
-                if (uart_tx_ready) begin
+                if (uart_tx_ready && uart_tx_valid) begin
                     if (print_idx == print_len - 1) begin
                         uart_tx_valid <= 1'b0;
                         print_idx     <= 5'd0;
