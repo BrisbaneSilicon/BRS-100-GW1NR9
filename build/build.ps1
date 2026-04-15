@@ -1,9 +1,9 @@
 # =============================================================
-# build_v0.7.ps1
+# build_v1.0.2.ps1
 # Windows build script for BRS-100-GW1NR9
 #
 # Author:    Bruce Mao
-# Based on build.sh, originally authored by Craig Haywood
+# Adapted from linux build.sh by Craig Haywood
 # Copyright: (C) Brisbane Silicon, Pty Ltd. All rights reserved.
 #
 # The source code contained herein is provided on an "as is" basis.
@@ -36,6 +36,7 @@
 # version 0.7 - implemented setup_build_output_directory — clean before build
 #               implemented is_supported_platform — validate platform exists
 #               note: xilinx not yet implemented. This script is currently only for GOWIN builds.
+# version 1.0.2 - added detailed help message, cleaned up code, added comments, added more error handling and user feedback
 # =============================================================
 
 param (
@@ -80,7 +81,7 @@ param (
     [Alias('clean')]
     [switch]$c,
 
-    # ---- NOT YET IMPLEMENTED, NOT IMPORTANT FOR CURRENT BOARD----
+    # ---- NOT YET IMPLEMENTED, NOT IMPORTANT FOR CURRNET BOARD----
     [Alias('custom_target')]
     [string]$t          = "",
 
@@ -135,6 +136,7 @@ if ($h) {
     Write-Host ""
     Write-Host "AUTHOR"
     Write-Host "    Written by Bruce Mao"
+    Write-Host "    Adapted from linux build.sh by Craig Haywood"
     Write-Host ""
     Write-Host "COPYRIGHT"
     Write-Host "    (C) Brisbane Silicon, Pty Ltd. All rights reserved."
@@ -173,16 +175,10 @@ if (-not $RepoRoot -or $RepoRoot.Trim() -eq '') {
 # ---- GOWIN INSTALL PATH DETECTION ----
 $GowinInstallDir = $null
 
-# define common paths for GOWIN v1.9.12.01 and v1.9.12.01
+# define common paths for GOWIN v1.9.12 and later
 $commonPaths = @(
-    "C:\Gowin\Gowin_V1.9.12.01_x64",
-    "C:\Gowin\Gowin_V1.9.12.01",
     "C:\Gowin\Gowin_V1.9.12_x64",
     "C:\Gowin\Gowin_V1.9.12",
-    "C:\Program Files\Gowin\Gowin_V1.9.12.01_x64",
-    "C:\Program Files\Gowin\Gowin_V1.9.12.01",
-    "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.01_x64",
-    "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.01"
     "C:\Gowin\Gowin_V1.9.12.02_x64",
     "C:\Gowin\Gowin_V1.9.12.02",
     "C:\Program Files\Gowin\Gowin_V1.9.12.02_x64",
@@ -224,12 +220,15 @@ if (-not $GowinInstallDir) {
     }
     Write-Host ""
     Write-Host "To fix this, either:"
-    Write-Host "  1. Install GOWIN EDA V1.9.12.01 to one of the above locations."
+    Write-Host "  1. Install GOWIN EDA V1.9.12.02 to one of the above locations."
     Write-Host "     Download: https://www.gowinsemi.com/en/support/download_eda/"
     Write-Host ""
     Write-Host "  2. Set the GOWIN_INSTALL_DIR environment variable to your install path:"
     Write-Host "     (Run this once in PowerShell, then reopen PowerShell)"
     Write-Host "     [System.Environment]::SetEnvironmentVariable('GOWIN_INSTALL_DIR', 'C:\your\gowin\path', 'User')"
+    Write-Host ""
+    Write-Host "  NOTE: Only GOWIN EDA V1.9.12.02 is tested and verified for this script. "
+    Write-Host "        Older versions may have compatibility issues. Please install V1.9.12.02."  
     Write-Host ""
     exit 1
 }
@@ -238,39 +237,53 @@ if (-not $GowinInstallDir) {
 $installFolderName = Split-Path $GowinInstallDir -Leaf
 Write-Host "Found GOWIN EDA at: $GowinInstallDir"
 
-if ($installFolderName -like "*1.9.12*") {
+# Extract version number from folder name (e.g., "Gowin_V1.9.12.02_x64" -> "1.9.12.02")
+if ($installFolderName -match 'V(\d+\.\d+\.\d+(?:\.\d+)?)') {
+    $versionNumber = $matches[1]
+} else {
+    $versionNumber = $installFolderName
+}
+
+if ($versionNumber -like "1.9.12*" -and $versionNumber -notlike "1.9.12.01*") {
     Write-Host "GOWIN version: $installFolderName (verified compatible)"
 
-} elseif ($installFolderName -like "*1.9.11.01*") {
+} elseif ($versionNumber -like "1.9.12.01*") {
     Write-Host ""
-    Write-Host "ERROR: GOWIN EDA V1.9.11.01 is a known broken release."
-    Write-Host "Please install V1.9.12.01 from:"
+    Write-Host "ERROR: GOWIN EDA V1.9.12.01 has a fatal bug and is not supported by this script."
+    Write-Host "Please install V1.9.12.02 or later from:"
     Write-Host "https://www.gowinsemi.com/en/support/download_eda/"
     exit 1
 
-} elseif ($installFolderName -like "*1.9.8*"  -or
-          $installFolderName -like "*1.9.9*"  -or
-          $installFolderName -like "*1.9.10*" -or
-          $installFolderName -like "*1.9.11*") {
+} elseif ($versionNumber -like "*1.9.11.01*") {
+    Write-Host ""
+    Write-Host "ERROR: GOWIN EDA V1.9.11.01 is a known broken release."
+    Write-Host "Please install V1.9.12.02 or later from:"
+    Write-Host "https://www.gowinsemi.com/en/support/download_eda/"
+    exit 1
+
+} elseif ($versionNumber -like "*1.9.8*"  -or
+          $versionNumber -like "*1.9.9*"  -or
+          $versionNumber -like "*1.9.10*" -or
+          $versionNumber -like "*1.9.11*") {
     Write-Host ""
     Write-Host "WARNING: GOWIN EDA $installFolderName has not been tested with this script."
-    Write-Host "         This script was developed and verified with V1.9.12.01."
+    Write-Host "         This script was developed and verified with V1.9.12.02."
     Write-Host "         Some TCL commands used in build.tcl may not be supported."
-    Write-Host "         Recommended version: V1.9.12.01"
+    Write-Host "         Recommended version: V1.9.12.02 or later"
     Write-Host "         Continuing anyway..."
     Write-Host ""
 
-} elseif ($installFolderName -notlike "*1.9.*") {
+} elseif ($versionNumber -notlike "*1.9.*") {
     Write-Host ""
     Write-Host "WARNING: Unrecognised GOWIN EDA version: $installFolderName"
-    Write-Host "         This script was developed and verified with V1.9.12.01."
+    Write-Host "         This script was developed and verified with V1.9.12.02."
     Write-Host "         Continuing anyway..."
     Write-Host ""
 
 } else {
     Write-Host ""
     Write-Host "WARNING: GOWIN EDA $installFolderName has not been tested with this script."
-    Write-Host "         This script was developed and verified with V1.9.12.01."
+    Write-Host "         This script was developed and verified with V1.9.12.02."
     Write-Host "         Continuing anyway..."
     Write-Host ""
 }
@@ -425,7 +438,7 @@ if ($PSBoundParameters.ContainsKey('k')) {
 }
 
 # ---- IMPLEMENT -c / clean ----
-# deletes current target build output only
+# deletes current target build output only — matches Linux behaviour, no prompt
 if ($c) {
     Write-Host ""
     Write-Host "====================================="
@@ -527,14 +540,14 @@ if ($m) { Write-Host "NOTE: -m / -clean_platform is not yet implemented."; exit 
 
 # ---- PRE-FLIGHT CHECKS ----
 
-## checks generate_top_wrapper.ps1
+## generate_top_wrapper.ps1 — match Linux pattern of checking script exists
 if (-not (Test-Path "$PSScriptRoot\generate_top_wrapper.ps1")) {
     Write-Host "ERROR: generate_top_wrapper.ps1 not found at: $PSScriptRoot"
     Write-Host "Make sure generate_top_wrapper.ps1 is in the same folder as this script."
     exit 1
 }
 
-## checks build.tcl
+## build.tcl
 if (-not (Test-Path $BuildTcl)) {
     Write-Host "ERROR: Cannot find build.tcl at: $BuildTcl"
     Write-Host "Please check RepoRoot was correctly derived from Git."
