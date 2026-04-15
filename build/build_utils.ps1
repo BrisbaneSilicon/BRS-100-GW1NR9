@@ -1,7 +1,8 @@
 # ---- TEXT FORMATTING ----
-$boldf      = "`e[1m"
-$underlinef = "`e[4m"
-$normf      = "`e[0m"
+$esc        = [char]0x1B
+$boldf      = "${esc}[1m"
+$underlinef = "${esc}[4m"
+$normf      = "${esc}[0m"
 
 # ---- COPYRIGHT ----
 $copyright = @"

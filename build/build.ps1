@@ -52,66 +52,44 @@ param (
 )
 
 
-# ---- HELP ---- 
+# ---- HELP ----
 if ($h) {
-    Write-Host ""
-    Write-Host "Usage: .\build.ps1 [OPTIONS]"
-    Write-Host ""
-    Write-Host "  Core Build Options:"
-    Write-Host "  -b, -board_demonstration            Board demonstration mode (default: LED blink)"
-    Write-Host "  -k, -clock_frequency <MHz>          System clock frequency in MHz (default: 51)"
-    Write-Host "  -u, -uart_baud <baud>               UART baud rate (default: 115200)"
-    Write-Host "  -r, -disable_pushbutton_reset       Disable pushbutton 1 as reset (default: enabled)"
-    Write-Host "  -p, -proj_only                      Generate project file only, then exit"
-    Write-Host "  -s, -synth_only                     Stop after synthesis, then exit"
-    Write-Host "  -a, -clean_all_platforms            Delete all build output and exit"
-    Write-Host "  -c, -clean                          Delete current target build output and exit"
-    Write-Host "  -y, -list_supported_system_clock_frequencies   List valid clock frequencies and exit"
-    Write-Host "  -d, -list_default_target            Print default target and exit"
-    Write-Host "  -i, -list_supported_platforms       List supported platforms and exit"
-    Write-Host "  -l, -list_supported_targets         List supported targets and exit"
-    Write-Host "  -h, -help                           Show this help and exit"
-    Write-Host ""
-    Write-Host "  Not Yet Implemented:"
-    Write-Host "  -t, -custom_target <TARGET>         Target a different board"
-    Write-Host "  -f, -platform <PLATFORM>            Specify platform explicitly"
-    Write-Host "  -m, -clean_platform                 Clean all devices for platform and exit"
-    Write-Host ""
-    Write-Host "  Examples:"
-    Write-Host "  .\build.ps1                         Default LED blink build"
-    Write-Host "  .\build.ps1 -b                      Board demonstration build"
-    Write-Host "  .\build.ps1 -k 66                   LED blink at 66 MHz"
-    Write-Host "  .\build.ps1 -b -k 66                Board demo at 66 MHz"
-    Write-Host "  .\build.ps1 -u 9600                 LED blink with 9600 baud UART"
-    Write-Host "  .\build.ps1 -r                      Disable pushbutton reset"
-    Write-Host "  .\build.ps1 -p                      Generate project file only"
-    Write-Host "  .\build.ps1 -s                      Run synthesis only"
-    Write-Host "  .\build.ps1 -a                      Clean all build output"
-    Write-Host "  .\build.ps1 -c                      Clean current target build output"
-    Write-Host "  .\build.ps1 -y                      List supported clock frequencies"
-    Write-Host "  .\build.ps1 -d                      Print default target"
-    Write-Host "  .\build.ps1 -i                      List supported platforms"
-    Write-Host "  .\build.ps1 -l                      List supported targets"
-    Write-Host ""
-    Write-Host "AUTHOR"
-    Write-Host "    Written by Bruce Mao"
-    Write-Host "    Adapted from linux build.sh by Craig Haywood"
-    Write-Host ""
-    Write-Host "COPYRIGHT"
-    Write-Host "    (C) Brisbane Silicon, Pty Ltd. All rights reserved."
-    Write-Host ""
-    Write-Host "    The source code contained herein is provided on an `"as is`" basis. Brisbane Silicon, Pty Ltd."
-    Write-Host "    disclaims any and all warranties, whether express, implied, or statutory, including any implied"
-    Write-Host "    warranties of merchantability or of fitness for a particular purpose. In no event shall Brisbane"
-    Write-Host "    Silicon, Pty Ltd. be liable for any incidental, punitive, or consequential damages of any kind"
-    Write-Host "    whatsoever arising from the use of this source code."
-    Write-Host ""
-    Write-Host "    This disclaimer of warranty extends to the user of this source code and user's customers,"
-    Write-Host "    employees, agents, transferees, successors and assigns."
-    Write-Host ""
-    Write-Host "    This is not a grant of patent rights."
-    Write-Host ""
+    # ---- UTILS (needed for formatting vars and copyright) ----
+    . "$PSScriptRoot\build_utils.ps1"
 
+    Write-Host "${underlinef}BUILD${normf}`n"
+    Write-Host "${boldf}NAME${normf}"
+    Write-Host "`tbuild - build the BRS-100-GW1NR9 FPGA firmware`n"
+    Write-Host "${boldf}SYNOPSIS${normf}"
+    Write-Host "`t${boldf}build${normf} [OPTIONS...]`n"
+    Write-Host "${boldf}DESCRIPTION${normf}"
+    Write-Host "`tBuild or query build options for the BRS-100-GW1NR9 FPGA firmware.`n"
+    Write-Host "${boldf}OPTIONS${normf}"
+    Write-Host "${boldf}    Generic Program Information${normf}"
+    Write-Host "`t${boldf}-h, -help${normf}`n`t`tDisplay this help and exit.`n"
+    Write-Host "${boldf}    Build Target Information${normf}"
+    Write-Host "`t${boldf}-d, -list_default_target${normf}`n`t`tList the default build target.`n"
+    Write-Host "`t${boldf}-l, -list_supported_targets${normf}`n`t`tList supported build targets and exit.`n"
+    Write-Host "`t${boldf}-i, -list_supported_platforms${normf}`n`t`tList supported target platforms and exit.`n"
+    Write-Host "`t${boldf}-y, -list_supported_system_clock_frequencies${normf}`n`t`tList supported system clock frequencies and exit.`n"
+    Write-Host "${boldf}    Build Related${normf}"
+    Write-Host "`t${boldf}-u, -uart_baud${normf} ${underlinef}UART_BAUD${normf}`n`t`tSet user comms baud rate (default 115200).`n"
+    Write-Host "`t${boldf}-r, -disable_pushbutton_reset${normf}`n`t`tDisable pushbutton 1 as hard reset.`n"
+    Write-Host "`t${boldf}-b, -board_demonstration${normf}`n`t`tPerform build of board demonstration bitstream.`n"
+    Write-Host "`t${boldf}-t, -custom_target${normf} ${underlinef}CUSTOM_TARGET${normf}`n`t`tPerform build targeting CUSTOM_TARGET.`n"
+    Write-Host "`t${boldf}-k, -clock_frequency${normf} ${underlinef}FREQUENCY_MHZ${normf}`n`t`tUse a frequency of FREQUENCY_MHZ for the system clock (default 51 MHz)."
+    Write-Host "`t`tSee '-y, -list_supported_system_clock_frequencies' above, for more information.`n"
+    Write-Host "`t${boldf}-f, -platform${normf} PLATFORM`n`t`tSpecify PLATFORM for build or clean.`n"
+    Write-Host "`t${boldf}-c, -clean${normf}`n`t`tPerform cleanup of TARGET for specified PLATFORM and exit.`n"
+    Write-Host "`t${boldf}-m, -clean_platform${normf}`n`t`tPerform cleanup of all target devices for specified PLATFORM and exit.`n"
+    Write-Host "`t${boldf}-a, -clean_all_platforms${normf}`n`t`tPerform cleanup of all target devices for all platforms and exit.`n"
+    Write-Host "`t${boldf}-p, -proj_only${normf}`n`t`tOnly generate the project file, then exit. Takes priority over ${boldf}-s${normf}/${boldf}-synth_only${normf} if both are provided.`n"
+    Write-Host "`t${boldf}-s, -synth_only${normf}`n`t`tOnly proceed with build until synthesis is complete, then exit.`n"
+    Write-Host "${boldf}AUTHOR${normf}"
+    Write-Host "`tWritten by Bruce Mao"
+    Write-Host "`tAdapted from linux build.sh by Craig Haywood`n"
+    Write-Host "${boldf}COPYRIGHT${normf}"
+    Write-Host $copyright
     exit 0
 }
 
@@ -129,52 +107,40 @@ $DoSynthOnly        = if ($s) { "true" } else { "false" }
 
 # ---- IMPLEMENT -d / list_default_target ----
 if ($d) {
-    Write-Host ""
-    Write-Host "Default target: $ProjectName"
+    Write-Host $ProjectName
     exit 0
 }
 
 # ---- IMPLEMENT -i / list_supported_platforms ----
 if ($i) {
-    Write-Host ""
-    Write-Host "====================================="
-    Write-Host " Supported Platforms"
-    Write-Host "====================================="
     if (Test-Path $PlatformsDir) {
         Get-ChildItem -Directory $PlatformsDir |
             Select-Object -ExpandProperty Name |
-            ForEach-Object { Write-Host "  $_" }
+            ForEach-Object { Write-Host $_ }
     } else {
         Write-Host "ERROR: Platforms directory not found at: $PlatformsDir"
     }
-    Write-Host "====================================="
     exit 0
 }
 
 # ---- IMPLEMENT -l / list_supported_targets ----
 if ($l) {
-    Write-Host ""
-    Write-Host "====================================="
-    Write-Host " Supported Targets"
-    Write-Host "====================================="
-    $devices | ForEach-Object {
-        Write-Host "  $($_.'Build Target'.Trim())"
-    }
-    Write-Host "====================================="
+    Write-Host "-----------------------------------------"
+    Write-Host "Platform  : $Platform"
+    $targetList = ($devices | ForEach-Object { $_.'Build Target'.Trim() }) -join ", "
+    Write-Host "Target(s) : $targetList"
+    Write-Host "-----------------------------------------"
     exit 0
 }
 
 # ---- IMPLEMENT -y / list_supported_system_clock_frequencies ----
 if ($y) {
-    Write-Host ""
-    Write-Host "====================================="
-    Write-Host " Supported System Clock Frequencies"
-    Write-Host "====================================="
-    Write-Host "Platform : $Platform"
-    Write-Host "Target   : $ProjectName"
-    Write-Host -NoNewline "Freq MHz : "
+    Write-Host "----------------------------------------------------------------------------------"
+    Write-Host "Platform           : $Platform"
+    Write-Host "Target             : $ProjectName"
+    Write-Host -NoNewline "Sysclk Freq (MHz)  : "
     Write-Host ($supportedFreqs -join ", ")
-    Write-Host "====================================="
+    Write-Host "----------------------------------------------------------------------------------"
     exit 0
 }
 
