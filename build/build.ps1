@@ -1,44 +1,3 @@
-# =============================================================
-# build_v1.0.2.ps1
-# Windows build script for BRS-100-GW1NR9
-#
-# Author:    Bruce Mao
-# Adapted from linux build.sh by Craig Haywood
-# Copyright: (C) Brisbane Silicon, Pty Ltd. All rights reserved.
-#
-# The source code contained herein is provided on an "as is" basis.
-# Brisbane Silicon, Pty Ltd. disclaims any and all warranties,
-# whether express, implied, or statutory, including any implied
-# warranties of merchantability or of fitness for a particular
-# purpose. In no event shall Brisbane Silicon, Pty Ltd. be liable
-# for any incidental, punitive, or consequential damages of any
-# kind whatsoever arising from the use of this source code.
-#
-# This disclaimer of warranty extends to the user of this source
-# code and user's customers, employees, agents, transferees,
-# successors and assigns.
-#
-# This is not a grant of patent rights.
-#
-# =============================================================
-# version 0.1 - minimal functionality, hardcoded paths
-# version 0.2 - added command line options and generate_top_wrapper
-# version 0.3 - implemented -p, -s, -a flags, added /output copy, y/n prompt for -a
-# version 0.4 - auto-derive RepoRoot from Git, auto-detect GOWIN install path,
-#               version compatibility check
-# version 0.5 - validate -k against CSV, implement -y, add build timing
-# version 0.6 - read chip settings from CSV, nothing hardcoded
-#               implemented -d, -i, -l, -c flags
-#               derive OutputDir and BuildTcl from CSV values
-#               added empty CSV checks matching Linux return code pattern
-#               added generate_top_wrapper.ps1 existence check
-#               improved RepoRoot empty string handling
-# version 0.7 - implemented setup_build_output_directory — clean before build
-#               implemented is_supported_platform — validate platform exists
-#               note: xilinx not yet implemented. This script is currently only for GOWIN builds.
-# version 1.0.2 - added detailed help message, cleaned up code, added comments, added more error handling and user feedback
-# =============================================================
-
 param (
     # ---- CORE BUILD FLAGS ----
     [Alias('board_demonstration')]
@@ -179,12 +138,8 @@ $GowinInstallDir = $null
 $commonPaths = @(
     "C:\Gowin\Gowin_V1.9.12_x64",
     "C:\Gowin\Gowin_V1.9.12",
-    "C:\Gowin\Gowin_V1.9.12.02_x64",
-    "C:\Gowin\Gowin_V1.9.12.02",
-    "C:\Program Files\Gowin\Gowin_V1.9.12.02_x64",
-    "C:\Program Files\Gowin\Gowin_V1.9.12.02",
-    "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.02_x64",
-    "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.02"
+    "C:\Program Files\Gowin\Gowin_V1.9.12_x64",
+    "C:\Program Files\Gowin\Gowin_V1.9.12"
 )
 
 # check environment variable
@@ -220,15 +175,15 @@ if (-not $GowinInstallDir) {
     }
     Write-Host ""
     Write-Host "To fix this, either:"
-    Write-Host "  1. Install GOWIN EDA V1.9.12.02 to one of the above locations."
+    Write-Host "  1. Install GOWIN EDA V1.9.12 to one of the above locations."
     Write-Host "     Download: https://www.gowinsemi.com/en/support/download_eda/"
     Write-Host ""
     Write-Host "  2. Set the GOWIN_INSTALL_DIR environment variable to your install path:"
     Write-Host "     (Run this once in PowerShell, then reopen PowerShell)"
     Write-Host "     [System.Environment]::SetEnvironmentVariable('GOWIN_INSTALL_DIR', 'C:\your\gowin\path', 'User')"
     Write-Host ""
-    Write-Host "  NOTE: Only GOWIN EDA V1.9.12.02 is tested and verified for this script. "
-    Write-Host "        Older versions may have compatibility issues. Please install V1.9.12.02."  
+    Write-Host "  NOTE: Only GOWIN EDA V1.9.12 is tested and verified for this script. "
+    Write-Host "        Older versions may have compatibility issues. Please install V1.9.12."
     Write-Host ""
     exit 1
 }
@@ -237,7 +192,7 @@ if (-not $GowinInstallDir) {
 $installFolderName = Split-Path $GowinInstallDir -Leaf
 Write-Host "Found GOWIN EDA at: $GowinInstallDir"
 
-# Extract version number from folder name (e.g., "Gowin_V1.9.12.02_x64" -> "1.9.12.02")
+# Extract version number from folder name (e.g., "Gowin_V1.9.12_x64" -> "1.9.12")
 if ($installFolderName -match 'V(\d+\.\d+\.\d+(?:\.\d+)?)') {
     $versionNumber = $matches[1]
 } else {
@@ -250,14 +205,14 @@ if ($versionNumber -like "1.9.12*" -and $versionNumber -notlike "1.9.12.01*") {
 } elseif ($versionNumber -like "1.9.12.01*") {
     Write-Host ""
     Write-Host "ERROR: GOWIN EDA V1.9.12.01 has a fatal bug and is not supported by this script."
-    Write-Host "Please install V1.9.12.02 or later from:"
+    Write-Host "Please install V1.9.12 from:"
     Write-Host "https://www.gowinsemi.com/en/support/download_eda/"
     exit 1
 
 } elseif ($versionNumber -like "*1.9.11.01*") {
     Write-Host ""
     Write-Host "ERROR: GOWIN EDA V1.9.11.01 is a known broken release."
-    Write-Host "Please install V1.9.12.02 or later from:"
+    Write-Host "Please install V1.9.12 from:"
     Write-Host "https://www.gowinsemi.com/en/support/download_eda/"
     exit 1
 
@@ -267,23 +222,23 @@ if ($versionNumber -like "1.9.12*" -and $versionNumber -notlike "1.9.12.01*") {
           $versionNumber -like "*1.9.11*") {
     Write-Host ""
     Write-Host "WARNING: GOWIN EDA $installFolderName has not been tested with this script."
-    Write-Host "         This script was developed and verified with V1.9.12.02."
+    Write-Host "         This script was developed and verified with V1.9.12."
     Write-Host "         Some TCL commands used in build.tcl may not be supported."
-    Write-Host "         Recommended version: V1.9.12.02 or later"
+    Write-Host "         Recommended version: V1.9.12"
     Write-Host "         Continuing anyway..."
     Write-Host ""
 
 } elseif ($versionNumber -notlike "*1.9.*") {
     Write-Host ""
     Write-Host "WARNING: Unrecognised GOWIN EDA version: $installFolderName"
-    Write-Host "         This script was developed and verified with V1.9.12.02."
+    Write-Host "         This script was developed and verified with V1.9.12."
     Write-Host "         Continuing anyway..."
     Write-Host ""
 
 } else {
     Write-Host ""
     Write-Host "WARNING: GOWIN EDA $installFolderName has not been tested with this script."
-    Write-Host "         This script was developed and verified with V1.9.12.02."
+    Write-Host "         This script was developed and verified with V1.9.12."
     Write-Host "         Continuing anyway..."
     Write-Host ""
 }
