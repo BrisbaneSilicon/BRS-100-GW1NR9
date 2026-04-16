@@ -1,7 +1,7 @@
 ﻿# =============================================================
 # generate_top_wrapper.ps1
 # Generates autogen_top_wrapper.sv with current build settings.
-# Called by build_win_v2.ps1 before running gw_sh.exe
+# Called by build.ps1 before running gw_sh.exe
 # =============================================================
 
 param (
