@@ -1,5 +1,5 @@
 # =============================================================
-# program_board_v0.4.ps1
+# program_board_v0.4.1.ps1
 # Windows programming script for BRS-100-GW1NR9
 # version 0.1 - minimal functionality:
 #               find programmer_cli.exe
@@ -25,6 +25,13 @@
 #               -k / --clock_frequency    pass clock frequency to build script
 #               -f / --jtag_frequency     override JTAG programming frequency
 #               warn if programmer.exe is running before cable scan
+# version 0.4.1 - fix intermittent hang during embFlash erase:
+#               programmer_cli.exe occasionally hangs because the ftd2xx driver
+#               doesn't fully release the USB handle between invocations. the
+#               FTDI chip's state machine accumulates stale state until it locks.
+#               fix: call FT_CyclePort via ftd2xx.dll P/Invoke before programming
+#               to force the FTDI chip to USB re-enumerate, clearing stale handles.
+#               this is equivalent to a physical USB unplug/replug.
 # =============================================================
 
 param(
@@ -68,7 +75,7 @@ function Show-Help {
     Write-Host "    program_board - program the BRS-100-GW1NR9 board with FPGA firmware"
     Write-Host ""
     Write-Host "SYNOPSIS"
-    Write-Host "    .\program_board_v0.4.ps1 [OPTIONS]"
+    Write-Host "    .\program_board_v0.4.1.ps1 [OPTIONS]"
     Write-Host ""
     Write-Host "DESCRIPTION"
     Write-Host "    Program the BRS-100-GW1NR9 board via JTAG using programmer_cli.exe."
@@ -98,25 +105,25 @@ function Show-Help {
     Write-Host "        Valid values: $($ValidJtagFrequencies -join ', ')"
     Write-Host ""
     Write-Host "EXAMPLES"
-    Write-Host "    .\program_board_v0.4.ps1"
+    Write-Host "    .\program_board_v0.4.1.ps1"
     Write-Host "        Build (if needed) and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.4.ps1 -c"
+    Write-Host "    .\program_board_v0.4.1.ps1 -c"
     Write-Host "        Clean, rebuild, and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.4.ps1 -b"
+    Write-Host "    .\program_board_v0.4.1.ps1 -b"
     Write-Host "        Check whether firmware is built without programming."
     Write-Host ""
-    Write-Host "    .\program_board_v0.4.ps1 -m C:\path\to\custom.fs"
+    Write-Host "    .\program_board_v0.4.1.ps1 -m C:\path\to\custom.fs"
     Write-Host "        Program the board with a custom bitstream file."
     Write-Host ""
-    Write-Host "    .\program_board_v0.4.ps1 -k 66"
+    Write-Host "    .\program_board_v0.4.1.ps1 -k 66"
     Write-Host "        Build at 66 MHz and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.4.ps1 -c -k 75"
+    Write-Host "    .\program_board_v0.4.1.ps1 -c -k 75"
     Write-Host "        Clean, rebuild at 75 MHz, and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.4.ps1 -f 2.5MHz"
+    Write-Host "    .\program_board_v0.4.1.ps1 -f 2.5MHz"
     Write-Host "        Program at 2.5MHz JTAG speed (faster, less reliable)."
     Write-Host ""
 }
@@ -264,6 +271,129 @@ $BuildScript    = "$RepoRoot\windows\build_v0.7.ps1"
 $DevicesCsvPath = "$RepoRoot\build\platforms\gowin\gowin_supported_devices_information.csv"
 $BoardsCsvPath  = "$RepoRoot\prog\supported_boards.csv"
 
+# ---- FTDI USB RESET VIA ftd2xx.dll ----
+# programmer_cli.exe occasionally hangs because the ftd2xx driver doesn't fully
+# release the USB handle between invocations. calling FT_CyclePort forces the
+# FTDI chip to USB re-enumerate (equivalent to physical unplug/replug), clearing
+# any stale driver state that would cause the next programmer_cli call to deadlock.
+#
+# ftd2xx API reference: https://ftdichip.com/wp-content/uploads/2024/09/D2XX_Programmers_Guide.pdf
+# FT_STATUS values: FT_OK=0, FT_INVALID_HANDLE=1, FT_DEVICE_NOT_FOUND=2, etc.
+$Ftd2xxDll = "$GowinInstallDir\Programmer\bin\ftd2xx.dll"
+
+if (Test-Path $Ftd2xxDll) {
+    try {
+        Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+
+public class Ftd2xx {
+    // FT_Open: open device by index number
+    // returns FT_STATUS (0 = FT_OK)
+    [DllImport("ftd2xx.dll", CallingConvention = CallingConvention.StdCall)]
+    public static extern uint FT_Open(uint deviceNumber, out IntPtr ftHandle);
+
+    // FT_Close: close an open device handle
+    [DllImport("ftd2xx.dll", CallingConvention = CallingConvention.StdCall)]
+    public static extern uint FT_Close(IntPtr ftHandle);
+
+    // FT_CyclePort: causes the USB device to be re-enumerated by the host.
+    // equivalent to unplugging and replugging the USB cable.
+    // the handle is invalid after this call - must close and re-open.
+    [DllImport("ftd2xx.dll", CallingConvention = CallingConvention.StdCall)]
+    public static extern uint FT_CyclePort(IntPtr ftHandle);
+
+    // FT_ResetDevice: sends a reset command to the FTDI device
+    [DllImport("ftd2xx.dll", CallingConvention = CallingConvention.StdCall)]
+    public static extern uint FT_ResetDevice(IntPtr ftHandle);
+
+    // FT_CreateDeviceInfoList: returns number of FTDI devices connected
+    [DllImport("ftd2xx.dll", CallingConvention = CallingConvention.StdCall)]
+    public static extern uint FT_CreateDeviceInfoList(out uint numDevs);
+}
+"@
+
+        # must set DLL search path so P/Invoke finds ftd2xx.dll in Gowin's bin dir
+        $env:PATH = "$GowinInstallDir\Programmer\bin;$env:PATH"
+
+        $script:Ftd2xxLoaded = $true
+    } catch {
+        Write-Host "WARNING: Could not load ftd2xx.dll for USB reset: $_"
+        Write-Host "         Continuing without USB reset (may hang on rapid re-runs)."
+        $script:Ftd2xxLoaded = $false
+    }
+} else {
+    Write-Host "WARNING: ftd2xx.dll not found at: $Ftd2xxDll"
+    Write-Host "         Continuing without USB reset (may hang on rapid re-runs)."
+    $script:Ftd2xxLoaded = $false
+}
+
+function Reset-FtdiDevice {
+    <#
+    .SYNOPSIS
+        Reset all FTDI devices via FT_CyclePort to clear stale USB handle state.
+        This forces a USB re-enumeration equivalent to physical unplug/replug.
+    #>
+    if (-not $script:Ftd2xxLoaded) {
+        return $false
+    }
+
+    try {
+        # enumerate how many FTDI devices are connected
+        [uint32]$numDevs = 0
+        $status = [Ftd2xx]::FT_CreateDeviceInfoList([ref]$numDevs)
+        if ($status -ne 0) {
+            Write-Host "WARNING: FT_CreateDeviceInfoList failed (status=$status)"
+            return $false
+        }
+
+        if ($numDevs -eq 0) {
+            Write-Host "WARNING: No FTDI devices found for reset."
+            return $false
+        }
+
+        Write-Host "Resetting $numDevs FTDI device(s) to clear stale USB state..."
+
+        # cycle port on device index 0 (JTAG interface)
+        # this resets the entire FT2232H chip (both channels)
+        [IntPtr]$handle = [IntPtr]::Zero
+        $status = [Ftd2xx]::FT_Open(0, [ref]$handle)
+        if ($status -ne 0) {
+            Write-Host "WARNING: FT_Open failed (status=$status) - device may be in use."
+            return $false
+        }
+
+        # reset the device first (clears internal buffers)
+        $status = [Ftd2xx]::FT_ResetDevice($handle)
+        if ($status -ne 0) {
+            Write-Host "WARNING: FT_ResetDevice failed (status=$status)"
+            [void][Ftd2xx]::FT_Close($handle)
+            return $false
+        }
+
+        # cycle port forces full USB re-enumeration
+        $status = [Ftd2xx]::FT_CyclePort($handle)
+        if ($status -ne 0) {
+            Write-Host "WARNING: FT_CyclePort failed (status=$status)"
+            [void][Ftd2xx]::FT_Close($handle)
+            return $false
+        }
+
+        # handle is invalid after CyclePort but close anyway for cleanup
+        [void][Ftd2xx]::FT_Close($handle)
+
+        # wait for Windows to complete USB re-enumeration
+        # FT_CyclePort triggers a disconnect+reconnect cycle at the USB level
+        Write-Host "Waiting for USB re-enumeration..."
+        Start-Sleep -Seconds 3
+
+        return $true
+    } catch {
+        Write-Host "WARNING: FTDI reset failed: $_"
+        return $false
+    }
+}
+
 # ---- PROJECT SETTINGS ----
 $ProjectName    = "BRS-100-GW1NR9"
 
@@ -370,6 +500,18 @@ if ($guiProcesses) {
     Write-Host ""
     Write-Host "Please close the Programmer GUI and try again."
     exit 1
+}
+
+# ---- RESET FTDI USB DEVICE ----
+# clear any stale ftd2xx handle state from previous programmer_cli invocations.
+# without this, rapid back-to-back programming can hang during embFlash erase
+# because the FTDI chip's state machine never fully released the previous handle.
+Write-Host ""
+$resetResult = Reset-FtdiDevice
+if ($resetResult) {
+    Write-Host "FTDI USB reset complete."
+} else {
+    Write-Host "FTDI USB reset skipped - proceeding anyway."
 }
 
 # ---- SCAN FOR JTAG CABLE ----
@@ -495,5 +637,8 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "  3. GOWIN Programmer GUI is open - close it and try again"
     Write-Host "  4. Driver issue - try unplugging and replugging the board"
     Write-Host "  5. License issue - check GOWIN license via IDE: Help > Manage License"
+    Write-Host ""
+    Write-Host "If the script froze and you had to Ctrl+C, see:"
+    Write-Host "  windows\TROUBLESHOOTING.txt"
     exit 1
 }
