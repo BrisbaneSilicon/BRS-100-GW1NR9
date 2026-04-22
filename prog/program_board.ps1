@@ -1,9 +1,9 @@
 # =============================================================
-# program_board_v0.6.ps1
+# program_board_v1.0.2.ps1
 # Windows programming script for BRS-100-GW1NR9
 #
 # Author:    Bruce Mao
-# Based on program_board.sh, originally authored by Craig Haywood
+# Adapted from linux program_board.sh by Craig Haywood
 # Copyright: (C) Brisbane Silicon, Pty Ltd. All rights reserved.
 #
 # The source code contained herein is provided on an "as is" basis.
@@ -63,6 +63,7 @@
 #               -jtag_frequency                   renamed from -f (no short flag, avoids -f collision)
 # version 0.6 - add author and copyright statement
 #               update help text references to v0.6
+# version 1.0.2 - added detailed help message, cleaned up code, added comments, added more error handling and user feedback
 # =============================================================
 
 param(
@@ -165,7 +166,7 @@ function Show-Help {
     Write-Host "        Valid values: 51, 66, 75, 81, 87 (default: 51)"
     Write-Host ""
     Write-Host "    -jtag_frequency  <freq>"
-    Write-Host "        Override the JTAG programming clock frequency (default: 0.02MHz)."
+    Write-Host "        Override the JTAG programming clock frequency (default: 0.5MHz)."
     Write-Host "        Valid values: $($ValidJtagFrequencies -join ', ')"
     Write-Host "        (Windows-only flag, no short form to avoid collision with -f)"
     Write-Host ""
@@ -203,6 +204,7 @@ function Show-Help {
     Write-Host ""
     Write-Host "AUTHOR"
     Write-Host "    Written by Bruce Mao"
+    write-Host "    Adapted from linux program_board.sh by Craig Haywood"
     Write-Host ""
     Write-Host "COPYRIGHT"
     Write-Host "    (C) Brisbane Silicon, Pty Ltd. All rights reserved."
@@ -225,7 +227,7 @@ if ($ShowHelp) {
     exit 0
 }
 
-# ---- DUMMY FLAGS (not implemented for Gowin / single target) ----
+# ---- DUMMY FLAGS (not implemented for Gowin / single-target) ----
 if ($UpdateFlashOnly) {
     Write-Host "ERROR: -f / --update_flash_only is not implemented on Windows."
     Write-Host "       Flash update is only supported on Xilinx boards (ARTYS7-25/50)"
@@ -263,29 +265,22 @@ if (-not $RepoRoot -or $RepoRoot.Trim() -eq '') {
 }
 
 # ---- AUTO-DETECT GOWIN INSTALL PATH ----
-# checks for programmer_cli.exe specifically
+# checks for programmer_cli.exe specifically - different from build script
 # which checks for gw_sh.exe
-# includes V1.9.12.01 and V1.9.12.02
 $GowinInstallDir = $null
 
 $commonPaths = @(
-    "C:\Gowin\Gowin_V1.9.12.01_x64",
-    "C:\Gowin\Gowin_V1.9.12.02_x64",
-    "C:\Gowin\Gowin_V1.9.12.01",
-    "C:\Gowin\Gowin_V1.9.12.02",
     "C:\Gowin\Gowin_V1.9.12_x64",
     "C:\Gowin\Gowin_V1.9.12",
-    "C:\Program Files\Gowin\Gowin_V1.9.12.01_x64",
+    "C:\Gowin\Gowin_V1.9.12.02_x64",
+    "C:\Gowin\Gowin_V1.9.12.02",
     "C:\Program Files\Gowin\Gowin_V1.9.12.02_x64",
-    "C:\Program Files\Gowin\Gowin_V1.9.12.01",
     "C:\Program Files\Gowin\Gowin_V1.9.12.02",
-    "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.01_x64",
     "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.02_x64",
-    "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.01",
     "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.02"
 )
 
-# check environment variable
+# first check environment variable
 if ($env:GOWIN_INSTALL_DIR) {
     if (Test-Path "$env:GOWIN_INSTALL_DIR\Programmer\bin\programmer_cli.exe") {
         $GowinInstallDir = $env:GOWIN_INSTALL_DIR
@@ -297,7 +292,7 @@ if ($env:GOWIN_INSTALL_DIR) {
     }
 }
 
-# check common install locations
+# then check common install locations
 if (-not $GowinInstallDir) {
     foreach ($path in $commonPaths) {
         if (Test-Path "$path\Programmer\bin\programmer_cli.exe") {
@@ -307,7 +302,7 @@ if (-not $GowinInstallDir) {
     }
 }
 
-# cannot find in common location or path
+# if still not found - fail with clear instructions
 if (-not $GowinInstallDir) {
     Write-Host ""
     Write-Host "ERROR: Could not find GOWIN programmer_cli.exe."
@@ -318,12 +313,15 @@ if (-not $GowinInstallDir) {
     }
     Write-Host ""
     Write-Host "To fix this, either:"
-    Write-Host "  1. Install GOWIN EDA V1.9.12.01 or V1.9.12.02 to one of the above locations."
+    Write-Host "  1. Install GOWIN EDA V1.9.12.02 to one of the above locations."
     Write-Host "     Download: https://www.gowinsemi.com/en/support/download_eda/"
     Write-Host ""
     Write-Host "  2. Set the GOWIN_INSTALL_DIR environment variable to your install path:"
     Write-Host "     (Run this once in PowerShell, then reopen PowerShell)"
     Write-Host "     [System.Environment]::SetEnvironmentVariable('GOWIN_INSTALL_DIR', 'C:\your\gowin\path', 'User')"
+    Write-Host ""
+    Write-Host "  NOTE: Only GOWIN EDA V1.9.12.02 is tested and verified for this script. "
+    Write-Host "        Older versions may have compatibility issues. Please install V1.9.12.02."
     Write-Host ""
     exit 1
 }
@@ -332,45 +330,51 @@ if (-not $GowinInstallDir) {
 $installFolderName = Split-Path $GowinInstallDir -Leaf
 Write-Host "Found GOWIN programmer at: $GowinInstallDir"
 
-if ($installFolderName -like "*1.9.12.01*" -or
-    $installFolderName -like "*1.9.12.02*") {
-    Write-Host "GOWIN version: $installFolderName (verified compatible)1"
+# Extract version number from folder name (e.g., "Gowin_V1.9.12.02_x64" -> "1.9.12.02")
+if ($installFolderName -match 'V(\d+\.\d+\.\d+(?:\.\d+)?)') {
+    $versionNumber = $matches[1]
+} else {
+    $versionNumber = $installFolderName
+}
 
-} elseif ($installFolderName -like "*1.9.12*") {
-    Write-Host ""
-    Write-Host "WARNING: GOWIN $installFolderName has not been verified with this script."
-    Write-Host "         Verified versions: V1.9.12.01, V1.9.12.02"
-    Write-Host "         Continuing anyway..."
-    Write-Host ""
+if ($versionNumber -like "1.9.12*" -and $versionNumber -notlike "1.9.12.01*") {
+    Write-Host "GOWIN version: $installFolderName (verified compatible)"
 
-} elseif ($installFolderName -like "*1.9.11.01*") {
+} elseif ($versionNumber -like "1.9.12.01*") {
     Write-Host ""
-    Write-Host "ERROR: GOWIN EDA V1.9.11.01 is a known broken release."
-    Write-Host "Please install V1.9.12.01 or V1.9.12.02 from:"
+    Write-Host "ERROR: GOWIN EDA V1.9.12.01 has a fatal bug and is not supported by this script."
+    Write-Host "Please install V1.9.12.02 or later from:"
     Write-Host "https://www.gowinsemi.com/en/support/download_eda/"
     exit 1
 
-} elseif ($installFolderName -like "*1.9.8*"  -or
-          $installFolderName -like "*1.9.9*"  -or
-          $installFolderName -like "*1.9.10*" -or
-          $installFolderName -like "*1.9.11*") {
+} elseif ($versionNumber -like "*1.9.11.01*") {
+    Write-Host ""
+    Write-Host "ERROR: GOWIN EDA V1.9.11.01 is a known broken release."
+    Write-Host "Please install V1.9.12.02 or later from:"
+    Write-Host "https://www.gowinsemi.com/en/support/download_eda/"
+    exit 1
+
+} elseif ($versionNumber -like "*1.9.8*"  -or
+          $versionNumber -like "*1.9.9*"  -or
+          $versionNumber -like "*1.9.10*" -or
+          $versionNumber -like "*1.9.11*") {
     Write-Host ""
     Write-Host "WARNING: GOWIN EDA $installFolderName has not been tested with this script."
-    Write-Host "         Verified versions: V1.9.12.01, V1.9.12.02"
+    Write-Host "         Verified versions: V1.9.12.02 and later"
     Write-Host "         Continuing anyway..."
     Write-Host ""
 
-} elseif ($installFolderName -notlike "*1.9.*") {
+} elseif ($versionNumber -notlike "*1.9.*") {
     Write-Host ""
     Write-Host "WARNING: Unrecognised GOWIN EDA version: $installFolderName"
-    Write-Host "         Verified versions: V1.9.12.01, V1.9.12.02"
+    Write-Host "         Verified versions: V1.9.12.02 and later"
     Write-Host "         Continuing anyway..."
     Write-Host ""
 
 } else {
     Write-Host ""
     Write-Host "WARNING: GOWIN EDA $installFolderName has not been tested with this script."
-    Write-Host "         Verified versions: V1.9.12.01, V1.9.12.02"
+    Write-Host "         Verified versions: V1.9.12.02 and later"
     Write-Host "         Continuing anyway..."
     Write-Host ""
 }
@@ -378,17 +382,18 @@ if ($installFolderName -like "*1.9.12.01*" -or
 # ---- PATHS ----
 $ProgrammerCli  = "$GowinInstallDir\Programmer\bin\programmer_cli.exe"
 $ProgrammerGui  = "$GowinInstallDir\Programmer\bin\programmer.exe"
-$BuildScript    = "$RepoRoot\windows\build_v0.7.ps1"
+$BuildScript    = "$RepoRoot\windows\build_v1.0.2.ps1"
 $DevicesCsvPath = "$RepoRoot\build\platforms\gowin\gowin_supported_devices_information.csv"
 $BoardsCsvPath  = "$RepoRoot\prog\supported_boards.csv"
 
 # ---- FTDI USB RESET VIA ftd2xx.dll ----
-# programmer_cli.exe occasionally hangs possibly because the ftd2xx driver doesn't fully
+# programmer_cli.exe occasionally hangs because the ftd2xx driver doesn't fully
 # release the USB handle between invocations. calling FT_CyclePort forces the
 # FTDI chip to USB re-enumerate (equivalent to physical unplug/replug), clearing
 # any stale driver state that would cause the next programmer_cli call to deadlock.
 #
-
+# ftd2xx API reference: https://ftdichip.com/wp-content/uploads/2024/09/D2XX_Programmers_Guide.pdf
+# FT_STATUS values: FT_OK=0, FT_INVALID_HANDLE=1, FT_DEVICE_NOT_FOUND=2, etc.
 $Ftd2xxDll = "$GowinInstallDir\Programmer\bin\ftd2xx.dll"
 
 if (Test-Path $Ftd2xxDll) {
@@ -529,6 +534,7 @@ if ($boards.Count -eq 0) {
 
 # ---- -l / --list_supported_targets ----
 # list all unique board names from the CSV, comma-separated, and exit.
+# matches Linux: list_supported_targets()
 if ($ListSupportedTargets) {
     $uniqueBoards = $boards | ForEach-Object { $_.Board.Trim() } | Select-Object -Unique
     Write-Host ($uniqueBoards -join ", ")
@@ -545,6 +551,7 @@ if (-not $board) {
 
 # ---- -s / --check_if_target_supported ----
 # print whether the current target board is in the supported_boards.csv and exit.
+# matches Linux: check_if_target_supported flag
 if ($CheckIfTargetSupported) {
     Write-Host "Target '$ProjectName' is supported."
     exit 0
@@ -606,6 +613,7 @@ if ($CustomBitfile) {
 }
 
 # ---- CHECK IF BUILT (-b flag) ----
+# matches Linux format: "Target 'BRS-100-GW1NR9' firmware built status: true/false"
 if ($CheckIfTargetBuilt) {
     if (Test-Path $DefaultFsFile) {
         Write-Host "Target '$ProjectName' firmware built status: true"
@@ -616,7 +624,7 @@ if ($CheckIfTargetBuilt) {
 }
 
 # ---- DETECT PROGRAMMER GUI RUNNING ----
-# programmer.exe (GUI) holds an exclusive lock on the USB cable if it's running,
+# programmer.exe holds an exclusive lock on the USB cable — if it's running,
 # programmer_cli.exe will fail to open the cable. detect this early and warn
 # the user instead of letting them wait for a cryptic cable-open failure.
 $programmerGuiName = [System.IO.Path]::GetFileNameWithoutExtension($ProgrammerGui)
@@ -633,7 +641,7 @@ if ($guiProcesses) {
 
 # ---- RESET FTDI USB DEVICE ----
 # clear any stale ftd2xx handle state from previous programmer_cli invocations.
-# without this, rapid programming can potentially hang during embFlash erase
+# without this, rapid back-to-back programming can hang during embFlash erase
 # because the FTDI chip's state machine never fully released the previous handle.
 Write-Host ""
 $resetResult = Reset-FtdiDevice
@@ -788,8 +796,8 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "  1. Board not plugged in via USB-C"
     Write-Host "  2. Wrong USB cable (must support data, not just power)"
     Write-Host "  3. GOWIN Programmer GUI is open - close it and try again"
-    Write-Host "  4. Driver issue - try unplugging and replugging the board (see TROUBLESHOOTING.txt)"
-    Write-Host "  5. License issue - check GOWIN license in GOWIN gui: Help > Manage License"
+    Write-Host "  4. Driver issue - try unplugging and replugging the board"
+    Write-Host "  5. License issue - check GOWIN license via IDE: Help > Manage License"
     Write-Host ""
     Write-Host "If the script froze and you had to Ctrl+C, see:"
     Write-Host "  windows\TROUBLESHOOTING.txt"
