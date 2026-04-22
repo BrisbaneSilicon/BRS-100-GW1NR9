@@ -26,6 +26,12 @@ $copyright = @"
 #
 # ftd2xx API reference: https://ftdichip.com/wp-content/uploads/2024/09/D2XX_Programmers_Guide.pdf
 # FT_STATUS values: FT_OK=0, FT_INVALID_HANDLE=1, FT_DEVICE_NOT_FOUND=2, etc.
+if (-not $GowinInstallDir) {
+    # utils sourced before globals (e.g. help path) - skip FTDI init
+    $script:Ftd2xxLoaded = $false
+    return
+}
+
 $Ftd2xxDll = "$GowinInstallDir\Programmer\bin\ftd2xx.dll"
 
 if (Test-Path $Ftd2xxDll) {
