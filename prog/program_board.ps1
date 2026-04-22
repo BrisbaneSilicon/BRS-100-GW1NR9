@@ -95,9 +95,8 @@ if ($ShowHelp) {
     exit 0
 }
 
-# ---- GLOBALS & UTILS ----
+# ---- GLOBALS ----
 . "$PSScriptRoot\program_board_globals.ps1"
-. "$PSScriptRoot\program_board_utils.ps1"
 
 # ---- DUMMY FLAGS (not implemented for Gowin / single-target) ----
 if ($UpdateFlashOnly) {
@@ -241,6 +240,9 @@ if ($CheckIfTargetBuilt) {
     }
     exit 0
 }
+
+# ---- UTILS (FTDI, needed only for programming) ----
+. "$PSScriptRoot\program_board_utils.ps1"
 
 # ---- DETECT PROGRAMMER GUI RUNNING ----
 # programmer.exe holds an exclusive lock on the USB cable - if it's running,
