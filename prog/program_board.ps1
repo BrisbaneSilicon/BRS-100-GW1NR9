@@ -1,5 +1,5 @@
 # =============================================================
-# program_board_v0.2.ps1
+# program_board_v0.4.ps1
 # Windows programming script for BRS-100-GW1NR9
 # version 0.1 - minimal functionality:
 #               find programmer_cli.exe
@@ -16,7 +16,126 @@
 #                 to match Linux build.sh behaviour
 #               use --scan-cables F (ftd2xx) for cable detection
 #               fix: actually execute programmer_cli with args
+# version 0.3 - implement command-line arguments:
+#               -h / --help               show usage and exit
+#               -b / --check_if_built     print firmware built status and exit
+#               -c / --clean              clean build before programming
+#               -m / --custom_bitfile     program a custom .fs file
+# version 0.4 - detect programmer.exe GUI running (exclusive cable lock)
+#               -k / --clock_frequency    pass clock frequency to build script
+#               -f / --jtag_frequency     override JTAG programming frequency
+#               warn if programmer.exe is running before cable scan
 # =============================================================
+
+param(
+    [switch]$h,
+    [switch]$help,
+    [switch]$b,
+    [switch]$check_if_built,
+    [switch]$c,
+    [switch]$clean,
+    [string]$m,
+    [string]$custom_bitfile,
+
+    [Alias('clock_frequency')]
+    [int]$k = 0,
+
+    [Alias('jtag_frequency')]
+    [string]$f
+)
+
+# ---- NORMALISE ALIASES ----
+$ShowHelp       = $h -or $help
+$CheckIfBuilt   = $b -or $check_if_built
+$CleanBuild     = $c -or $clean
+$CustomBitfile  = if ($m) { $m } elseif ($custom_bitfile) { $custom_bitfile } else { $null }
+$ClockMhz       = $k
+$JtagFrequency  = if ($f) { $f } elseif ($jtag_frequency) { $jtag_frequency } else { $null }
+
+# ---- CONSTANTS ----
+$DefaultJtagFrequency = "0.5MHz"
+$ValidJtagFrequencies = @(
+    "2.5MHz", "2MHz", "15MHz", "10MHz", "1.5MHz", "1.1MHz",
+    "0.9MHz", "0.75MHz", "0.5MHz", "0.3MHz", "0.4MHz", "0.1MHz", "0.02MHz"
+)
+
+# ---- HELP ----
+function Show-Help {
+    Write-Host ""
+    Write-Host "PROGRAM_BOARD"
+    Write-Host ""
+    Write-Host "NAME"
+    Write-Host "    program_board - program the BRS-100-GW1NR9 board with FPGA firmware"
+    Write-Host ""
+    Write-Host "SYNOPSIS"
+    Write-Host "    .\program_board_v0.4.ps1 [OPTIONS]"
+    Write-Host ""
+    Write-Host "DESCRIPTION"
+    Write-Host "    Program the BRS-100-GW1NR9 board via JTAG using programmer_cli.exe."
+    Write-Host "    If firmware is not yet built, automatically triggers a build first."
+    Write-Host ""
+    Write-Host "OPTIONS"
+    Write-Host "    -h, --help"
+    Write-Host "        Display this help and exit."
+    Write-Host ""
+    Write-Host "    -b, --check_if_built"
+    Write-Host "        Print whether the firmware is built and exit without programming."
+    Write-Host ""
+    Write-Host "    -c, --clean"
+    Write-Host "        Clean the build output before building and programming."
+    Write-Host ""
+    Write-Host "    -m, --custom_bitfile  <PATH>"
+    Write-Host "        Program the board with a custom .fs file instead of the default"
+    Write-Host "        build output. Path must be the full path to a .fs file."
+    Write-Host ""
+    Write-Host "    -k, --clock_frequency  <MHz>"
+    Write-Host "        System clock frequency in MHz passed to the build script when"
+    Write-Host "        auto-triggering a build. Ignored when using -m (custom bitfile)."
+    Write-Host "        Valid values: 51, 66, 75, 81, 87 (default: 51)"
+    Write-Host ""
+    Write-Host "    -f, --jtag_frequency  <freq>"
+    Write-Host "        Override the JTAG programming clock frequency (default: 0.5MHz)."
+    Write-Host "        Valid values: $($ValidJtagFrequencies -join ', ')"
+    Write-Host ""
+    Write-Host "EXAMPLES"
+    Write-Host "    .\program_board_v0.4.ps1"
+    Write-Host "        Build (if needed) and program the board."
+    Write-Host ""
+    Write-Host "    .\program_board_v0.4.ps1 -c"
+    Write-Host "        Clean, rebuild, and program the board."
+    Write-Host ""
+    Write-Host "    .\program_board_v0.4.ps1 -b"
+    Write-Host "        Check whether firmware is built without programming."
+    Write-Host ""
+    Write-Host "    .\program_board_v0.4.ps1 -m C:\path\to\custom.fs"
+    Write-Host "        Program the board with a custom bitstream file."
+    Write-Host ""
+    Write-Host "    .\program_board_v0.4.ps1 -k 66"
+    Write-Host "        Build at 66 MHz and program the board."
+    Write-Host ""
+    Write-Host "    .\program_board_v0.4.ps1 -c -k 75"
+    Write-Host "        Clean, rebuild at 75 MHz, and program the board."
+    Write-Host ""
+    Write-Host "    .\program_board_v0.4.ps1 -f 2.5MHz"
+    Write-Host "        Program at 2.5MHz JTAG speed (faster, less reliable)."
+    Write-Host ""
+}
+
+if ($ShowHelp) {
+    Show-Help
+    exit 0
+}
+
+# ---- VALIDATE JTAG FREQUENCY ----
+if ($JtagFrequency) {
+    if ($ValidJtagFrequencies -notcontains $JtagFrequency) {
+        Write-Host "ERROR: Invalid JTAG frequency '$JtagFrequency'."
+        Write-Host "Valid values: $($ValidJtagFrequencies -join ', ')"
+        exit 1
+    }
+} else {
+    $JtagFrequency = $DefaultJtagFrequency
+}
 
 # ---- AUTO-DERIVE REPO ROOT FROM GIT ----
 $RepoRoot = (git rev-parse --show-toplevel 2>$null) -replace '/', '\'
@@ -140,6 +259,7 @@ if ($installFolderName -like "*1.9.12.01*" -or
 
 # ---- PATHS ----
 $ProgrammerCli  = "$GowinInstallDir\Programmer\bin\programmer_cli.exe"
+$ProgrammerGui  = "$GowinInstallDir\Programmer\bin\programmer.exe"
 $BuildScript    = "$RepoRoot\windows\build_v0.7.ps1"
 $DevicesCsvPath = "$RepoRoot\build\platforms\gowin\gowin_supported_devices_information.csv"
 $BoardsCsvPath  = "$RepoRoot\prog\supported_boards.csv"
@@ -192,7 +312,7 @@ $SpeedGrade = $device.'Speed Grade'.Trim()   # C7I6
 
 # ---- DERIVE .FS FILE PATH FROM CSV VALUES ----
 $ArtifactsDir = "$RepoRoot\build\platforms\gowin\devices\$DeviceId\$SpeedGrade\output\.artifacts"
-$FsFile       = "$ArtifactsDir\$ProjectName.$BitstreamExt"
+$DefaultFsFile = "$ArtifactsDir\$ProjectName.$BitstreamExt"
 
 # ---- BUILD DEVICE ARGUMENT FOR PROGRAMMER ----
 # matches Linux: speed_grade_category=${speed_grade:0:1}
@@ -202,9 +322,55 @@ $DeviceArg          = "$DeviceId$SpeedGradeCategory"
 
 Write-Host "Board    : $ProjectName ($BoardPlatform)"
 Write-Host "Device   : $DeviceArg"
-Write-Host "Bitstream: $FsFile"
 
+# ---- VALIDATE CUSTOM BITFILE ----
+if ($CustomBitfile) {
+    if (-not (Test-Path $CustomBitfile)) {
+        Write-Host ""
+        Write-Host "ERROR: Custom bitfile not found: $CustomBitfile"
+        exit 1
+    }
+    if ([System.IO.Path]::GetExtension($CustomBitfile) -ne ".$BitstreamExt") {
+        Write-Host ""
+        Write-Host "ERROR: Custom bitfile must have .$BitstreamExt extension: $CustomBitfile"
+        exit 1
+    }
+    $FsFile = $CustomBitfile
+    Write-Host "Bitstream: $FsFile (custom)"
+} else {
+    $FsFile = $DefaultFsFile
+    Write-Host "Bitstream: $FsFile"
+}
 
+# ---- CHECK IF BUILT (-b flag) ----
+if ($CheckIfBuilt) {
+    if (Test-Path $DefaultFsFile) {
+        Write-Host ""
+        Write-Host "Firmware built status: true"
+        Write-Host "  $DefaultFsFile"
+    } else {
+        Write-Host ""
+        Write-Host "Firmware built status: false"
+        Write-Host "  $DefaultFsFile not found"
+    }
+    exit 0
+}
+
+# ---- DETECT PROGRAMMER GUI RUNNING ----
+# programmer.exe holds an exclusive lock on the USB cable — if it's running,
+# programmer_cli.exe will fail to open the cable. detect this early and warn
+# the user instead of letting them wait for a cryptic cable-open failure.
+$programmerGuiName = [System.IO.Path]::GetFileNameWithoutExtension($ProgrammerGui)
+$guiProcesses = Get-Process -Name $programmerGuiName -ErrorAction SilentlyContinue
+if ($guiProcesses) {
+    Write-Host ""
+    Write-Host "ERROR: GOWIN Programmer GUI (programmer.exe) is currently running."
+    Write-Host "       The GUI holds an exclusive lock on the USB cable and will"
+    Write-Host "       prevent programmer_cli.exe from accessing the board."
+    Write-Host ""
+    Write-Host "Please close the Programmer GUI and try again."
+    exit 1
+}
 
 # ---- SCAN FOR JTAG CABLE ----
 # scan using ftd2xx driver (F flag) - this matches the GUI's "Using ftd2xx driver"
@@ -236,34 +402,51 @@ if (-not $regexMatch.Success) {
 $cableLocation = $regexMatch.Groups[1].Value
 Write-Host "JTAG interface found at USB location: $cableLocation - proceeding."
 
-# ---- CHECK IF FIRMWARE IS BUILT ----
-if (-not (Test-Path $FsFile)) {
-    Write-Host ""
-    Write-Host "Detected firmware not built - triggering build..."
-    Write-Host ""
-
-    if (-not (Test-Path $BuildScript)) {
-        Write-Host "ERROR: Cannot find build script at: $BuildScript"
-        Write-Host "Please check the build script exists at that location."
-        exit 1
-    }
-
-    & $BuildScript
-
-    if ($LASTEXITCODE -ne 0) {
+# ---- BUILD IF NEEDED (skipped when -m custom bitfile is provided) ----
+if (-not $CustomBitfile) {
+    if (-not (Test-Path $FsFile) -or $CleanBuild) {
+        if ($CleanBuild) {
+            Write-Host ""
+            Write-Host "Clean build requested - triggering build with -c flag..."
+        } else {
+            Write-Host ""
+            Write-Host "Detected firmware not built - triggering build..."
+        }
         Write-Host ""
-        Write-Host "ERROR: Build failed - cannot program board."
-        exit 1
-    }
 
-    if (-not (Test-Path $FsFile)) {
-        Write-Host "ERROR: Build completed but .fs file not found at: $FsFile"
-        exit 1
-    }
+        if (-not (Test-Path $BuildScript)) {
+            Write-Host "ERROR: Cannot find build script at: $BuildScript"
+            Write-Host "Please check the build script exists at that location."
+            exit 1
+        }
 
-} else {
-    Write-Host ""
-    Write-Host "Detected firmware already built - reusing."
+        # build the argument list for the build script
+        $buildArgs = @()
+        if ($CleanBuild) {
+            $buildArgs += "-c"
+        }
+        if ($ClockMhz -gt 0) {
+            $buildArgs += "-k"
+            $buildArgs += $ClockMhz
+        }
+
+        & $BuildScript @buildArgs
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host ""
+            Write-Host "ERROR: Build failed - cannot program board."
+            exit 1
+        }
+
+        if (-not (Test-Path $FsFile)) {
+            Write-Host "ERROR: Build completed but .fs file not found at: $FsFile"
+            exit 1
+        }
+
+    } else {
+        Write-Host ""
+        Write-Host "Detected firmware already built - reusing."
+    }
 }
 
 # ---- PROGRAM THE BOARD ----
@@ -272,7 +455,7 @@ if (-not (Test-Path $FsFile)) {
 # required together to force the correct ftd2xx driver path:
 #   --cable-index 4  : selects "USB Debugger A" cable type (ftd2xx driver)
 #   --location <loc> : targets the specific USB device (from --scan-cables F)
-#   --frequency 0.5MHz : reliable JTAG clock speed for this board
+#   --frequency      : JTAG clock speed (default 0.5MHz, configurable via -f)
 # without all three, programmer_cli falls back to FT2CH and fails with CRC errors.
 # operation_index 5 = embFlash Erase,Program (matches Linux build.sh behaviour)
 Write-Host ""
@@ -281,7 +464,7 @@ Write-Host " BRS-100-GW1NR9 Windows Programmer"
 Write-Host "====================================="
 Write-Host "Device    : $DeviceArg"
 Write-Host "Cable     : USB Debugger A (cable-index 4, location $cableLocation - JTAG)"
-Write-Host "Frequency : 0.5MHz"
+Write-Host "Frequency : $JtagFrequency"
 Write-Host "Operation : embFlash Erase, Program (index 5)"
 Write-Host "Bitstream : $FsFile"
 Write-Host "Programmer: $ProgrammerCli"
@@ -289,7 +472,7 @@ Write-Host "====================================="
 Write-Host "Programming board..."
 Write-Host ""
 
-& $ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency 0.5MHz --operation_index 5 --fsFile $FsFile
+& $ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile
 
 # ---- RESULT ----
 if ($LASTEXITCODE -eq 0) {
