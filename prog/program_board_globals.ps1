@@ -1,6 +1,6 @@
 # ---- REPO ROOT DETECTION ----
 $RepoRoot = (git rev-parse --show-toplevel 2>$null) -replace '/', '\'
-if (-not $RepoRoot -or $RepoRoot.Trim() -eq '') {
+if (-not $RepoRoot) {
     Write-Host "ERROR: Could not determine repo root from Git."
     Write-Host "Make sure Git is installed and you are running this script from inside the repository."
     exit 1
