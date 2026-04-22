@@ -1,5 +1,5 @@
 # =============================================================
-# program_board_v0.4.1.ps1
+# program_board_v0.5.1.ps1
 # Windows programming script for BRS-100-GW1NR9
 # version 0.1 - minimal functionality:
 #               find programmer_cli.exe
@@ -32,32 +32,55 @@
 #               fix: call FT_CyclePort via ftd2xx.dll P/Invoke before programming
 #               to force the FTDI chip to USB re-enumerate, clearing stale handles.
 #               this is equivalent to a physical USB unplug/replug.
+# version 0.5.1 - align flags with Linux program_board.sh:
+#               -d / --list_default_target        print default target and exit
+#               -l / --list_supported_targets     list all supported boards and exit
+#               -s / --check_if_target_supported  print whether this board is supported and exit
+#               -b / --check_if_target_built      renamed from --check_if_built to match Linux
+#               -c / --clean_target_prior         renamed from --clean to match Linux
+#               -f / --update_flash_only          dummy flag (Xilinx only, not implemented)
+#               -t / --custom_target              dummy flag (single target, not implemented)
+#               --jtag_frequency                  renamed from -f (no short flag, avoids -f collision)
 # =============================================================
 
 param(
     [switch]$h,
     [switch]$help,
-    [switch]$b,
-    [switch]$check_if_built,
+    [switch]$d,
+    [switch]$list_default_target,
     [switch]$c,
-    [switch]$clean,
+    [switch]$clean_target_prior,
+    [switch]$l,
+    [switch]$list_supported_targets,
+    [switch]$s,
+    [switch]$check_if_target_supported,
+    [switch]$b,
+    [switch]$check_if_target_built,
     [string]$m,
     [string]$custom_bitfile,
+    [string]$t,
+    [string]$custom_target,
+    [string]$f,
+    [string]$update_flash_only,
 
     [Alias('clock_frequency')]
     [int]$k = 0,
 
-    [Alias('jtag_frequency')]
-    [string]$f
+    [string]$jtag_frequency
 )
 
 # ---- NORMALISE ALIASES ----
-$ShowHelp       = $h -or $help
-$CheckIfBuilt   = $b -or $check_if_built
-$CleanBuild     = $c -or $clean
-$CustomBitfile  = if ($m) { $m } elseif ($custom_bitfile) { $custom_bitfile } else { $null }
-$ClockMhz       = $k
-$JtagFrequency  = if ($f) { $f } elseif ($jtag_frequency) { $jtag_frequency } else { $null }
+$ShowHelp                  = $h -or $help
+$ListDefaultTarget         = $d -or $list_default_target
+$CleanBuild                = $c -or $clean_target_prior
+$ListSupportedTargets      = $l -or $list_supported_targets
+$CheckIfTargetSupported    = $s -or $check_if_target_supported
+$CheckIfTargetBuilt        = $b -or $check_if_target_built
+$CustomBitfile             = if ($m) { $m } elseif ($custom_bitfile) { $custom_bitfile } else { $null }
+$CustomTarget              = if ($t) { $t } elseif ($custom_target) { $custom_target } else { $null }
+$UpdateFlashOnly           = if ($f) { $f } elseif ($update_flash_only) { $update_flash_only } else { $null }
+$ClockMhz                  = $k
+$JtagFrequency             = $jtag_frequency
 
 # ---- CONSTANTS ----
 $DefaultJtagFrequency = "0.5MHz"
@@ -75,7 +98,7 @@ function Show-Help {
     Write-Host "    program_board - program the BRS-100-GW1NR9 board with FPGA firmware"
     Write-Host ""
     Write-Host "SYNOPSIS"
-    Write-Host "    .\program_board_v0.4.1.ps1 [OPTIONS]"
+    Write-Host "    .\program_board_v0.5.1.ps1 [OPTIONS]"
     Write-Host ""
     Write-Host "DESCRIPTION"
     Write-Host "    Program the BRS-100-GW1NR9 board via JTAG using programmer_cli.exe."
@@ -85,45 +108,65 @@ function Show-Help {
     Write-Host "    -h, --help"
     Write-Host "        Display this help and exit."
     Write-Host ""
-    Write-Host "    -b, --check_if_built"
-    Write-Host "        Print whether the firmware is built and exit without programming."
+    Write-Host "    -d, --list_default_target"
+    Write-Host "        Print the default target board name and exit."
     Write-Host ""
-    Write-Host "    -c, --clean"
+    Write-Host "    -c, --clean_target_prior"
     Write-Host "        Clean the build output before building and programming."
+    Write-Host ""
+    Write-Host "    -f, --update_flash_only  <MCS_FILE_PATH>"
+    Write-Host "        [NOT IMPLEMENTED] Update flash with provided MCS file."
+    Write-Host "        This flag exists for compatibility with the Linux script."
+    Write-Host "        Flash update is only supported on Xilinx boards (ARTYS7-25/50)."
     Write-Host ""
     Write-Host "    -m, --custom_bitfile  <PATH>"
     Write-Host "        Program the board with a custom .fs file instead of the default"
     Write-Host "        build output. Path must be the full path to a .fs file."
+    Write-Host ""
+    Write-Host "    -l, --list_supported_targets"
+    Write-Host "        List all supported target boards and exit."
+    Write-Host ""
+    Write-Host "    -s, --check_if_target_supported"
+    Write-Host "        Print whether the current target board is supported and exit."
+    Write-Host ""
+    Write-Host "    -b, --check_if_target_built"
+    Write-Host "        Print firmware built status of the target board and exit."
+    Write-Host ""
+    Write-Host "    -t, --custom_target  <TARGET>"
+    Write-Host "        [NOT IMPLEMENTED] Instead of the default target, target CUSTOM_TARGET."
+    Write-Host "        This flag exists for compatibility with the Linux script."
+    Write-Host "        Currently only one target (BRS-100-GW1NR9) is supported."
     Write-Host ""
     Write-Host "    -k, --clock_frequency  <MHz>"
     Write-Host "        System clock frequency in MHz passed to the build script when"
     Write-Host "        auto-triggering a build. Ignored when using -m (custom bitfile)."
     Write-Host "        Valid values: 51, 66, 75, 81, 87 (default: 51)"
     Write-Host ""
-    Write-Host "    -f, --jtag_frequency  <freq>"
+    Write-Host "    --jtag_frequency  <freq>"
     Write-Host "        Override the JTAG programming clock frequency (default: 0.5MHz)."
     Write-Host "        Valid values: $($ValidJtagFrequencies -join ', ')"
+    Write-Host "        (Windows-only flag, no short form to avoid collision with -f)"
     Write-Host ""
     Write-Host "EXAMPLES"
-    Write-Host "    .\program_board_v0.4.1.ps1"
+    Write-Host "    .\program_board_v0.5.1.ps1"
     Write-Host "        Build (if needed) and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.4.1.ps1 -c"
+    Write-Host "    .\program_board_v0.5.1.ps1 -c"
     Write-Host "        Clean, rebuild, and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.4.1.ps1 -b"
+    Write-Host "    .\program_board_v0.5.1.ps1 -b"
     Write-Host "        Check whether firmware is built without programming."
     Write-Host ""
-    Write-Host "    .\program_board_v0.4.1.ps1 -m C:\path\to\custom.fs"
+    Write-Host "    .\program_board_v0.5.1.ps1 -m C:\path\to\custom.fs"
     Write-Host "        Program the board with a custom bitstream file."
     Write-Host ""
-    Write-Host "    .\program_board_v0.4.1.ps1 -k 66"
+    Write-Host "    .\program_board_v0.5.1.ps1 -k 66"
     Write-Host "        Build at 66 MHz and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.4.1.ps1 -c -k 75"
+    Write-Host "    .\program_board_v0.5.1.ps1 -c -k 75"
     Write-Host "        Clean, rebuild at 75 MHz, and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.4.1.ps1 -f 2.5MHz"
+    Write-Host "    .\program_board_v0.5.1.ps1 --jtag_frequency 2.5MHz"
     Write-Host "        Program at 2.5MHz JTAG speed (faster, less reliable)."
     Write-Host ""
 }
@@ -131,6 +174,24 @@ function Show-Help {
 if ($ShowHelp) {
     Show-Help
     exit 0
+}
+
+# ---- DUMMY FLAGS (not implemented for Gowin / single-target) ----
+if ($UpdateFlashOnly) {
+    Write-Host "ERROR: -f / --update_flash_only is not implemented on Windows."
+    Write-Host "       Flash update is only supported on Xilinx boards (ARTYS7-25/50)"
+    Write-Host "       via the Linux program_board.sh script."
+    exit 1
+}
+
+if ($CustomTarget) {
+    if ($CustomTarget -eq "BRS-100-GW1NR9") {
+        Write-Host "Target '$CustomTarget' is already the default target - continuing."
+    } else {
+        Write-Host "ERROR: Target '$CustomTarget' is not supported."
+        Write-Host "       Only 'BRS-100-GW1NR9' is supported in this version."
+        exit 1
+    }
 }
 
 # ---- VALIDATE JTAG FREQUENCY ----
@@ -397,6 +458,14 @@ function Reset-FtdiDevice {
 # ---- PROJECT SETTINGS ----
 $ProjectName    = "BRS-100-GW1NR9"
 
+# ---- -d / --list_default_target ----
+# print the default target board name and exit.
+# matches Linux: echo "$target_board"
+if ($ListDefaultTarget) {
+    Write-Host $ProjectName
+    exit 0
+}
+
 # ---- LOAD SUPPORTED BOARDS FROM CSV ----
 # confirms this board is supported and gets bitstream extension
 if (-not (Test-Path $BoardsCsvPath)) {
@@ -409,12 +478,29 @@ if ($boards.Count -eq 0) {
     exit 1
 }
 
+# ---- -l / --list_supported_targets ----
+# list all unique board names from the CSV, comma-separated, and exit.
+# matches Linux: list_supported_targets()
+if ($ListSupportedTargets) {
+    $uniqueBoards = $boards | ForEach-Object { $_.Board.Trim() } | Select-Object -Unique
+    Write-Host ($uniqueBoards -join ", ")
+    exit 0
+}
+
 $board = $boards | Where-Object { $_.Board.Trim() -eq $ProjectName }
 if (-not $board) {
     Write-Host "ERROR: Board '$ProjectName' not found in supported boards CSV."
     Write-Host "Supported boards:"
     $boards | ForEach-Object { Write-Host "  $($_.Board.Trim())" }
     exit 1
+}
+
+# ---- -s / --check_if_target_supported ----
+# print whether the current target board is in the supported_boards.csv and exit.
+# matches Linux: check_if_target_supported flag
+if ($CheckIfTargetSupported) {
+    Write-Host "Target '$ProjectName' is supported."
+    exit 0
 }
 
 $BitstreamExt  = $board.BitstreamExt.Trim()    # fs
@@ -473,15 +559,12 @@ if ($CustomBitfile) {
 }
 
 # ---- CHECK IF BUILT (-b flag) ----
-if ($CheckIfBuilt) {
+# matches Linux format: "Target 'BRS-100-GW1NR9' firmware built status: true/false"
+if ($CheckIfTargetBuilt) {
     if (Test-Path $DefaultFsFile) {
-        Write-Host ""
-        Write-Host "Firmware built status: true"
-        Write-Host "  $DefaultFsFile"
+        Write-Host "Target '$ProjectName' firmware built status: true"
     } else {
-        Write-Host ""
-        Write-Host "Firmware built status: false"
-        Write-Host "  $DefaultFsFile not found"
+        Write-Host "Target '$ProjectName' firmware built status: false"
     }
     exit 0
 }
@@ -597,7 +680,7 @@ if (-not $CustomBitfile) {
 # required together to force the correct ftd2xx driver path:
 #   --cable-index 4  : selects "USB Debugger A" cable type (ftd2xx driver)
 #   --location <loc> : targets the specific USB device (from --scan-cables F)
-#   --frequency      : JTAG clock speed (default 0.5MHz, configurable via -f)
+#   --frequency      : JTAG clock speed (default 0.5MHz, configurable via --jtag_frequency)
 # without all three, programmer_cli falls back to FT2CH and fails with CRC errors.
 # operation_index 5 = embFlash Erase,Program (matches Linux build.sh behaviour)
 Write-Host ""
@@ -611,7 +694,9 @@ Write-Host "Operation : embFlash Erase, Program (index 5)"
 Write-Host "Bitstream : $FsFile"
 Write-Host "Programmer: $ProgrammerCli"
 Write-Host "====================================="
-Write-Host "Programming board..."
+
+# echo exact command line before executing (matches Linux behaviour)
+Write-Host "Program command line: '$ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile'"
 Write-Host ""
 
 & $ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile
