@@ -1,6 +1,26 @@
 # =============================================================
-# program_board_v0.5.1.ps1
+# program_board_v0.6.ps1
 # Windows programming script for BRS-100-GW1NR9
+#
+# Author:    Bruce Mao
+# Based on program_board.sh, originally authored by Craig Haywood
+# Copyright: (C) Brisbane Silicon, Pty Ltd. All rights reserved.
+#
+# The source code contained herein is provided on an "as is" basis.
+# Brisbane Silicon, Pty Ltd. disclaims any and all warranties,
+# whether express, implied, or statutory, including any implied
+# warranties of merchantability or of fitness for a particular
+# purpose. In no event shall Brisbane Silicon, Pty Ltd. be liable
+# for any incidental, punitive, or consequential damages of any
+# kind whatsoever arising from the use of this source code.
+#
+# This disclaimer of warranty extends to the user of this source
+# code and user's customers, employees, agents, transferees,
+# successors and assigns.
+#
+# This is not a grant of patent rights.
+#
+# =============================================================
 # version 0.1 - minimal functionality:
 #               find programmer_cli.exe
 #               scan for JTAG cable and verify board connected
@@ -23,7 +43,7 @@
 #               -m / --custom_bitfile     program a custom .fs file
 # version 0.4 - detect programmer.exe GUI running (exclusive cable lock)
 #               -k / --clock_frequency    pass clock frequency to build script
-#               -f / --jtag_frequency     override JTAG programming frequency
+#               -f / -jtag_frequency     override JTAG programming frequency
 #               warn if programmer.exe is running before cable scan
 # version 0.4.1 - fix intermittent hang during embFlash erase:
 #               programmer_cli.exe occasionally hangs because the ftd2xx driver
@@ -40,7 +60,9 @@
 #               -c / --clean_target_prior         renamed from --clean to match Linux
 #               -f / --update_flash_only          dummy flag (Xilinx only, not implemented)
 #               -t / --custom_target              dummy flag (single target, not implemented)
-#               --jtag_frequency                  renamed from -f (no short flag, avoids -f collision)
+#               -jtag_frequency                   renamed from -f (no short flag, avoids -f collision)
+# version 0.6 - add author and copyright statement
+#               update help text references to v0.6
 # =============================================================
 
 param(
@@ -83,7 +105,7 @@ $ClockMhz                  = $k
 $JtagFrequency             = $jtag_frequency
 
 # ---- CONSTANTS ----
-$DefaultJtagFrequency = "0.5MHz"
+$DefaultJtagFrequency = "0.02MHz"
 $ValidJtagFrequencies = @(
     "2.5MHz", "2MHz", "15MHz", "10MHz", "1.5MHz", "1.1MHz",
     "0.9MHz", "0.75MHz", "0.5MHz", "0.3MHz", "0.4MHz", "0.1MHz", "0.02MHz"
@@ -98,7 +120,7 @@ function Show-Help {
     Write-Host "    program_board - program the BRS-100-GW1NR9 board with FPGA firmware"
     Write-Host ""
     Write-Host "SYNOPSIS"
-    Write-Host "    .\program_board_v0.5.1.ps1 [OPTIONS]"
+    Write-Host "    .\program_board_v0.6.ps1 [OPTIONS]"
     Write-Host ""
     Write-Host "DESCRIPTION"
     Write-Host "    Program the BRS-100-GW1NR9 board via JTAG using programmer_cli.exe."
@@ -142,32 +164,59 @@ function Show-Help {
     Write-Host "        auto-triggering a build. Ignored when using -m (custom bitfile)."
     Write-Host "        Valid values: 51, 66, 75, 81, 87 (default: 51)"
     Write-Host ""
-    Write-Host "    --jtag_frequency  <freq>"
-    Write-Host "        Override the JTAG programming clock frequency (default: 0.5MHz)."
+    Write-Host "    -jtag_frequency  <freq>"
+    Write-Host "        Override the JTAG programming clock frequency (default: 0.02MHz)."
     Write-Host "        Valid values: $($ValidJtagFrequencies -join ', ')"
     Write-Host "        (Windows-only flag, no short form to avoid collision with -f)"
     Write-Host ""
     Write-Host "EXAMPLES"
-    Write-Host "    .\program_board_v0.5.1.ps1"
+    Write-Host "    .\program_board_v0.6.ps1"
     Write-Host "        Build (if needed) and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.5.1.ps1 -c"
+    Write-Host "    .\program_board_v0.6.ps1 -c"
     Write-Host "        Clean, rebuild, and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.5.1.ps1 -b"
+    Write-Host "    .\program_board_v0.6.ps1 -b"
     Write-Host "        Check whether firmware is built without programming."
     Write-Host ""
-    Write-Host "    .\program_board_v0.5.1.ps1 -m C:\path\to\custom.fs"
+    Write-Host "    .\program_board_v0.6.ps1 -m C:\path\to\custom.fs"
     Write-Host "        Program the board with a custom bitstream file."
     Write-Host ""
-    Write-Host "    .\program_board_v0.5.1.ps1 -k 66"
+    Write-Host "    .\program_board_v0.6.ps1 -k 66"
     Write-Host "        Build at 66 MHz and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.5.1.ps1 -c -k 75"
+    Write-Host "    .\program_board_v0.6.ps1 -c -k 75"
     Write-Host "        Clean, rebuild at 75 MHz, and program the board."
     Write-Host ""
-    Write-Host "    .\program_board_v0.5.1.ps1 --jtag_frequency 2.5MHz"
+    Write-Host "    .\program_board_v0.6.ps1 -jtag_frequency 2.5MHz"
     Write-Host "        Program at 2.5MHz JTAG speed (faster, less reliable)."
+    Write-Host ""
+    Write-Host "IMPORTANT NOTICE"
+    Write-Host "    The Windows ftd2xx driver may cause the script to freeze during programming."
+    Write-Host "    If the script freezes at the following line:"
+    Write-Host ""
+    Write-Host "        Operation `"embFlash Erase,Program`" for device#1..."
+    Write-Host ""
+    Write-Host "    Manually kill programmer_cli.exe in Task Manager and disconnect the USB-C"
+    Write-Host "    cable for 3-5 seconds before reconnecting. See detailed troubleshooting"
+    Write-Host "    steps in windows\TROUBLESHOOTING.txt."
+    Write-Host ""
+    Write-Host "AUTHOR"
+    Write-Host "    Written by Bruce Mao"
+    Write-Host ""
+    Write-Host "COPYRIGHT"
+    Write-Host "    (C) Brisbane Silicon, Pty Ltd. All rights reserved."
+    Write-Host ""
+    Write-Host "    The source code contained herein is provided on an `"as is`" basis. Brisbane Silicon, Pty Ltd."
+    Write-Host "    disclaims any and all warranties, whether express, implied, or statutory, including any implied"
+    Write-Host "    warranties of merchantability or of fitness for a particular purpose. In no event shall Brisbane"
+    Write-Host "    Silicon, Pty Ltd. be liable for any incidental, punitive, or consequential damages of any kind"
+    Write-Host "    whatsoever arising from the use of this source code."
+    Write-Host ""
+    Write-Host "    This disclaimer of warranty extends to the user of this source code and user's customers,"
+    Write-Host "    employees, agents, transferees, successors and assigns."
+    Write-Host ""
+    Write-Host "    This is not a grant of patent rights."
     Write-Host ""
 }
 
@@ -176,7 +225,7 @@ if ($ShowHelp) {
     exit 0
 }
 
-# ---- DUMMY FLAGS (not implemented for Gowin / single-target) ----
+# ---- DUMMY FLAGS (not implemented for Gowin / single target) ----
 if ($UpdateFlashOnly) {
     Write-Host "ERROR: -f / --update_flash_only is not implemented on Windows."
     Write-Host "       Flash update is only supported on Xilinx boards (ARTYS7-25/50)"
@@ -214,8 +263,9 @@ if (-not $RepoRoot -or $RepoRoot.Trim() -eq '') {
 }
 
 # ---- AUTO-DETECT GOWIN INSTALL PATH ----
-# checks for programmer_cli.exe specifically - different from build script
+# checks for programmer_cli.exe specifically
 # which checks for gw_sh.exe
+# includes V1.9.12.01 and V1.9.12.02
 $GowinInstallDir = $null
 
 $commonPaths = @(
@@ -235,7 +285,7 @@ $commonPaths = @(
     "$env:LOCALAPPDATA\Gowin\Gowin_V1.9.12.02"
 )
 
-# first check environment variable
+# check environment variable
 if ($env:GOWIN_INSTALL_DIR) {
     if (Test-Path "$env:GOWIN_INSTALL_DIR\Programmer\bin\programmer_cli.exe") {
         $GowinInstallDir = $env:GOWIN_INSTALL_DIR
@@ -247,7 +297,7 @@ if ($env:GOWIN_INSTALL_DIR) {
     }
 }
 
-# then check common install locations
+# check common install locations
 if (-not $GowinInstallDir) {
     foreach ($path in $commonPaths) {
         if (Test-Path "$path\Programmer\bin\programmer_cli.exe") {
@@ -257,7 +307,7 @@ if (-not $GowinInstallDir) {
     }
 }
 
-# if still not found - fail with clear instructions
+# cannot find in common location or path
 if (-not $GowinInstallDir) {
     Write-Host ""
     Write-Host "ERROR: Could not find GOWIN programmer_cli.exe."
@@ -284,7 +334,7 @@ Write-Host "Found GOWIN programmer at: $GowinInstallDir"
 
 if ($installFolderName -like "*1.9.12.01*" -or
     $installFolderName -like "*1.9.12.02*") {
-    Write-Host "GOWIN version: $installFolderName (verified compatible)"
+    Write-Host "GOWIN version: $installFolderName (verified compatible)1"
 
 } elseif ($installFolderName -like "*1.9.12*") {
     Write-Host ""
@@ -333,13 +383,12 @@ $DevicesCsvPath = "$RepoRoot\build\platforms\gowin\gowin_supported_devices_infor
 $BoardsCsvPath  = "$RepoRoot\prog\supported_boards.csv"
 
 # ---- FTDI USB RESET VIA ftd2xx.dll ----
-# programmer_cli.exe occasionally hangs because the ftd2xx driver doesn't fully
+# programmer_cli.exe occasionally hangs possibly because the ftd2xx driver doesn't fully
 # release the USB handle between invocations. calling FT_CyclePort forces the
 # FTDI chip to USB re-enumerate (equivalent to physical unplug/replug), clearing
 # any stale driver state that would cause the next programmer_cli call to deadlock.
 #
-# ftd2xx API reference: https://ftdichip.com/wp-content/uploads/2024/09/D2XX_Programmers_Guide.pdf
-# FT_STATUS values: FT_OK=0, FT_INVALID_HANDLE=1, FT_DEVICE_NOT_FOUND=2, etc.
+
 $Ftd2xxDll = "$GowinInstallDir\Programmer\bin\ftd2xx.dll"
 
 if (Test-Path $Ftd2xxDll) {
@@ -480,7 +529,6 @@ if ($boards.Count -eq 0) {
 
 # ---- -l / --list_supported_targets ----
 # list all unique board names from the CSV, comma-separated, and exit.
-# matches Linux: list_supported_targets()
 if ($ListSupportedTargets) {
     $uniqueBoards = $boards | ForEach-Object { $_.Board.Trim() } | Select-Object -Unique
     Write-Host ($uniqueBoards -join ", ")
@@ -497,7 +545,6 @@ if (-not $board) {
 
 # ---- -s / --check_if_target_supported ----
 # print whether the current target board is in the supported_boards.csv and exit.
-# matches Linux: check_if_target_supported flag
 if ($CheckIfTargetSupported) {
     Write-Host "Target '$ProjectName' is supported."
     exit 0
@@ -559,7 +606,6 @@ if ($CustomBitfile) {
 }
 
 # ---- CHECK IF BUILT (-b flag) ----
-# matches Linux format: "Target 'BRS-100-GW1NR9' firmware built status: true/false"
 if ($CheckIfTargetBuilt) {
     if (Test-Path $DefaultFsFile) {
         Write-Host "Target '$ProjectName' firmware built status: true"
@@ -570,7 +616,7 @@ if ($CheckIfTargetBuilt) {
 }
 
 # ---- DETECT PROGRAMMER GUI RUNNING ----
-# programmer.exe holds an exclusive lock on the USB cable — if it's running,
+# programmer.exe (GUI) holds an exclusive lock on the USB cable if it's running,
 # programmer_cli.exe will fail to open the cable. detect this early and warn
 # the user instead of letting them wait for a cryptic cable-open failure.
 $programmerGuiName = [System.IO.Path]::GetFileNameWithoutExtension($ProgrammerGui)
@@ -587,7 +633,7 @@ if ($guiProcesses) {
 
 # ---- RESET FTDI USB DEVICE ----
 # clear any stale ftd2xx handle state from previous programmer_cli invocations.
-# without this, rapid back-to-back programming can hang during embFlash erase
+# without this, rapid programming can potentially hang during embFlash erase
 # because the FTDI chip's state machine never fully released the previous handle.
 Write-Host ""
 $resetResult = Reset-FtdiDevice
@@ -629,30 +675,45 @@ Write-Host "JTAG interface found at USB location: $cableLocation - proceeding."
 
 # ---- BUILD IF NEEDED (skipped when -m custom bitfile is provided) ----
 if (-not $CustomBitfile) {
-    if (-not (Test-Path $FsFile) -or $CleanBuild) {
-        if ($CleanBuild) {
+    # match Linux program_board.sh flow:
+    #   1. if -c flag, clean build output first (separate step)
+    #   2. then check if firmware exists
+    #   3. if not, trigger a normal build (without -c)
+    if (-not (Test-Path $BuildScript)) {
+        Write-Host "ERROR: Cannot find build script at: $BuildScript"
+        Write-Host "Please check the build script exists at that location."
+        exit 1
+    }
+
+    if ($CleanBuild) {
+        Write-Host ""
+        Write-Host "Clean build requested - cleaning build output first..."
+        Write-Host ""
+
+        $cleanArgs = @{ c = $true }
+        & $BuildScript @cleanArgs
+
+        if ($LASTEXITCODE -ne 0) {
             Write-Host ""
-            Write-Host "Clean build requested - triggering build with -c flag..."
-        } else {
+            Write-Host "ERROR: Clean failed."
+            exit 1
+        }
+    }
+
+    if (-not (Test-Path $FsFile)) {
+        if (-not $CleanBuild) {
             Write-Host ""
             Write-Host "Detected firmware not built - triggering build..."
+        } else {
+            Write-Host ""
+            Write-Host "Rebuilding firmware..."
         }
         Write-Host ""
 
-        if (-not (Test-Path $BuildScript)) {
-            Write-Host "ERROR: Cannot find build script at: $BuildScript"
-            Write-Host "Please check the build script exists at that location."
-            exit 1
-        }
-
-        # build the argument list for the build script
-        $buildArgs = @()
-        if ($CleanBuild) {
-            $buildArgs += "-c"
-        }
+        # build without -c (clean already done above if requested)
+        $buildArgs = @{}
         if ($ClockMhz -gt 0) {
-            $buildArgs += "-k"
-            $buildArgs += $ClockMhz
+            $buildArgs['k'] = $ClockMhz
         }
 
         & $BuildScript @buildArgs
@@ -680,7 +741,7 @@ if (-not $CustomBitfile) {
 # required together to force the correct ftd2xx driver path:
 #   --cable-index 4  : selects "USB Debugger A" cable type (ftd2xx driver)
 #   --location <loc> : targets the specific USB device (from --scan-cables F)
-#   --frequency      : JTAG clock speed (default 0.5MHz, configurable via --jtag_frequency)
+#   --frequency      : JTAG clock speed (default 0.5MHz, configurable via -jtag_frequency)
 # without all three, programmer_cli falls back to FT2CH and fails with CRC errors.
 # operation_index 5 = embFlash Erase,Program (matches Linux build.sh behaviour)
 Write-Host ""
@@ -694,9 +755,16 @@ Write-Host "Operation : embFlash Erase, Program (index 5)"
 Write-Host "Bitstream : $FsFile"
 Write-Host "Programmer: $ProgrammerCli"
 Write-Host "====================================="
+Write-Host ""
+Write-Host "  [i] NOTE"
+Write-Host "  If the script freezes below, kill programmer_cli.exe in Task Manager"
+Write-Host "  and replug USB. See TROUBLESHOOTING.txt for details."
+Write-Host ""
 
 # echo exact command line before executing (matches Linux behaviour)
 Write-Host "Program command line: '$ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile'"
+Write-Host ""
+Write-Host "*** GOWIN programmer_cli Command Line Console ***"
 Write-Host ""
 
 & $ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile
@@ -720,8 +788,8 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "  1. Board not plugged in via USB-C"
     Write-Host "  2. Wrong USB cable (must support data, not just power)"
     Write-Host "  3. GOWIN Programmer GUI is open - close it and try again"
-    Write-Host "  4. Driver issue - try unplugging and replugging the board"
-    Write-Host "  5. License issue - check GOWIN license via IDE: Help > Manage License"
+    Write-Host "  4. Driver issue - try unplugging and replugging the board (see TROUBLESHOOTING.txt)"
+    Write-Host "  5. License issue - check GOWIN license in GOWIN gui: Help > Manage License"
     Write-Host ""
     Write-Host "If the script froze and you had to Ctrl+C, see:"
     Write-Host "  windows\TROUBLESHOOTING.txt"
