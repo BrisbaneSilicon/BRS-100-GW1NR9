@@ -1,12 +1,21 @@
 # =============================================================
-# program_win_v0.1.ps1
-# Minimal Windows programming script for BRS-100-GW1NR9
+# program_board_v0.2.ps1
+# Windows programming script for BRS-100-GW1NR9
 # version 0.1 - minimal functionality:
 #               find programmer_cli.exe
 #               scan for JTAG cable and verify board connected
 #               find .fs file at default location
 #               auto-trigger build if .fs not found
 #               program board via programmer_cli.exe
+# version 0.2 - fix programming command:
+#               use --cable-index 4 (USB Debugger A) to select
+#                 ftd2xx driver path instead of default FT2CH
+#               use --location to target the correct USB device
+#               use --frequency 0.5MHz for reliable JTAG comms
+#               use --operation_index 5 (embFlash Erase,Program)
+#                 to match Linux build.sh behaviour
+#               use --scan-cables F (ftd2xx) for cable detection
+#               fix: actually execute programmer_cli with args
 # =============================================================
 
 # ---- AUTO-DERIVE REPO ROOT FROM GIT ----
@@ -198,17 +207,18 @@ Write-Host "Bitstream: $FsFile"
 
 
 # ---- SCAN FOR JTAG CABLE ----
-# scan first, display results, then extract JTAG location dynamically
+# scan using ftd2xx driver (F flag) - this matches the GUI's "Using ftd2xx driver"
+# checkbox which must be checked for this board to work.
 # board shows up as two USB Debugger A interfaces:
 #   index 0 - JTAG  - used for programming
 #   index 1 - UART  - used for serial communication
 Write-Host ""
-Write-Host "Scanning for connected cables..."
-$scanOutput = & $ProgrammerCli --scan-cables 2>&1
+Write-Host "Scanning for connected cables (ftd2xx)..."
+$scanOutput = & $ProgrammerCli --scan-cables F 2>&1
 Write-Host $scanOutput
 
 # extract JTAG cable location from scan output
-# scan output format: "USB Debugger A/0/529/null"
+# scan output format: "USB Debugger A/0/529/null (USB location:529)"
 $locationMatch = ($scanOutput | Out-String)
 $regexMatch    = [regex]::Match($locationMatch, "USB Debugger A/0/(\d+)/null")
 
@@ -257,25 +267,29 @@ if (-not (Test-Path $FsFile)) {
 }
 
 # ---- PROGRAM THE BOARD ----
+# on Windows, programmer_cli.exe defaults to the FT2CH cable type which does not
+# work with the BRS-100-GW1NR9's USB Debugger A interface. three arguments are
+# required together to force the correct ftd2xx driver path:
+#   --cable-index 4  : selects "USB Debugger A" cable type (ftd2xx driver)
+#   --location <loc> : targets the specific USB device (from --scan-cables F)
+#   --frequency 0.5MHz : reliable JTAG clock speed for this board
+# without all three, programmer_cli falls back to FT2CH and fails with CRC errors.
+# operation_index 5 = embFlash Erase,Program (matches Linux build.sh behaviour)
 Write-Host ""
 Write-Host "====================================="
 Write-Host " BRS-100-GW1NR9 Windows Programmer"
 Write-Host "====================================="
 Write-Host "Device    : $DeviceArg"
-Write-Host "Cable     : USB Debugger A (location $cableLocation - JTAG)"
-Write-Host "Operation : embFlash Erase, Program, Verify (index 6)"
+Write-Host "Cable     : USB Debugger A (cable-index 4, location $cableLocation - JTAG)"
+Write-Host "Frequency : 0.5MHz"
+Write-Host "Operation : embFlash Erase, Program (index 5)"
 Write-Host "Bitstream : $FsFile"
 Write-Host "Programmer: $ProgrammerCli"
 Write-Host "====================================="
 Write-Host "Programming board..."
 Write-Host ""
 
-$programArgs = @(
-    "--device", $DeviceArg,
-    "--cable-index", "4",
-    "--operation_index", "6",
-    "--fsFile", $FsFile
-)
+& $ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency 0.5MHz --operation_index 5 --fsFile $FsFile
 
 # ---- RESULT ----
 if ($LASTEXITCODE -eq 0) {
