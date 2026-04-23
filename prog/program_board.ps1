@@ -394,8 +394,8 @@ Write-Host "Bitstream : $FsFile"
 Write-Host "Programmer: $ProgrammerCli"
 Write-Host "====================================="
 Write-Host ""
-Write-Host "  [i] Hang detection active: if no progress for 10 s, programmer_cli.exe"
-Write-Host "      will be killed automatically. Replug USB-C and re-run to recover."
+Write-Host "  [i] Hang detection active: if no progress appears for 10 s, programmer_cli.exe"
+Write-Host "      will be killed automatically. Replug USB and re-run this script to recover."
 Write-Host ""
 
 # echo exact command line before executing (matches Linux behaviour)

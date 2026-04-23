@@ -6,9 +6,16 @@ INTERMITTENT FREEZE DURING PROGRAMMING
 
 Symptom:
     The script prints:
-        Operation "embFlash Erase,Program" for device#1...
-    
-    and then hangs indefinitely with no further output.
+        *** GOWIN programmer_cli Command Line Console ***
+
+    and then appears to hang with no further output for approximately 10 seconds.
+    After 10 seconds with no progress, the script detects the hang, kills
+    programmer_cli.exe automatically, and prints:
+
+        PROGRAMMING STALLED
+        ERROR: programmer_cli.exe produced no progress for 10 seconds.
+               The Windows ftd2xx driver has hung at embFlash Erase.
+               programmer_cli.exe has been killed.
 
 Cause:
     The FTDI chip on the board accumulates internal state (incomplete
@@ -16,33 +23,21 @@ Cause:
     rapid back-to-back programmer_cli.exe invocations. After several cycles,
     the chip stops responding to new JTAG commands.
 
-    Note: previous versions of this script called FT_CyclePort and
-    FT_ResetDevice via ftd2xx.dll before each programming attempt to clear
-    stale state. Both have been removed in v1.0 because any ftd2xx API call
-    that opens and manipulates the FTDI device can trigger
-    KERNEL_SECURITY_CHECK_FAILURE (BSOD 0x139) after repeated cycles.
-    See the "KERNEL SECURITY CHECK FAILURE" section below.
-
     This is a hardware level limitation of the FTDI interface, not a software
     bug. The freeze is non-deterministic: it may occur after 3-6 rapid runs,
     or sometimes not at all for 10+ runs. The GOWIN Programmer GUI avoids
     this because manual button clicks are naturally slower than scripted runs.
 
-Recovery steps:
-    1. Press Ctrl+C in the terminal to stop the script.
-    2. Open Task Manager (Ctrl+Shift+Esc) and check if programmer_cli.exe
-       is still running. If it is, right-click it and select End Task.
-       Alternatively, run in a new PowerShell window:
-           Stop-Process -Name programmer_cli -Force -ErrorAction SilentlyContinue
-    3. Unplug the USB-C cable from the board.
-    4. Wait at least 3 seconds before reconnecting. The FTDI chip's internal
-       microcontroller needs time to fully power down and clear its state.
-       If you replug too quickly (<3 seconds), the chip resumes with stale
-       state and the first programming attempt will likely fail again.
-    5. Plug the USB-C cable back in.
-    6. Wait for Windows to finish enumerating the device (Device Manager will
-       show "USB Debugger A" again — usually takes 2-3 seconds).
-    7. Run the programming script again.
+Recovery steps (after the script prints PROGRAMMING STALLED):
+    1. Unplug the USB-C cable from the board.
+    2. Wait 3-5 seconds. The FTDI chip needs time to fully power down and
+       clear its state. Replugging too quickly may leave stale state and
+       cause the next run to fail again.
+    3. Plug the USB-C cable back in.
+    4. Run the programming script again.
+
+    programmer_cli.exe is killed automatically by the script — no need to
+    use Task Manager or Ctrl+C.
 
 Prevention:
     - Wait a few seconds between programming runs.
@@ -69,7 +64,7 @@ Cause:
     programmer_cli process that was killed without releasing the ftd2xx handle).
 
 Recovery:
-    Follow the recovery steps above (Ctrl+C, kill programmer_cli, replug USB).
+    Follow the recovery steps above (Ctrl+C, replug USB).
 
 
 PROGRAM FAILED (exit code non-zero)
@@ -122,7 +117,7 @@ Symptom:
     ERROR: Could not find GOWIN programmer_cli.exe.
 
 Fix:
-    Install GOWIN EDA V1.9.12 or V1.9.12.02 from:
+    Install GOWIN EDA V1.9.12 from:
         https://www.gowinsemi.com/en/support/download_eda/
 
     NOTE: Do NOT use V1.9.12.01 — it has a bug that prevents programming
