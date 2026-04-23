@@ -1,3 +1,5 @@
-# Build output / artifacts
-/build/output
+/build/platforms/gowin/devices/GW1NR-9/C7I6/output/.artifacts
 /build/platforms/gowin/devices/GW1NR-9/C7I6/output
+CLAUDE.md
+/build/output
+.claude/
