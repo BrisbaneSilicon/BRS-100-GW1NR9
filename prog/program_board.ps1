@@ -97,6 +97,10 @@ if ($ShowHelp) {
 
 # ---- GLOBALS ----
 . "$PSScriptRoot\program_board_globals.ps1"
+# exit 1 in another script does not reliably terminate the caller in powershell.
+# $ProgrammerCli is only set if all globals completed without error, so null means
+# globals already printed the error message and just need to exit here.
+if (-not $ProgrammerCli) { exit 1 }
 
 # ---- DUMMY FLAGS (not implemented for Gowin / single-target) ----
 if ($UpdateFlashOnly) {
