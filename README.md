@@ -390,13 +390,13 @@ In board demonstration mode, the state of GPIO<1..16> (the demonstration firmwar
 Build the demonstration firmware:
 
 ```powershell
-.\windows\build.ps1 -b
+.\build\build.ps1 -b
 ```
 
 Then program it:
 
 ```powershell
-.\windows\program_board.ps1
+.\build\program_board.ps1
 ```
 
 Connect a serial terminal (e.g. PuTTY, Tera Term) to the board's UART at **115200 baud**. Press pushbutton 1 (the pushbutton closest to Pin 1) to reset the board. The terminal should print something like:
