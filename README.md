@@ -271,10 +271,10 @@ The most commonly used are listed below.
 
 ### Windows
 
-Open PowerShell (Admin not required), `cd` into the repository root, then run:
+Open PowerShell (Admin not required), `cd` into the repository root, then the 'build' directory, and then run:
 
 ```powershell
-.\windows\build.ps1
+.\build.ps1
 ```
 <br><br>
 
@@ -329,10 +329,10 @@ The most commonly used are listed below.
 > [!WARNING]
 > Make sure there are no conflicts between FTDI driver versions before running this script — see [Other](#ftdi-driver-setup).
 
-Plug the board into your PC via the USB-C cable, then open PowerShell, `cd` into the repository root, and run:
+Plug the board into your PC via the USB-C cable, then open PowerShell, `cd` into the repository root, then the 'prog' directory, and then run:
 
 ```powershell
-.\windows\program_board.ps1
+.\program_board.ps1
 ```
 
 > [!NOTE]
