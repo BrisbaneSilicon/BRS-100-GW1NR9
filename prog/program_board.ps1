@@ -55,16 +55,16 @@ function Show-Help {
     Write-Host "`tProgram the BRS-100-GW1NR9 board via JTAG using programmer_cli.exe."
     Write-Host "`tIf firmware is not yet built, automatically triggers a build first.`n"
     Write-Host "${boldf}OPTIONS${normf}"
-    Write-Host "`t${boldf}-h, --help${normf}`n`t`tDisplay this help and exit.`n"
-    Write-Host "`t${boldf}-d, --list_default_target${normf}`n`t`tList the default build target.`n"
-    Write-Host "`t${boldf}-c, --clean_target_prior${normf}`n`t`tClean TARGET_BOARD build prior to building and programming the BRS-100-GW1NR9 board.`n"
-    Write-Host "`t${boldf}-f, --update_flash_only${normf} MCS_FILE_FULLPATH`n`t`tUpdate TARGET_BOARD flash with provided MCS_FILE_FULLPATH. (not implemented on Windows)`n"
-    Write-Host "`t${boldf}-m, --custom_bitfile${normf} CUSTOM_BITFILE_FULLPATH`n`t`tProgram TARGET_BOARD with custom bitfile CUSTOM_BITFILE_FULLPATH.`n"
-    Write-Host "`t${boldf}-l, --list_supported_targets${normf}`n`t`tList supported build targets and exit.`n"
-    Write-Host "`t${boldf}-s, --check_if_target_supported${normf}`n`t`tPrint supported status of provided target board and exit.`n"
-    Write-Host "`t${boldf}-b, --check_if_target_built${normf}`n`t`tPrint firmware built status of provided target board and exit.`n"
-    Write-Host "`t${boldf}-t, --custom_target${normf} CUSTOM_TARGET`n`t`tInstead of the default target, target 'CUSTOM_TARGET'. (not implemented on Windows)`n"
-    Write-Host "`t${boldf}-k, --clock_frequency${normf} ${underlinef}FREQUENCY_MHZ${normf}`n`t`tSystem clock frequency in MHz passed to the build script when auto-triggering a build."
+    Write-Host "`t${boldf}-h, -help${normf}`n`t`tDisplay this help and exit.`n"
+    Write-Host "`t${boldf}-d, -list_default_target${normf}`n`t`tList the default build target.`n"
+    Write-Host "`t${boldf}-c, -clean_target_prior${normf}`n`t`tClean TARGET_BOARD build prior to building and programming the BRS-100-GW1NR9 board.`n"
+    Write-Host "`t${boldf}-f, -update_flash_only${normf} MCS_FILE_FULLPATH`n`t`tUpdate TARGET_BOARD flash with provided MCS_FILE_FULLPATH. (not implemented on Windows)`n"
+    Write-Host "`t${boldf}-m, -custom_bitfile${normf} CUSTOM_BITFILE_FULLPATH`n`t`tProgram TARGET_BOARD with custom bitfile CUSTOM_BITFILE_FULLPATH.`n"
+    Write-Host "`t${boldf}-l, -list_supported_targets${normf}`n`t`tList supported build targets and exit.`n"
+    Write-Host "`t${boldf}-s, -check_if_target_supported${normf}`n`t`tPrint supported status of provided target board and exit.`n"
+    Write-Host "`t${boldf}-b, -check_if_target_built${normf}`n`t`tPrint firmware built status of provided target board and exit.`n"
+    Write-Host "`t${boldf}-t, -custom_target${normf} CUSTOM_TARGET`n`t`tInstead of the default target, target 'CUSTOM_TARGET'. (not implemented on Windows)`n"
+    Write-Host "`t${boldf}-k, -clock_frequency${normf} ${underlinef}FREQUENCY_MHZ${normf}`n`t`tSystem clock frequency in MHz passed to the build script when auto-triggering a build."
     Write-Host "`t`tIgnored when using -m. Valid values: 51, 66, 75, 81, 87 (default: 51).`n"
     Write-Host "`t${boldf}-jtag_frequency${normf} ${underlinef}FREQ${normf}`n`t`tOverride the JTAG programming clock frequency (default: 0.02MHz)."
     Write-Host "`t`tValid values: $($ValidJtagFrequencies -join ', ')."
@@ -100,7 +100,7 @@ if ($ShowHelp) {
 
 # ---- DUMMY FLAGS (not implemented for Gowin / single-target) ----
 if ($UpdateFlashOnly) {
-    Write-Host "ERROR: -f / --update_flash_only is not implemented on Windows."
+    Write-Host "ERROR: -f / -update_flash_only is not implemented on Windows."
     Write-Host "       Flash update is only supported on Xilinx boards (ARTYS7-25/50)"
     Write-Host "       via the Linux program_board.sh script."
     exit 1
@@ -130,7 +130,7 @@ if ($JtagFrequency) {
 # ---- PROJECT SETTINGS ----
 $ProjectName    = "BRS-100-GW1NR9"
 
-# ---- -d / --list_default_target ----
+# ---- -d / -list_default_target ----
 # print the default target board name and exit.
 # matches Linux: echo "$target_board"
 if ($ListDefaultTarget) {
@@ -150,7 +150,7 @@ if ($boards.Count -eq 0) {
     exit 1
 }
 
-# ---- -l / --list_supported_targets ----
+# ---- -l / -list_supported_targets ----
 # list all unique board names from the CSV, comma-separated, and exit.
 # matches Linux: list_supported_targets()
 if ($ListSupportedTargets) {
@@ -167,7 +167,7 @@ if (-not $board) {
     exit 1
 }
 
-# ---- -s / --check_if_target_supported ----
+# ---- -s / -check_if_target_supported ----
 # print whether the current target board is in the supported_boards.csv and exit.
 # matches Linux: check_if_target_supported flag
 if ($CheckIfTargetSupported) {
@@ -230,7 +230,7 @@ if ($CustomBitfile) {
     Write-Host "Bitstream: $FsFile"
 }
 
-# ---- CHECK IF BUILT (-b flag) ----
+# ---- -b / -check_if_target_built ----
 # matches Linux format: "Target 'BRS-100-GW1NR9' firmware built status: true/false"
 if ($CheckIfTargetBuilt) {
     if (Test-Path $DefaultFsFile) {
