@@ -146,3 +146,83 @@ function Reset-FtdiDevice {
         return $false
     }
 }
+
+function Invoke-ProgrammerCliWithStallDetection {
+    param(
+        [Parameter(Mandatory)][string]$Exe,
+        [Parameter(Mandatory)][string[]]$Arguments,
+        [int]$StallTimeoutSeconds = 10
+    )
+
+    # quote any argument that contains spaces so Start-Process doesn't split it
+    $argString = ($Arguments | ForEach-Object {
+        if ($_ -match ' ') { "`"$_`"" } else { $_ }
+    }) -join ' '
+
+    $stdoutFile = [System.IO.Path]::GetTempFileName()
+    $stderrFile = [System.IO.Path]::GetTempFileName()
+
+    $proc = Start-Process -FilePath $Exe -ArgumentList $argString `
+        -NoNewWindow -PassThru `
+        -RedirectStandardOutput $stdoutFile `
+        -RedirectStandardError  $stderrFile
+
+    # PS 5.1 quirk: touch Handle before the process can exit so the native
+    # handle is pinned; otherwise $proc.ExitCode returns $null after exit.
+    $null = $proc.Handle
+
+    $lastOutput  = Get-Date
+    $stalled     = $false
+    $procExitCode = $null
+
+    # keep streams open with ReadWrite sharing - Start-Process holds a write lock
+    $stdoutStream = [System.IO.File]::Open($stdoutFile, 'Open', 'Read', 'ReadWrite')
+    $stderrStream = [System.IO.File]::Open($stderrFile, 'Open', 'Read', 'ReadWrite')
+
+    function Read-NewBytes($stream) {
+        $available = $stream.Length - $stream.Position
+        if ($available -le 0) { return }
+        $buf = New-Object byte[] $available
+        [void]$stream.Read($buf, 0, $available)
+        [Console]::Write([System.Text.Encoding]::Default.GetString($buf))
+    }
+
+    try {
+        while (-not $proc.HasExited) {
+            Start-Sleep -Milliseconds 200
+
+            $posBefore = $stdoutStream.Position + $stderrStream.Position
+            Read-NewBytes $stdoutStream
+            Read-NewBytes $stderrStream
+            if (($stdoutStream.Position + $stderrStream.Position) -gt $posBefore) {
+                $lastOutput = Get-Date
+            }
+
+            if (((Get-Date) - $lastOutput).TotalSeconds -gt $StallTimeoutSeconds) {
+                $stalled = $true
+                Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+                break
+            }
+        }
+
+        if (-not $stalled) {
+            Read-NewBytes $stdoutStream
+            Read-NewBytes $stderrStream
+            # capture ExitCode inside try before finally closes resources;
+            # WaitForExit(ms) is more reliable than WaitForExit() in PS 5.1
+            [void]$proc.WaitForExit(30000)
+            $procExitCode = $proc.ExitCode
+        }
+    } finally {
+        $stdoutStream.Close()
+        $stderrStream.Close()
+        if (-not $proc.HasExited) {
+            Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+        }
+        Remove-Item $stdoutFile -ErrorAction SilentlyContinue
+        Remove-Item $stderrFile -ErrorAction SilentlyContinue
+    }
+
+    $exitCode = if ($stalled) { 1 } else { $procExitCode }
+    return [PSCustomObject]@{ ExitCode = $exitCode; Stalled = $stalled }
+}

@@ -77,11 +77,10 @@ function Show-Help {
     Write-Host "`t${boldf}.\program_board.ps1 -k 66${normf}`n`t`tBuild at 66 MHz and program the board.`n"
     Write-Host "`t${boldf}.\program_board.ps1 -jtag_frequency 2.5MHz${normf}`n`t`tProgram at 2.5MHz JTAG speed. Faster but less reliable.`n"
     Write-Host "${boldf}IMPORTANT NOTICE${normf}"
-    Write-Host "`tThe Windows ftd2xx driver may cause the script to freeze during programming."
-    Write-Host "`tIf the script freezes at the following line:`n"
-    Write-Host "`t`tOperation `"embFlash Erase,Program`" for device#1...`n"
-    Write-Host "`tManually kill programmer_cli.exe in Task Manager and disconnect the USB-C"
-    Write-Host "`tcable for 3-5 seconds before reconnecting. See TROUBLESHOOTING.txt.`n"
+    Write-Host "`tThe Windows ftd2xx driver may cause programmer_cli.exe to hang at embFlash Erase."
+    Write-Host "`tThis script detects the hang automatically (no progress for 10 seconds) and"
+    Write-Host "`tkills programmer_cli.exe. To recover: disconnect the USB-C cable for 3-5"
+    Write-Host "`tseconds, then reconnect and re-run. See TROUBLESHOOTING.txt for details.`n"
     Write-Host "${boldf}AUTHOR${normf}"
     Write-Host "`tWritten by Bruce Mao"
     Write-Host "`tAdapted from linux program_board.sh by Craig Haywood`n"
@@ -101,6 +100,12 @@ if ($ShowHelp) {
 # $ProgrammerCli is only set if all globals completed without error, so null means
 # globals already printed the error message and just need to exit here.
 if (-not $ProgrammerCli) { exit 1 }
+
+
+
+
+
+
 
 # ---- DUMMY FLAGS (not implemented for Gowin / single-target) ----
 if ($UpdateFlashOnly) {
@@ -389,9 +394,8 @@ Write-Host "Bitstream : $FsFile"
 Write-Host "Programmer: $ProgrammerCli"
 Write-Host "====================================="
 Write-Host ""
-Write-Host "  [i] NOTE"
-Write-Host "  If the script freezes below, kill programmer_cli.exe in Task Manager"
-Write-Host "  and replug USB. See TROUBLESHOOTING.txt for details."
+Write-Host "  [i] Hang detection active: if no progress for 10 s, programmer_cli.exe"
+Write-Host "      will be killed automatically. Replug USB-C and re-run to recover."
 Write-Host ""
 
 # echo exact command line before executing (matches Linux behaviour)
@@ -400,10 +404,33 @@ Write-Host ""
 Write-Host "*** GOWIN programmer_cli Command Line Console ***"
 Write-Host ""
 
-& $ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile
+$result = Invoke-ProgrammerCliWithStallDetection `
+    -Exe $ProgrammerCli `
+    -Arguments @('--device', $DeviceArg, '--cable-index', '4',
+                 '--location', $cableLocation, '--frequency', $JtagFrequency,
+                 '--operation_index', '5', '--fsFile', $FsFile)
 
 # ---- RESULT ----
-if ($LASTEXITCODE -eq 0) {
+if ($result.Stalled) {
+    Write-Host ""
+    Write-Host "====================================="
+    Write-Host " PROGRAMMING STALLED"
+    Write-Host "====================================="
+    Write-Host ""
+    Write-Host "ERROR: programmer_cli.exe produced no progress for 10 seconds."
+    Write-Host "       The Windows ftd2xx driver has hung at embFlash Erase."
+    Write-Host "       programmer_cli.exe has been killed."
+    Write-Host ""
+    Write-Host "To recover:"
+    Write-Host "  1. Disconnect the USB-C cable"
+    Write-Host "  2. Wait 3-5 seconds"
+    Write-Host "  3. Reconnect the cable"
+    Write-Host "  4. Re-run this script"
+    Write-Host ""
+    Write-Host "See TROUBLESHOOTING.txt for details."
+    exit 1
+
+} elseif ($result.ExitCode -eq 0) {
     Write-Host ""
     Write-Host "====================================="
     Write-Host " PROGRAMMING SUCCESS"
@@ -414,7 +441,7 @@ if ($LASTEXITCODE -eq 0) {
 } else {
     Write-Host ""
     Write-Host "====================================="
-    Write-Host " PROGRAMMING FAILED (exit code: $LASTEXITCODE)"
+    Write-Host " PROGRAMMING FAILED (exit code: $($result.ExitCode))"
     Write-Host "====================================="
     Write-Host ""
     Write-Host "Common causes:"
@@ -424,7 +451,6 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "  4. Driver issue - try unplugging and replugging the board"
     Write-Host "  5. License issue - check GOWIN license via IDE: Help > Manage License"
     Write-Host ""
-    Write-Host "If the script froze and you had to Ctrl+C, see:"
-    Write-Host "  windows\TROUBLESHOOTING.txt"
+    Write-Host "See TROUBLESHOOTING.txt for details."
     exit 1
 }
