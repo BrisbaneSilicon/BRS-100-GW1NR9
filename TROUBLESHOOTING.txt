@@ -1,0 +1,209 @@
+TROUBLESHOOTING - BRS-100-GW1NR9 Windows Programming
+=====================================================
+
+INTERMITTENT FREEZE DURING PROGRAMMING
+---------------------------------------
+
+Symptom:
+    The script prints:
+        *** GOWIN programmer_cli Command Line Console ***
+
+    and then appears to hang with no further output for approximately 10 seconds.
+    After 10 seconds with no progress, the script detects the hang, kills
+    programmer_cli.exe automatically, and prints:
+
+        PROGRAMMING STALLED
+        ERROR: programmer_cli.exe produced no progress for 10 seconds.
+               The Windows ftd2xx driver has hung at embFlash Erase.
+               programmer_cli.exe has been killed.
+
+Cause:
+    The FTDI chip on the board accumulates internal state (incomplete
+    USB transfers, pending URBs in the Windows USB host controller) across
+    rapid back-to-back programmer_cli.exe invocations. After several cycles,
+    the chip stops responding to new JTAG commands.
+
+    This is a hardware level limitation of the FTDI interface, not a software
+    bug. The freeze is non-deterministic: it may occur after 3-6 rapid runs,
+    or sometimes not at all for 10+ runs. The GOWIN Programmer GUI avoids
+    this because manual button clicks are naturally slower than scripted runs.
+
+Recovery steps (after the script prints PROGRAMMING STALLED):
+    1. Unplug the USB-C cable from the board.
+    2. Wait 3-5 seconds. The FTDI chip needs time to fully power down and
+       clear its state. Replugging too quickly may leave stale state and
+       cause the next run to fail again.
+    3. Plug the USB-C cable back in.
+    4. Run the programming script again.
+
+    programmer_cli.exe is killed automatically by the script — no need to
+    use Task Manager or Ctrl+C.
+
+Prevention:
+    - Wait a few seconds between programming runs.
+    - Do not run the script while GOWIN Programmer GUI is open — it holds an
+      exclusive lock on the USB cable and will cause immediate failure.
+    - The script already detects if programmer.exe is running and will warn you.
+
+Note:
+    The GOWIN Programmer GUI has also been observed to hang occasionally after
+    manually clicking Program/Configure button, requiring the same recovery steps
+     (kill programmer.exe in Task Manager and reconnecting USB). This suggests the root
+    cause is either a hardware limitation of the board's FTDI interface or an
+    issue within programmer_cli.exe itself.
+
+
+CABLE FAILED TO OPEN
+---------------------
+
+Symptom:
+    Error: Cable failed to open via the location.
+
+Cause:
+    The USB device is in a bad state (usually from a previous hung
+    programmer_cli process that was killed without releasing the ftd2xx handle).
+
+Recovery:
+    Follow the recovery steps above (Ctrl+C, replug USB).
+
+
+PROGRAM FAILED (exit code non-zero)
+-------------------------------------
+
+Symptom:
+    PROGRAMMING FAILED (exit code: 1)
+    Status Code is: 0x00015421
+
+Cause:
+    The wrong cable type was selected internally. This happens if
+    programmer_cli.exe ignores the --cable-index 4 argument (a known bug
+    in some versions) and falls back to the FT2CH driver path.
+
+    Status codes starting with 0x0001xxxx = FT2CH driver path (wrong).
+    Status codes starting with 0x0003xxxx = USB Debugger A / ftd2xx (correct).
+
+Recovery:
+    Unplug and replug the board, then retry. Also double check the GOWIN EDA
+    version (V1.9.12 or V1.9.12.02), as this error is commonly seen when
+    the wrong version is installed. If the issue persists, try reinstalling
+    GOWIN EDA.
+
+
+GOWIN EDA V1.9.12.01 — DO NOT USE
+------------------------------------
+
+Symptom:
+    The build completes successfully and produces a .fs bitstream file, but
+    programmer_cli.exe fails to program it to the board. Programming may hang,
+    produce errors, or silently fail.
+
+Cause:
+    GOWIN EDA V1.9.12.01 has a known bug that prevents it from programming
+    the bitstream to the board. The build/synthesis toolchain works correctly,
+    but the programmer component is broken in this release.
+
+Fix:
+    Uninstall V1.9.12.01 and install V1.9.12 or V1.9.12.02 from:
+        https://www.gowinsemi.com/en/support/download_eda/
+
+    The build and program_board scripts (v1.0+) will refuse to run if they
+    detect V1.9.12.01 is installed.
+
+
+GOWIN EDA NOT FOUND
+--------------------
+
+Symptom:
+    ERROR: Could not find GOWIN programmer_cli.exe.
+
+Fix:
+    Install GOWIN EDA V1.9.12 from:
+        https://www.gowinsemi.com/en/support/download_eda/
+
+    NOTE: Do NOT use V1.9.12.01 — it has a bug that prevents programming
+    to the board.
+
+    Or set the GOWIN_INSTALL_DIR environment variable to your install path:
+        [System.Environment]::SetEnvironmentVariable('GOWIN_INSTALL_DIR', 'C:\your\gowin\path', 'User')
+    Then reopen PowerShell and retry.
+
+
+KERNEL SECURITY CHECK FAILURE (BSOD 0x139)
+---------------------------------------------
+
+Symptom:
+    Windows crashes with a blue/black screen showing:
+        KERNEL_SECURITY_CHECK_FAILURE (bug check 0x139)
+    This occurs after several successful programming cycles, or during
+    programming with script. 
+
+Cause:
+    The ftd2xx.sys kernel-mode driver (FTDI's USB driver) has a bug where
+    rapid open/reset/close cycles corrupt kernel memory. This was previously
+    triggered by the script calling FT_CyclePort and FT_ResetDevice via
+    ftd2xx.dll before each programming attempt.
+
+    V1.9.12.01 ships an older/buggier ftd2xx.sys that is more susceptible
+    to this crash. V1.9.12 and V1.9.12.02 are more stable but not fully immune.
+
+Fix:
+    1. Remove all FTDI devices and drivers
+    Open Device Manager (devmgmt.msc), then enable hidden devices via View > Show hidden devices. Look under:
+
+    "Universal Serial Bus controllers" — any FTDI entries
+    "Ports (COM & LPT)" — any "USB Serial Port" entries
+    "USB Debugger A" entries
+    "USB Serial Converter" entries
+    Right-click each device > Uninstall device > check "Attempt to remove the driver for this device" (important).
+
+    2. Clear ghost devices
+
+    With the board unplugged, open an admin PowerShell:
+
+    pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5
+
+    This lists any FTDI drivers still in the driver store. For each one, note the published name (e.g. oem12.inf) and remove it:
+
+    pnputil /delete-driver oem12.inf /force
+
+    3. Clean leftover files
+
+    Check for stale copies:
+
+    Get-ChildItem C:\Windows\System32\drivers\ftd*.sys
+    Get-ChildItem C:\Windows\System32\ftd2xx*.dll
+    Get-ChildItem C:\Windows\SysWOW64\ftd2xx*.dll
+
+    These should be gone after step 2. If any remain, note the versions (Right-click > Properties > Details > File version) before deleting — this tells you what was installed.
+
+    4. Reboot
+
+    Reboot before reinstalling anything. This ensures the kernel fully unloads the old drivers.
+
+    5. Reinstall clean
+
+    Download the latest D2XX driver from FTDI (not from GOWIN):
+    https://ftdichip.com/drivers/d2xx-drivers/
+
+    Run the installer. Then plug in the board — Windows should pick up the new drivers.
+
+    6. Verify versions match
+
+    After reinstall, check if the driver versions match by running:
+
+    pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5
+
+
+
+
+SCRIPT EXECUTION POLICY ERROR
+-------------------------------
+
+Symptom:
+    .\program_board.ps1 cannot be loaded because running scripts is
+    disabled on this system.
+
+Fix:
+    Run PowerShell as Administrator and execute:
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+    Then retry the script.

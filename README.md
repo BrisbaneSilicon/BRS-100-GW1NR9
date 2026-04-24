@@ -67,50 +67,52 @@ Ensure all listed driver versions match. If they do not, follow the full FTDI re
 
    1. Remove all FTDI devices and drivers
     Open Device Manager (devmgmt.msc), then enable hidden devices via View > Show hidden devices. Look under:
-
+```
     "Universal Serial Bus controllers" — any FTDI entries
     "Ports (COM & LPT)" — any "USB Serial Port" entries
     "USB Debugger A" entries
     "USB Serial Converter" entries
-    Right-click each device > Uninstall device > check "Attempt to remove the driver for this device" (important).
+```
 
-    2. Clear ghost devices
+  Right-click each device > Uninstall device > check "Attempt to remove the driver for this device".
 
-    With the board unplugged, open an admin PowerShell:
 
-    ```pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5```
+   2. Clear ghost devices
 
-    This lists any FTDI drivers still in the driver store. For each one, note the published name (e.g. oem12.inf) and remove it:
+  With the board unplugged, open an admin PowerShell:
 
-    ```pnputil /delete-driver oem12.inf /force```
+  ```pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5```
 
-    3. Clean leftover files
+  This lists any FTDI drivers still in the driver store. For each one, note the published name (e.g. oem12.inf) and remove it:
 
-    Check for stale copies:
+  ```pnputil /delete-driver oem12.inf /force```
+
+   3. Clean leftover files
+
+  Check for stale copies:
 
     Get-ChildItem C:\Windows\System32\drivers\ftd*.sys
     Get-ChildItem C:\Windows\System32\ftd2xx*.dll
     Get-ChildItem C:\Windows\SysWOW64\ftd2xx*.dll
 
-    These should be gone after step 2. If any remain, note the versions (Right-click > Properties > Details > File version) before deleting — this tells you what was installed.
+  These should be gone after step 2. If any remain, note the versions (Right-click > Properties > Details > File version) before deleting — this tells you what was installed.
 
-    4. Reboot
+   4. Reboot
 
     Reboot before reinstalling anything. This ensures the kernel fully unloads the old drivers.
 
-    5. Reinstall clean
+   5. Reinstall clean
 
-    Download the latest D2XX driver from FTDI (not from GOWIN):
-    https://ftdichip.com/drivers/d2xx-drivers/
+  Download the latest D2XX driver from FTDI: https://ftdichip.com/drivers/d2xx-drivers/
 
-    Run the installer. Then plug in the board — Windows should pick up the new drivers.
+  Run the installer. Then plug in the board. Windows should pick up the new drivers.
 
-    6. Verify versions match
+   6. Verify versions match
 
-    After reinstall, check if the driver versions match by running: 
-    ```
-    pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5
-    ``` 
+  After reinstall, check if the driver versions match by running: 
+  ```
+  pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5
+  ``` 
 
 
 <br>
@@ -146,10 +148,12 @@ Launch a bash terminal and perform the following:
 To configure the license on Windows GOWIN EDA:
 
 1. Open GOWIN EDA (`gw_ide.exe`) from your install directory.
-2. Click **Help** → **Manage License**.
-3. Enter either your local license file path or the server IP and port.
-4. Click **Check** — a popup saying **Server is OK** confirms it works.
-5. Click **Save**.
+2. Click 'Help' - 'Manage License'.
+3. Either point the licensing manager at your local license file (Option 1 above) or a floating license server.
+4. Press 'Check' to validate the license.
+   - If the license has been successfully validated, it should produce a popup window __INFO__ with the message __Server is OK__.
+5. Click 'Save' to save your license setup.
+<br>
 
 > [!WARNING]
 > Sometimes the first license check (step 4) will fail - simply repeat the step to validate the license.
@@ -329,25 +333,26 @@ The most commonly used are listed below.
 > [!WARNING]
 > Make sure there are no conflicts between FTDI driver versions before running this script — see [Other](#ftdi-driver-setup).
 
-Plug the board into your PC via the USB-C cable, then open PowerShell, `cd` into the repository root, then the 'prog' directory, and then run:
+The '\<this repository directory>' is the directory in which you performed Step (4) of [prerequisites](#prerequisites) - i.e. the directory in which you cloned this repository.
 
 ```powershell
+cd '<this repository directory>\prog\'
 .\program_board.ps1
 ```
 
-> [!NOTE]
-> The script may freeze during programming at ``` Operation "embFlash Erase,Program" for device#1... ``` line and then hangs indefinitely with no further output. Typically occurs after 3-6 rapid programming commands.
-> This is due to the FTDI chip accumulating internal states across rapid programmer_cli.exe calls. After a few cycles, the chip stops responding to new JTAG commands.
-> This may take a few tries depending on the state of the FTDI chip.
 
-Manual Recovery steps:
-1. Press Ctrl+C in the terminal to stop the script.
-2. Open Task Manager (Ctrl+Shift+Esc) and check if programmer_cli.exe is still running. If it is, right-click it and select End Task. Alternatively, run in a new PowerShell window: ```Stop-Process -Name programmer_cli -Force -ErrorAction SilentlyContinue```
-3. Unplug the USB-C cable from the board.
-4. Wait at least 3 seconds before reconnecting. The FTDI chip's internal microcontroller needs time to fully power down and clear its state. If you replug too quickly (<3 seconds), the chip resumes with stale state and the first programming attempt will likely fail again.
-5. Plug the USB-C cable back in.
-6. Wait for Windows to finish enumerating the device (Device Manager will show "USB Debugger A" again — usually takes 2-3 seconds).
-7. Run the programming script again.
+> [!NOTE]
+> After printing `*** GOWIN programmer_cli Command Line Console ***`, the script may appear to hang with no further output for approximately 10 seconds. This is caused by the FTDI chip accumulating internal state across rapid back-to-back programming runs. The script detects this automatically, kills `programmer_cli.exe`, and prints `PROGRAMMING STALLED`.
+
+Recovery steps (after the script prints `PROGRAMMING STALLED`):
+1. Unplug the USB-C cable from the board.
+2. Wait 3-5 seconds for the FTDI chip to fully power down and clear its state.
+3. Plug the USB-C cable back in.
+4. Run the programming script again.
+
+For more detailed windows troubleshooting steps, see TROUBLESHOOTING.txt. 
+
+`programmer_cli.exe` is killed automatically. You shouldn't need to manually kill it in Task Manager. 
 <br><br>
 > [!NOTE]
 > If you use GOWIN EDA or GOWIN Programmer to flash the BRS-100-GW1NR9, ensure that you connect to the board with 'using ftd2xx driver' unselected:
@@ -396,7 +401,7 @@ Build the demonstration firmware:
 Then program it:
 
 ```powershell
-.\build\program_board.ps1
+.\prog\program_board.ps1
 ```
 
 Connect a serial terminal (e.g. PuTTY, Tera Term) to the board's UART at **115200 baud**. Press pushbutton 1 (the pushbutton closest to Pin 1) to reset the board. The terminal should print something like:

@@ -55,16 +55,16 @@ function Show-Help {
     Write-Host "`tProgram the BRS-100-GW1NR9 board via JTAG using programmer_cli.exe."
     Write-Host "`tIf firmware is not yet built, automatically triggers a build first.`n"
     Write-Host "${boldf}OPTIONS${normf}"
-    Write-Host "`t${boldf}-h, --help${normf}`n`t`tDisplay this help and exit.`n"
-    Write-Host "`t${boldf}-d, --list_default_target${normf}`n`t`tList the default build target.`n"
-    Write-Host "`t${boldf}-c, --clean_target_prior${normf}`n`t`tClean TARGET_BOARD build prior to building and programming the BRS-100-GW1NR9 board.`n"
-    Write-Host "`t${boldf}-f, --update_flash_only${normf} MCS_FILE_FULLPATH`n`t`tUpdate TARGET_BOARD flash with provided MCS_FILE_FULLPATH. (not implemented on Windows)`n"
-    Write-Host "`t${boldf}-m, --custom_bitfile${normf} CUSTOM_BITFILE_FULLPATH`n`t`tProgram TARGET_BOARD with custom bitfile CUSTOM_BITFILE_FULLPATH.`n"
-    Write-Host "`t${boldf}-l, --list_supported_targets${normf}`n`t`tList supported build targets and exit.`n"
-    Write-Host "`t${boldf}-s, --check_if_target_supported${normf}`n`t`tPrint supported status of provided target board and exit.`n"
-    Write-Host "`t${boldf}-b, --check_if_target_built${normf}`n`t`tPrint firmware built status of provided target board and exit.`n"
-    Write-Host "`t${boldf}-t, --custom_target${normf} CUSTOM_TARGET`n`t`tInstead of the default target, target 'CUSTOM_TARGET'. (not implemented on Windows)`n"
-    Write-Host "`t${boldf}-k, --clock_frequency${normf} ${underlinef}FREQUENCY_MHZ${normf}`n`t`tSystem clock frequency in MHz passed to the build script when auto-triggering a build."
+    Write-Host "`t${boldf}-h, -help${normf}`n`t`tDisplay this help and exit.`n"
+    Write-Host "`t${boldf}-d, -list_default_target${normf}`n`t`tList the default build target.`n"
+    Write-Host "`t${boldf}-c, -clean_target_prior${normf}`n`t`tClean TARGET_BOARD build prior to building and programming the BRS-100-GW1NR9 board.`n"
+    Write-Host "`t${boldf}-f, -update_flash_only${normf} MCS_FILE_FULLPATH`n`t`tUpdate TARGET_BOARD flash with provided MCS_FILE_FULLPATH. (not implemented on Windows)`n"
+    Write-Host "`t${boldf}-m, -custom_bitfile${normf} CUSTOM_BITFILE_FULLPATH`n`t`tProgram TARGET_BOARD with custom bitfile CUSTOM_BITFILE_FULLPATH.`n"
+    Write-Host "`t${boldf}-l, -list_supported_targets${normf}`n`t`tList supported build targets and exit.`n"
+    Write-Host "`t${boldf}-s, -check_if_target_supported${normf}`n`t`tPrint supported status of provided target board and exit.`n"
+    Write-Host "`t${boldf}-b, -check_if_target_built${normf}`n`t`tPrint firmware built status of provided target board and exit.`n"
+    Write-Host "`t${boldf}-t, -custom_target${normf} CUSTOM_TARGET`n`t`tInstead of the default target, target 'CUSTOM_TARGET'. (not implemented on Windows)`n"
+    Write-Host "`t${boldf}-k, -clock_frequency${normf} ${underlinef}FREQUENCY_MHZ${normf}`n`t`tSystem clock frequency in MHz passed to the build script when auto-triggering a build."
     Write-Host "`t`tIgnored when using -m. Valid values: 51, 66, 75, 81, 87 (default: 51).`n"
     Write-Host "`t${boldf}-jtag_frequency${normf} ${underlinef}FREQ${normf}`n`t`tOverride the JTAG programming clock frequency (default: 0.02MHz)."
     Write-Host "`t`tValid values: $($ValidJtagFrequencies -join ', ')."
@@ -77,11 +77,10 @@ function Show-Help {
     Write-Host "`t${boldf}.\program_board.ps1 -k 66${normf}`n`t`tBuild at 66 MHz and program the board.`n"
     Write-Host "`t${boldf}.\program_board.ps1 -jtag_frequency 2.5MHz${normf}`n`t`tProgram at 2.5MHz JTAG speed. Faster but less reliable.`n"
     Write-Host "${boldf}IMPORTANT NOTICE${normf}"
-    Write-Host "`tThe Windows ftd2xx driver may cause the script to freeze during programming."
-    Write-Host "`tIf the script freezes at the following line:`n"
-    Write-Host "`t`tOperation `"embFlash Erase,Program`" for device#1...`n"
-    Write-Host "`tManually kill programmer_cli.exe in Task Manager and disconnect the USB-C"
-    Write-Host "`tcable for 3-5 seconds before reconnecting. See TROUBLESHOOTING.txt.`n"
+    Write-Host "`tThe Windows ftd2xx driver may cause programmer_cli.exe to hang at embFlash Erase."
+    Write-Host "`tThis script detects the hang automatically (no progress for 10 seconds) and"
+    Write-Host "`tkills programmer_cli.exe. To recover: disconnect the USB-C cable for 3-5"
+    Write-Host "`tseconds, then reconnect and re-run. See TROUBLESHOOTING.txt for details.`n"
     Write-Host "${boldf}AUTHOR${normf}"
     Write-Host "`tWritten by Bruce Mao"
     Write-Host "`tAdapted from linux program_board.sh by Craig Haywood`n"
@@ -97,10 +96,20 @@ if ($ShowHelp) {
 
 # ---- GLOBALS ----
 . "$PSScriptRoot\program_board_globals.ps1"
+# exit 1 in another script does not reliably terminate the caller in powershell.
+# $ProgrammerCli is only set if all globals completed without error, so null means
+# globals already printed the error message and just need to exit here.
+if (-not $ProgrammerCli) { exit 1 }
+
+
+
+
+
+
 
 # ---- DUMMY FLAGS (not implemented for Gowin / single-target) ----
 if ($UpdateFlashOnly) {
-    Write-Host "ERROR: -f / --update_flash_only is not implemented on Windows."
+    Write-Host "ERROR: -f / -update_flash_only is not implemented on Windows."
     Write-Host "       Flash update is only supported on Xilinx boards (ARTYS7-25/50)"
     Write-Host "       via the Linux program_board.sh script."
     exit 1
@@ -130,7 +139,7 @@ if ($JtagFrequency) {
 # ---- PROJECT SETTINGS ----
 $ProjectName    = "BRS-100-GW1NR9"
 
-# ---- -d / --list_default_target ----
+# ---- -d / -list_default_target ----
 # print the default target board name and exit.
 # matches Linux: echo "$target_board"
 if ($ListDefaultTarget) {
@@ -150,7 +159,7 @@ if ($boards.Count -eq 0) {
     exit 1
 }
 
-# ---- -l / --list_supported_targets ----
+# ---- -l / -list_supported_targets ----
 # list all unique board names from the CSV, comma-separated, and exit.
 # matches Linux: list_supported_targets()
 if ($ListSupportedTargets) {
@@ -167,7 +176,7 @@ if (-not $board) {
     exit 1
 }
 
-# ---- -s / --check_if_target_supported ----
+# ---- -s / -check_if_target_supported ----
 # print whether the current target board is in the supported_boards.csv and exit.
 # matches Linux: check_if_target_supported flag
 if ($CheckIfTargetSupported) {
@@ -230,7 +239,7 @@ if ($CustomBitfile) {
     Write-Host "Bitstream: $FsFile"
 }
 
-# ---- CHECK IF BUILT (-b flag) ----
+# ---- -b / -check_if_target_built ----
 # matches Linux format: "Target 'BRS-100-GW1NR9' firmware built status: true/false"
 if ($CheckIfTargetBuilt) {
     if (Test-Path $DefaultFsFile) {
@@ -385,9 +394,8 @@ Write-Host "Bitstream : $FsFile"
 Write-Host "Programmer: $ProgrammerCli"
 Write-Host "====================================="
 Write-Host ""
-Write-Host "  [i] NOTE"
-Write-Host "  If the script freezes below, kill programmer_cli.exe in Task Manager"
-Write-Host "  and replug USB. See TROUBLESHOOTING.txt for details."
+Write-Host "  [i] Hang detection active: if no progress appears for 10 s, programmer_cli.exe"
+Write-Host "      will be killed automatically. Replug USB and re-run this script to recover."
 Write-Host ""
 
 # echo exact command line before executing (matches Linux behaviour)
@@ -396,10 +404,33 @@ Write-Host ""
 Write-Host "*** GOWIN programmer_cli Command Line Console ***"
 Write-Host ""
 
-& $ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile
+$result = Invoke-ProgrammerCliWithStallDetection `
+    -Exe $ProgrammerCli `
+    -Arguments @('--device', $DeviceArg, '--cable-index', '4',
+                 '--location', $cableLocation, '--frequency', $JtagFrequency,
+                 '--operation_index', '5', '--fsFile', $FsFile)
 
 # ---- RESULT ----
-if ($LASTEXITCODE -eq 0) {
+if ($result.Stalled) {
+    Write-Host ""
+    Write-Host "====================================="
+    Write-Host " PROGRAMMING STALLED"
+    Write-Host "====================================="
+    Write-Host ""
+    Write-Host "ERROR: programmer_cli.exe produced no progress for 10 seconds."
+    Write-Host "       The Windows ftd2xx driver has hung at embFlash Erase."
+    Write-Host "       programmer_cli.exe has been killed."
+    Write-Host ""
+    Write-Host "To recover:"
+    Write-Host "  1. Disconnect the USB-C cable"
+    Write-Host "  2. Wait 3-5 seconds"
+    Write-Host "  3. Reconnect the cable"
+    Write-Host "  4. Re-run this script"
+    Write-Host ""
+    Write-Host "See TROUBLESHOOTING.txt for details."
+    exit 1
+
+} elseif ($result.ExitCode -eq 0) {
     Write-Host ""
     Write-Host "====================================="
     Write-Host " PROGRAMMING SUCCESS"
@@ -410,7 +441,7 @@ if ($LASTEXITCODE -eq 0) {
 } else {
     Write-Host ""
     Write-Host "====================================="
-    Write-Host " PROGRAMMING FAILED (exit code: $LASTEXITCODE)"
+    Write-Host " PROGRAMMING FAILED (exit code: $($result.ExitCode))"
     Write-Host "====================================="
     Write-Host ""
     Write-Host "Common causes:"
@@ -420,7 +451,6 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "  4. Driver issue - try unplugging and replugging the board"
     Write-Host "  5. License issue - check GOWIN license via IDE: Help > Manage License"
     Write-Host ""
-    Write-Host "If the script froze and you had to Ctrl+C, see:"
-    Write-Host "  windows\TROUBLESHOOTING.txt"
+    Write-Host "See TROUBLESHOOTING.txt for details."
     exit 1
 }
