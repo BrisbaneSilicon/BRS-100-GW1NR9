@@ -269,18 +269,6 @@ if ($guiProcesses) {
     exit 1
 }
 
-# ---- RESET FTDI USB DEVICE ----
-# clear any stale ftd2xx handle state from previous programmer_cli invocations.
-# without this, rapid back-to-back programming can hang during embFlash erase
-# because the FTDI chip's state machine never fully released the previous handle.
-Write-Host ""
-$resetResult = Reset-FtdiDevice
-if ($resetResult) {
-    Write-Host "FTDI USB reset complete."
-} else {
-    Write-Host "FTDI USB reset skipped - proceeding anyway."
-}
-
 # ---- SCAN FOR JTAG CABLE ----
 # scan using ftd2xx driver (F flag) - this matches the GUI's "Using ftd2xx driver"
 # checkbox which must be checked for this board to work.
