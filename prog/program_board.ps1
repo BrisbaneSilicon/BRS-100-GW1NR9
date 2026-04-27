@@ -400,14 +400,34 @@ $result = Invoke-ProgrammerCliWithStallDetection `
 
 # ---- RESULT ----
 if ($result.Stalled) {
+    # programmer_cli was killed by stall detection. an in-process retry
+    # (Start-Process from the current shell) does not wake the wedged ftd2xx
+    # driver - empirically only running programmer_cli from a fresh
+    # powershell.exe wakes it (mirrors the user's manual "open new terminal"
+    # workaround). wrap the retry in `powershell.exe -Command` so the new
+    # programmer_cli is a grandchild of the original shell rather than a
+    # direct child.
+    Write-Host ""
+    Write-Host "Stall detected - retrying program command in a fresh shell to wake the ftd2xx driver..."
+    Write-Host ""
+    Write-Host "*** GOWIN programmer_cli Command Line Console (retry) ***"
+    Write-Host ""
+
+    $retryInner = "& '$ProgrammerCli' --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile '$FsFile'; exit `$LASTEXITCODE"
+
+    $result = Invoke-ProgrammerCliWithStallDetection `
+        -Exe "powershell.exe" `
+        -Arguments @('-NoProfile', '-Command', $retryInner)
+}
+
+if ($result.Stalled) {
     Write-Host ""
     Write-Host "====================================="
-    Write-Host " PROGRAMMING STALLED"
+    Write-Host " PROGRAMMING FAILED (stalled twice)"
     Write-Host "====================================="
     Write-Host ""
-    Write-Host "ERROR: programmer_cli.exe produced no progress for 10 seconds."
-    Write-Host "       The Windows ftd2xx driver has hung at embFlash Erase."
-    Write-Host "       programmer_cli.exe has been killed."
+    Write-Host "ERROR: programmer_cli.exe stalled twice (no progress for 10 s each time)."
+    Write-Host "       The Windows ftd2xx driver is wedged."
     Write-Host ""
     Write-Host "To recover:"
     Write-Host "  1. Disconnect the USB-C cable"
