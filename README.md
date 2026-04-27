@@ -342,17 +342,17 @@ cd '<this repository directory>\prog\'
 
 
 > [!NOTE]
-> After printing `*** GOWIN programmer_cli Command Line Console ***`, the script may appear to hang with no further output for approximately 10 seconds. This is caused by the FTDI chip accumulating internal state across rapid back-to-back programming runs. The script detects this automatically, kills `programmer_cli.exe`, and prints `PROGRAMMING STALLED`.
+> After printing `*** GOWIN programmer_cli Command Line Console ***`, the script may appear to hang with no further output for approximately 3 seconds. The script detects the hang automatically, kills `programmer_cli.exe`, and retries the programming command in a fresh hidden console (up to two retries). Most stalls are recovered automatically without user intervention.
 
-Recovery steps (after the script prints `PROGRAMMING STALLED`):
+If all three attempts stall, the script prints `PROGRAMMING FAILED (stalled)`. To recover:
 1. Unplug the USB-C cable from the board.
 2. Wait 3-5 seconds for the FTDI chip to fully power down and clear its state.
 3. Plug the USB-C cable back in.
 4. Run the programming script again.
 
-For more detailed windows troubleshooting steps, see TROUBLESHOOTING.txt. 
+For more detailed windows troubleshooting steps, see TROUBLESHOOTING.txt.
 
-`programmer_cli.exe` is killed automatically. You shouldn't need to manually kill it in Task Manager. 
+`programmer_cli.exe` is killed automatically. You shouldn't need to manually kill it in Task Manager.
 <br><br>
 > [!NOTE]
 > If you use GOWIN EDA or GOWIN Programmer to flash the BRS-100-GW1NR9, ensure that you connect to the board with 'using ftd2xx driver' unselected:
