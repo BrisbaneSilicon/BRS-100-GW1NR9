@@ -151,7 +151,8 @@ function Invoke-ProgrammerCliWithStallDetection {
     param(
         [Parameter(Mandatory)][string]$Exe,
         [Parameter(Mandatory)][string[]]$Arguments,
-        [int]$StallTimeoutSeconds = 10
+        [int]$StallTimeoutSeconds = 3,
+        [switch]$NewConsole
     )
 
     # quote any argument that contains spaces so Start-Process doesn't split it
@@ -162,10 +163,22 @@ function Invoke-ProgrammerCliWithStallDetection {
     $stdoutFile = [System.IO.Path]::GetTempFileName()
     $stderrFile = [System.IO.Path]::GetTempFileName()
 
-    $proc = Start-Process -FilePath $Exe -ArgumentList $argString `
-        -NoNewWindow -PassThru `
-        -RedirectStandardOutput $stdoutFile `
-        -RedirectStandardError  $stderrFile
+    # -NewConsole: use WindowStyle Hidden to get a fresh console host (needed when
+    # the retry must be isolated from the parent session to wake the ftd2xx driver).
+    # Default: -NoNewWindow shares the parent console (normal run).
+    $startArgs = @{
+        FilePath               = $Exe
+        ArgumentList           = $argString
+        PassThru               = $true
+        RedirectStandardOutput = $stdoutFile
+        RedirectStandardError  = $stderrFile
+    }
+    if ($NewConsole) {
+        $startArgs['WindowStyle'] = 'Hidden'
+    } else {
+        $startArgs['NoNewWindow'] = $true
+    }
+    $proc = Start-Process @startArgs
 
     # PS 5.1 quirk: touch Handle before the process can exit so the native
     # handle is pinned; otherwise $proc.ExitCode returns $null after exit.

@@ -78,7 +78,7 @@ function Show-Help {
     Write-Host "`t${boldf}.\program_board.ps1 -jtag_frequency 2.5MHz${normf}`n`t`tProgram at 2.5MHz JTAG speed. Faster but less reliable.`n"
     Write-Host "${boldf}IMPORTANT NOTICE${normf}"
     Write-Host "`tThe Windows ftd2xx driver may cause programmer_cli.exe to hang at embFlash Erase."
-    Write-Host "`tThis script detects the hang automatically (no progress for 10 seconds) and"
+    Write-Host "`tThis script detects the hang automatically (no progress for 3 seconds) and"
     Write-Host "`tkills programmer_cli.exe. To recover: disconnect the USB-C cable for 3-5"
     Write-Host "`tseconds, then reconnect and re-run. See TROUBLESHOOTING.txt for details.`n"
     Write-Host "${boldf}AUTHOR${normf}"
@@ -382,8 +382,8 @@ Write-Host "Bitstream : $FsFile"
 Write-Host "Programmer: $ProgrammerCli"
 Write-Host "====================================="
 Write-Host ""
-Write-Host "  [i] Hang detection active: if no progress appears for 10 s, programmer_cli.exe"
-Write-Host "      will be killed automatically. Replug USB and re-run this script to recover."
+Write-Host "  [i] Hang detection active: if no progress appears for 3 s, auto-recovery"
+Write-Host "      will be attempted. Replug USB and re-run if recovery fails."
 Write-Host ""
 
 # echo exact command line before executing (matches Linux behaviour)
@@ -400,15 +400,11 @@ $result = Invoke-ProgrammerCliWithStallDetection `
 
 # ---- RESULT ----
 if ($result.Stalled) {
-    # programmer_cli was killed by stall detection. an in-process retry
-    # (Start-Process from the current shell) does not wake the wedged ftd2xx
-    # driver - empirically only running programmer_cli from a fresh
-    # powershell.exe wakes it (mirrors the user's manual "open new terminal"
-    # workaround). wrap the retry in `powershell.exe -Command` so the new
-    # programmer_cli is a grandchild of the original shell rather than a
-    # direct child.
+    # programmer_cli was killed. retry via a fresh console (WindowStyle Hidden) to
+    # recreate the isolation of "open a new terminal" - empirically this wakes the
+    # wedged ftd2xx driver. 60 s stall timeout gives the driver time to clear.
     Write-Host ""
-    Write-Host "Stall detected - retrying program command in a fresh shell to wake the ftd2xx driver..."
+    Write-Host "Stall detected - retrying in a fresh console to wake the ftd2xx driver..."
     Write-Host ""
     Write-Host "*** GOWIN programmer_cli Command Line Console (retry) ***"
     Write-Host ""
@@ -417,16 +413,18 @@ if ($result.Stalled) {
 
     $result = Invoke-ProgrammerCliWithStallDetection `
         -Exe "powershell.exe" `
-        -Arguments @('-NoProfile', '-Command', $retryInner)
+        -Arguments @('-NoProfile', '-Command', $retryInner) `
+        -StallTimeoutSeconds 5 `
+        -NewConsole
 }
 
 if ($result.Stalled) {
     Write-Host ""
     Write-Host "====================================="
-    Write-Host " PROGRAMMING FAILED (stalled twice)"
+    Write-Host " PROGRAMMING FAILED (stalled)"
     Write-Host "====================================="
     Write-Host ""
-    Write-Host "ERROR: programmer_cli.exe stalled twice (no progress for 10 s each time)."
+    Write-Host "ERROR: programmer_cli.exe stalled and did not recover."
     Write-Host "       The Windows ftd2xx driver is wedged."
     Write-Host ""
     Write-Host "To recover:"
