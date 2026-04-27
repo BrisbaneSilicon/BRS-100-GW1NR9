@@ -399,22 +399,22 @@ $result = Invoke-ProgrammerCliWithStallDetection `
                  '--operation_index', '5', '--fsFile', $FsFile)
 
 # ---- RESULT ----
-if ($result.Stalled) {
-    # programmer_cli was killed. retry via a fresh console (WindowStyle Hidden) to
-    # recreate the isolation of "open a new terminal" - empirically this wakes the
-    # wedged ftd2xx driver. 60 s stall timeout gives the driver time to clear.
-    Write-Host ""
-    Write-Host "Stall detected - retrying in a fresh console to wake the ftd2xx driver..."
-    Write-Host ""
-    Write-Host "*** GOWIN programmer_cli Command Line Console (retry) ***"
-    Write-Host ""
+# retry via a fresh console (WindowStyle Hidden) to recreate the isolation of
+# "open a new terminal" - empirically this wakes the wedged ftd2xx driver.
+# 60 s stall timeout gives the driver time to clear after each kill.
+$retryInner = "& '$ProgrammerCli' --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile '$FsFile'; exit `$LASTEXITCODE"
 
-    $retryInner = "& '$ProgrammerCli' --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile '$FsFile'; exit `$LASTEXITCODE"
+for ($retry = 1; $retry -le 2 -and $result.Stalled; $retry++) {
+    Write-Host ""
+    Write-Host "Stall detected - retrying in a fresh console (attempt $retry of 2)..."
+    Write-Host ""
+    Write-Host "*** GOWIN programmer_cli Command Line Console (retry $retry) ***"
+    Write-Host ""
 
     $result = Invoke-ProgrammerCliWithStallDetection `
         -Exe "powershell.exe" `
         -Arguments @('-NoProfile', '-Command', $retryInner) `
-        -StallTimeoutSeconds 5 `
+        -StallTimeoutSeconds 10 `
         -NewConsole
 }
 
@@ -425,7 +425,6 @@ if ($result.Stalled) {
     Write-Host "====================================="
     Write-Host ""
     Write-Host "ERROR: programmer_cli.exe stalled and did not recover."
-    Write-Host "       The Windows ftd2xx driver is wedged."
     Write-Host ""
     Write-Host "To recover:"
     Write-Host "  1. Disconnect the USB-C cable"
