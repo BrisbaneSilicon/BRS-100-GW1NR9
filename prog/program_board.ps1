@@ -419,18 +419,45 @@ for ($retry = 1; $retry -le 2 -and $result.Stalled; $retry++) {
 }
 
 if ($result.Stalled) {
+    # all three programming attempts stalled - the ftd2xx driver is wedged.
+    # final recovery: run FT_ResetDevice + FT_CyclePort in a fresh console host
+    # to USB re-enumerate the FTDI chip (equivalent to physical unplug/replug),
+    # so the user's next run starts from a clean driver state.
+    # done in a new console to keep the reset isolated from this (already-wedged)
+    # session, and wrapped in stall detection in case FT_Open itself hangs.
+    Write-Host ""
+    Write-Host "All three programming attempts stalled - attempting FTDI driver reset"
+    Write-Host "in a fresh console..."
+    Write-Host ""
+
+    $resetInner = ". '$PSScriptRoot\program_board_globals.ps1'; . '$PSScriptRoot\program_board_utils.ps1'; Reset-FtdiDevice"
+
+    $resetResult = Invoke-ProgrammerCliWithStallDetection `
+        -Exe "powershell.exe" `
+        -Arguments @('-NoProfile', '-Command', $resetInner) `
+        -StallTimeoutSeconds 10 `
+        -NewConsole
+
     Write-Host ""
     Write-Host "====================================="
     Write-Host " PROGRAMMING FAILED (stalled)"
     Write-Host "====================================="
     Write-Host ""
     Write-Host "ERROR: programmer_cli.exe stalled and did not recover."
-    Write-Host ""
-    Write-Host "To recover:"
-    Write-Host "  1. Disconnect the USB-C cable"
-    Write-Host "  2. Wait 3-5 seconds"
-    Write-Host "  3. Reconnect the cable"
-    Write-Host "  4. Re-run this script"
+
+    if ($resetResult.Stalled) {
+        Write-Host "       FTDI reset also stalled."
+        Write-Host ""
+        Write-Host "To recover:"
+        Write-Host "  1. Disconnect the USB-C cable"
+        Write-Host "  2. Wait 3-5 seconds"
+        Write-Host "  3. Reconnect the cable"
+        Write-Host "  4. Re-run this script"
+    } else {
+        Write-Host "       FTDI driver was reset automatically. Please run the script to program the board again."
+        Write-Host "       (no need to unplug the USB-C cable)."
+    }
+
     Write-Host ""
     Write-Host "See TROUBLESHOOTING.txt for details."
     exit 1
