@@ -78,7 +78,7 @@ function Show-Help {
     Write-Host "`t${boldf}.\program_board.ps1 -jtag_frequency 2.5MHz${normf}`n`t`tProgram at 2.5MHz JTAG speed. Faster but less reliable.`n"
     Write-Host "${boldf}IMPORTANT NOTICE${normf}"
     Write-Host "`tThe Windows ftd2xx driver may cause programmer_cli.exe to hang at embFlash Erase."
-    Write-Host "`tThis script detects the hang automatically (no progress for 10 seconds) and"
+    Write-Host "`tThis script detects the hang automatically (no progress for 3 seconds) and"
     Write-Host "`tkills programmer_cli.exe. To recover: disconnect the USB-C cable for 3-5"
     Write-Host "`tseconds, then reconnect and re-run. See TROUBLESHOOTING.txt for details.`n"
     Write-Host "${boldf}AUTHOR${normf}"
@@ -269,18 +269,6 @@ if ($guiProcesses) {
     exit 1
 }
 
-# ---- RESET FTDI USB DEVICE ----
-# clear any stale ftd2xx handle state from previous programmer_cli invocations.
-# without this, rapid back-to-back programming can hang during embFlash erase
-# because the FTDI chip's state machine never fully released the previous handle.
-Write-Host ""
-$resetResult = Reset-FtdiDevice
-if ($resetResult) {
-    Write-Host "FTDI USB reset complete."
-} else {
-    Write-Host "FTDI USB reset skipped - proceeding anyway."
-}
-
 # ---- SCAN FOR JTAG CABLE ----
 # scan using ftd2xx driver (F flag) - this matches the GUI's "Using ftd2xx driver"
 # checkbox which must be checked for this board to work.
@@ -394,8 +382,8 @@ Write-Host "Bitstream : $FsFile"
 Write-Host "Programmer: $ProgrammerCli"
 Write-Host "====================================="
 Write-Host ""
-Write-Host "  [i] Hang detection active: if no progress appears for 10 s, programmer_cli.exe"
-Write-Host "      will be killed automatically. Replug USB and re-run this script to recover."
+Write-Host "  [i] Hang detection active: if no progress appears for 3 s, auto-recovery"
+Write-Host "      will be attempted. Replug USB and re-run if recovery fails."
 Write-Host ""
 
 # echo exact command line before executing (matches Linux behaviour)
@@ -411,21 +399,65 @@ $result = Invoke-ProgrammerCliWithStallDetection `
                  '--operation_index', '5', '--fsFile', $FsFile)
 
 # ---- RESULT ----
+# retry via a fresh console (WindowStyle Hidden) to recreate the isolation of
+# "open a new terminal" - empirically this wakes the wedged ftd2xx driver.
+# 60 s stall timeout gives the driver time to clear after each kill.
+$retryInner = "& '$ProgrammerCli' --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile '$FsFile'; exit `$LASTEXITCODE"
+
+for ($retry = 1; $retry -le 2 -and $result.Stalled; $retry++) {
+    Write-Host ""
+    Write-Host "Stall detected - retrying in a fresh console (attempt $retry of 2)..."
+    Write-Host ""
+    Write-Host "*** GOWIN programmer_cli Command Line Console (retry $retry) ***"
+    Write-Host ""
+
+    $result = Invoke-ProgrammerCliWithStallDetection `
+        -Exe "powershell.exe" `
+        -Arguments @('-NoProfile', '-Command', $retryInner) `
+        -StallTimeoutSeconds 10 `
+        -NewConsole
+}
+
 if ($result.Stalled) {
+    # all three programming attempts stalled - the ftd2xx driver is wedged.
+    # final recovery: run FT_ResetDevice + FT_CyclePort in a fresh console host
+    # to USB re-enumerate the FTDI chip (equivalent to physical unplug/replug),
+    # so the user's next run starts from a clean driver state.
+    # done in a new console to keep the reset isolated from this (already-wedged)
+    # session, and wrapped in stall detection in case FT_Open itself hangs.
+    Write-Host ""
+    Write-Host "All three programming attempts stalled - attempting FTDI driver reset"
+    Write-Host "in a fresh console..."
+    Write-Host ""
+
+    $resetInner = ". '$PSScriptRoot\program_board_globals.ps1'; . '$PSScriptRoot\program_board_utils.ps1'; Reset-FtdiDevice"
+
+    $resetResult = Invoke-ProgrammerCliWithStallDetection `
+        -Exe "powershell.exe" `
+        -Arguments @('-NoProfile', '-Command', $resetInner) `
+        -StallTimeoutSeconds 10 `
+        -NewConsole
+
     Write-Host ""
     Write-Host "====================================="
-    Write-Host " PROGRAMMING STALLED"
+    Write-Host " PROGRAMMING FAILED (stalled)"
     Write-Host "====================================="
     Write-Host ""
-    Write-Host "ERROR: programmer_cli.exe produced no progress for 10 seconds."
-    Write-Host "       The Windows ftd2xx driver has hung at embFlash Erase."
-    Write-Host "       programmer_cli.exe has been killed."
-    Write-Host ""
-    Write-Host "To recover:"
-    Write-Host "  1. Disconnect the USB-C cable"
-    Write-Host "  2. Wait 3-5 seconds"
-    Write-Host "  3. Reconnect the cable"
-    Write-Host "  4. Re-run this script"
+    Write-Host "ERROR: programmer_cli.exe stalled and did not recover."
+
+    if ($resetResult.Stalled) {
+        Write-Host "       FTDI reset also stalled."
+        Write-Host ""
+        Write-Host "To recover:"
+        Write-Host "  1. Disconnect the USB-C cable"
+        Write-Host "  2. Wait 3-5 seconds"
+        Write-Host "  3. Reconnect the cable"
+        Write-Host "  4. Re-run this script"
+    } else {
+        Write-Host "       FTDI driver was reset automatically. Please run the script to program the board again."
+        Write-Host "       (no need to unplug the USB-C cable)."
+    }
+
     Write-Host ""
     Write-Host "See TROUBLESHOOTING.txt for details."
     exit 1
