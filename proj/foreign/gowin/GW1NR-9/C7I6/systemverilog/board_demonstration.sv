@@ -89,6 +89,16 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
         eHRAM_WRITE,
         eHRAM_READ,
         eHRAM_COMPARE,
+        eJEDEC_INIT_EN,
+        eJEDEC_INIT_OE,
+        eJEDEC_INIT_CSB_HI,
+        eJEDEC_INIT_CSB_LO,
+        eJEDEC_BIT_LO,
+        eJEDEC_BIT_HI,
+        eJEDEC_BIT_CAP,
+        eJEDEC_END,
+        eJEDEC_RESTORE,
+        eJEDEC_COMPARE,
         ePRINT_BUF,
         eIDLE
     } tDEMONSTRATE_SYSTEM_STATE;
@@ -101,6 +111,7 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
         eOUTPUT_NLCR_2,
         eTEST_SRAM,
         eTEST_HRAM,
+        eTEST_FLASH_ID,
         eNONE
     } tSTARTUP_TASKS;
 
@@ -122,6 +133,15 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
     reg                         [5:0]                   print_idx;
     reg                         [5:0]                   print_len;
     reg                         [7:0]                   hram_init_us;
+
+    reg                         [5:0]                   jedec_bit_idx;
+    reg                         [23:0]                  jedec_id_in;
+
+    localparam [7:0]  JEDEC_CMD         = 8'h9F;
+    localparam [23:0] EXPECTED_JEDEC_ID = 24'h85_6016;
+
+    wire [2:0] jedec_tx_idx   = 3'd7 - jedec_bit_idx[2:0];
+    wire       jedec_mosi_bit = (jedec_bit_idx < 6'd8) ? JEDEC_CMD[jedec_tx_idx] : 1'b0;
 
     function automatic [7:0] hex_nibble;
         input [3:0] n;
@@ -201,9 +221,16 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                 end
 
                 if (i_next_startup_task == eTEST_HRAM) begin
-                    i_next_startup_task <= eNONE;
+                    i_next_startup_task <= eTEST_FLASH_ID;
                     hram_init_us        <= 8'd0;
                     i_demo_system_state <= eHRAM_WAIT;
+                end
+
+                if (i_next_startup_task == eTEST_FLASH_ID) begin
+                    i_next_startup_task <= eNONE;
+                    jedec_bit_idx       <= 6'd0;
+                    jedec_id_in         <= 24'h0;
+                    i_demo_system_state <= eJEDEC_INIT_EN;
                 end
 
                 if (i_next_startup_task == eNONE) begin
@@ -368,6 +395,144 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                     print_buf[58] <= ")";
                     print_buf[59] <= 8'h0D; print_buf[60] <= 8'h0A;
                     print_len <= 6'd61;
+                end
+                print_idx <= 6'd0;
+                i_demo_system_state <= ePRINT_BUF;
+            end
+
+            eJEDEC_INIT_EN:                                                     begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b1000;
+                flash_cfg_wdata <= 32'h0000_0000;  // config_en = 0 (cfg-mode)
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= eJEDEC_INIT_OE;
+                end
+            end
+
+            eJEDEC_INIT_OE:                                                     begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0010;
+                flash_cfg_wdata <= 32'h0000_0100;  // oe = 4'b0001 (MOSI=out, MISO=in)
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= eJEDEC_INIT_CSB_HI;
+                end
+            end
+
+            eJEDEC_INIT_CSB_HI:                                                 begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0001;
+                flash_cfg_wdata <= 32'h0000_0020;  // CSB=1, CLK=0, MOSI=0
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= eJEDEC_INIT_CSB_LO;
+                end
+            end
+
+            eJEDEC_INIT_CSB_LO:                                                 begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0001;
+                flash_cfg_wdata <= 32'h0000_0000;  // CSB=0, CLK=0, MOSI=0
+                if (flash_cfg_ready) begin
+                    jedec_bit_idx       <= 6'd0;
+                    i_demo_system_state <= eJEDEC_BIT_LO;
+                end
+            end
+
+            eJEDEC_BIT_LO:                                                      begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0001;
+                flash_cfg_wdata <= {26'h0, 1'b0, 1'b0, 3'h0, jedec_mosi_bit};
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= eJEDEC_BIT_HI;
+                end
+            end
+
+            eJEDEC_BIT_HI:                                                      begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0001;
+                flash_cfg_wdata <= {26'h0, 1'b0, 1'b1, 3'h0, jedec_mosi_bit};
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= eJEDEC_BIT_CAP;
+                end
+            end
+
+            eJEDEC_BIT_CAP:                                                     begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0000;  // pure read
+                if (flash_cfg_ready) begin
+                    if (jedec_bit_idx >= 6'd8) begin
+                        jedec_id_in <= {jedec_id_in[22:0], flash_cfg_rdata[1]};
+                    end
+                    if (jedec_bit_idx == 6'd31) begin
+                        i_demo_system_state <= eJEDEC_END;
+                    end else begin
+                        jedec_bit_idx       <= jedec_bit_idx + 6'd1;
+                        i_demo_system_state <= eJEDEC_BIT_LO;
+                    end
+                end
+            end
+
+            eJEDEC_END:                                                         begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0001;
+                flash_cfg_wdata <= 32'h0000_0020;  // CSB=1, CLK=0, MOSI=0
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= eJEDEC_RESTORE;
+                end
+            end
+
+            eJEDEC_RESTORE:                                                     begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b1000;
+                flash_cfg_wdata <= 32'h8000_0000;  // config_en = 1 (XIP mode)
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= eJEDEC_COMPARE;
+                end
+            end
+
+            eJEDEC_COMPARE:                                                     begin
+                // "Testing Flash ID... "
+                print_buf[0]  <= "T"; print_buf[1]  <= "e"; print_buf[2]  <= "s";
+                print_buf[3]  <= "t"; print_buf[4]  <= "i"; print_buf[5]  <= "n";
+                print_buf[6]  <= "g"; print_buf[7]  <= " "; print_buf[8]  <= "F";
+                print_buf[9]  <= "l"; print_buf[10] <= "a"; print_buf[11] <= "s";
+                print_buf[12] <= "h"; print_buf[13] <= " "; print_buf[14] <= "I";
+                print_buf[15] <= "D"; print_buf[16] <= "."; print_buf[17] <= ".";
+                print_buf[18] <= "."; print_buf[19] <= " ";
+                if (jedec_id_in == EXPECTED_JEDEC_ID) begin
+                    print_buf[20] <= "p"; print_buf[21] <= "a";
+                    print_buf[22] <= "s"; print_buf[23] <= "s";
+                    print_buf[24] <= 8'h0D; print_buf[25] <= 8'h0A;
+                    print_len <= 6'd26;
+                end else begin
+                    // "FAIL (read 0xXXXXXX expected 0xYYYYYY)\r\n"
+                    print_buf[20] <= "F"; print_buf[21] <= "A";
+                    print_buf[22] <= "I"; print_buf[23] <= "L";
+                    print_buf[24] <= " "; print_buf[25] <= "(";
+                    print_buf[26] <= "r"; print_buf[27] <= "e";
+                    print_buf[28] <= "a"; print_buf[29] <= "d";
+                    print_buf[30] <= " "; print_buf[31] <= "0";
+                    print_buf[32] <= "x";
+                    print_buf[33] <= hex_nibble(jedec_id_in[23:20]);
+                    print_buf[34] <= hex_nibble(jedec_id_in[19:16]);
+                    print_buf[35] <= hex_nibble(jedec_id_in[15:12]);
+                    print_buf[36] <= hex_nibble(jedec_id_in[11:8]);
+                    print_buf[37] <= hex_nibble(jedec_id_in[7:4]);
+                    print_buf[38] <= hex_nibble(jedec_id_in[3:0]);
+                    print_buf[39] <= " "; print_buf[40] <= "e";
+                    print_buf[41] <= "x"; print_buf[42] <= "p";
+                    print_buf[43] <= "e"; print_buf[44] <= "c";
+                    print_buf[45] <= "t"; print_buf[46] <= "e";
+                    print_buf[47] <= "d"; print_buf[48] <= " ";
+                    print_buf[49] <= "0"; print_buf[50] <= "x";
+                    print_buf[51] <= hex_nibble(EXPECTED_JEDEC_ID[23:20]);
+                    print_buf[52] <= hex_nibble(EXPECTED_JEDEC_ID[19:16]);
+                    print_buf[53] <= hex_nibble(EXPECTED_JEDEC_ID[15:12]);
+                    print_buf[54] <= hex_nibble(EXPECTED_JEDEC_ID[11:8]);
+                    print_buf[55] <= hex_nibble(EXPECTED_JEDEC_ID[7:4]);
+                    print_buf[56] <= hex_nibble(EXPECTED_JEDEC_ID[3:0]);
+                    print_buf[57] <= ")";
+                    print_buf[58] <= 8'h0D; print_buf[59] <= 8'h0A;
+                    print_len <= 6'd60;
                 end
                 print_idx <= 6'd0;
                 i_demo_system_state <= ePRINT_BUF;
