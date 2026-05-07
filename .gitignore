@@ -4,3 +4,4 @@ CLAUDE.md
 /build/output
 .claude/
 stress_test_program_board.ps1
+stage0_debug.md

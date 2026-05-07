@@ -261,7 +261,28 @@ localparam CS_WIDTH         = 2;
                 .uart_tx_data       (i_uart_tx_data),
                 .uart_rx_valid      (i_uart_rx_valid),
                 .uart_rx_ready      (i_uart_rx_ready),
-                .uart_rx_data       (i_uart_rx_data)
+                .uart_rx_data       (i_uart_rx_data),
+
+                .ram_addr           (i_ram_addr),
+                .ram_wdata          (i_ram_wdata),
+                .ram_wstrb          (i_ram_wstrb),
+                .ram_rdata          (i_ram_rdata),
+                .ram_valid          (i_ram_valid),
+                .ram_ready          (i_ram_ready),
+
+                .flash_cfg_addr     (i_flash_cfg_addr),
+                .flash_cfg_wdata    (i_flash_cfg_wdata),
+                .flash_cfg_wstrb    (i_flash_cfg_wstrb),
+                .flash_cfg_rdata    (i_flash_cfg_rdata),
+                .flash_cfg_valid    (i_flash_cfg_valid),
+                .flash_cfg_ready    (i_flash_cfg_ready),
+
+                .flash_xip_addr     (i_flash_xip_addr),
+                .flash_xip_wdata    (i_flash_xip_wdata),
+                .flash_xip_wstrb    (i_flash_xip_wstrb),
+                .flash_xip_rdata    (i_flash_xip_rdata),
+                .flash_xip_valid    (i_flash_xip_valid),
+                .flash_xip_ready    (i_flash_xip_ready)
             );
 
             assign pad_leds_n = ~i_top_leds;
@@ -271,20 +292,6 @@ localparam CS_WIDTH         = 2;
                 //          led[2]: hyperram activity
                 //          led[1]: uart activity
                 //          led[0]: heartbeat
-
-            // Memory buses idle in demo mode
-            assign i_ram_addr        = 32'd0;
-            assign i_ram_wdata       = 32'd0;
-            assign i_ram_wstrb       = 4'd0;
-            assign i_ram_valid       = 1'b0;
-            assign i_flash_cfg_addr  = 32'd0;
-            assign i_flash_cfg_wdata = 32'd0;
-            assign i_flash_cfg_wstrb = 4'd0;
-            assign i_flash_cfg_valid = 1'b0;
-            assign i_flash_xip_addr  = 32'd0;
-            assign i_flash_xip_wdata = 32'd0;
-            assign i_flash_xip_wstrb = 4'd0;
-            assign i_flash_xip_valid = 1'b0;
 
         end else begin
 
