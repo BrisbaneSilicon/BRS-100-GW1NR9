@@ -85,6 +85,10 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
         eSRAM_WRITE,
         eSRAM_READ,
         eSRAM_COMPARE,
+        eHRAM_WAIT,
+        eHRAM_WRITE,
+        eHRAM_READ,
+        eHRAM_COMPARE,
         ePRINT_BUF,
         eIDLE
     } tDEMONSTRATE_SYSTEM_STATE;
@@ -96,6 +100,7 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
         eOUTPUT_VERSION_MSG,
         eOUTPUT_NLCR_2,
         eTEST_SRAM,
+        eTEST_HRAM,
         eNONE
     } tSTARTUP_TASKS;
 
@@ -116,6 +121,7 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
     reg                         [7:0]                   print_buf [0:63];
     reg                         [5:0]                   print_idx;
     reg                         [5:0]                   print_len;
+    reg                         [7:0]                   hram_init_us;
 
     function automatic [7:0] hex_nibble;
         input [3:0] n;
@@ -190,8 +196,14 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                 end
 
                 if (i_next_startup_task == eTEST_SRAM) begin
-                    i_next_startup_task <= eNONE;
+                    i_next_startup_task <= eTEST_HRAM;
                     i_demo_system_state <= eSRAM_WRITE;
+                end
+
+                if (i_next_startup_task == eTEST_HRAM) begin
+                    i_next_startup_task <= eNONE;
+                    hram_init_us        <= 8'd0;
+                    i_demo_system_state <= eHRAM_WAIT;
                 end
 
                 if (i_next_startup_task == eNONE) begin
@@ -277,6 +289,85 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                     print_buf[54] <= ")";
                     print_buf[55] <= 8'h0D; print_buf[56] <= 8'h0A;
                     print_len <= 6'd57;
+                end
+                print_idx <= 6'd0;
+                i_demo_system_state <= ePRINT_BUF;
+            end
+
+            eHRAM_WAIT:                                                         begin
+                // HyperRAM controller needs ~160us after reset; 250us is safe margin.
+                // The 1s startup delay already covers this, but keep the wait for
+                // correctness if the board is reset without full power cycle.
+                if (microsecond_tick) begin
+                    hram_init_us <= hram_init_us + 8'd1;
+                    if (hram_init_us == 8'd249) begin
+                        i_demo_system_state <= eHRAM_WRITE;
+                    end
+                end
+            end
+
+            eHRAM_WRITE:                                                        begin
+                ram_valid <= 1'b1;
+                ram_addr  <= 32'h0000_8000;
+                ram_wdata <= 32'h5445_5354;
+                ram_wstrb <= 4'hF;
+                if (ram_ready) begin
+                    i_demo_system_state <= eHRAM_READ;
+                end
+            end
+
+            eHRAM_READ:                                                         begin
+                ram_valid <= 1'b1;
+                ram_addr  <= 32'h0000_8000;
+                ram_wstrb <= 4'h0;
+                if (ram_ready) begin
+                    readback            <= ram_rdata;
+                    i_demo_system_state <= eHRAM_COMPARE;
+                end
+            end
+
+            eHRAM_COMPARE:                                                      begin
+                // "Testing HyperRAM... "
+                print_buf[0]  <= "T"; print_buf[1]  <= "e"; print_buf[2]  <= "s";
+                print_buf[3]  <= "t"; print_buf[4]  <= "i"; print_buf[5]  <= "n";
+                print_buf[6]  <= "g"; print_buf[7]  <= " "; print_buf[8]  <= "H";
+                print_buf[9]  <= "y"; print_buf[10] <= "p"; print_buf[11] <= "e";
+                print_buf[12] <= "r"; print_buf[13] <= "R"; print_buf[14] <= "A";
+                print_buf[15] <= "M"; print_buf[16] <= "."; print_buf[17] <= ".";
+                print_buf[18] <= "."; print_buf[19] <= " ";
+                if (readback == 32'h5445_5354) begin
+                    print_buf[20] <= "p"; print_buf[21] <= "a";
+                    print_buf[22] <= "s"; print_buf[23] <= "s";
+                    print_buf[24] <= 8'h0D; print_buf[25] <= 8'h0A;
+                    print_len <= 6'd26;
+                end else begin
+                    // "FAIL (wrote 0x54455354 read 0xRRRRRRRR)\r\n"
+                    print_buf[20] <= "F"; print_buf[21] <= "A";
+                    print_buf[22] <= "I"; print_buf[23] <= "L";
+                    print_buf[24] <= " "; print_buf[25] <= "(";
+                    print_buf[26] <= "w"; print_buf[27] <= "r";
+                    print_buf[28] <= "o"; print_buf[29] <= "t";
+                    print_buf[30] <= "e"; print_buf[31] <= " ";
+                    print_buf[32] <= "0"; print_buf[33] <= "x";
+                    print_buf[34] <= "5"; print_buf[35] <= "4";
+                    print_buf[36] <= "4"; print_buf[37] <= "5";
+                    print_buf[38] <= "5"; print_buf[39] <= "3";
+                    print_buf[40] <= "5"; print_buf[41] <= "4";
+                    print_buf[42] <= " "; print_buf[43] <= "r";
+                    print_buf[44] <= "e"; print_buf[45] <= "a";
+                    print_buf[46] <= "d"; print_buf[47] <= " ";
+                    print_buf[48] <= "0"; print_buf[49] <= "x";
+                    print_buf[50] <= hex_nibble(readback[31:28]);
+                    print_buf[51] <= hex_nibble(readback[27:24]);
+                    print_buf[52] <= hex_nibble(readback[23:20]);
+                    print_buf[53] <= hex_nibble(readback[19:16]);
+                    print_buf[54] <= hex_nibble(readback[15:12]);
+                    print_buf[55] <= hex_nibble(readback[11:8]);
+                    print_buf[56] <= hex_nibble(readback[7:4]);
+                    print_buf[57] <= hex_nibble(readback[3:0]);
+                    print_buf[58] <= ")";
+                    print_buf[59] <= 8'h0D; print_buf[60] <= 8'h0A;
+                    print_len <= 6'd61;
                 end
                 print_idx <= 6'd0;
                 i_demo_system_state <= ePRINT_BUF;
