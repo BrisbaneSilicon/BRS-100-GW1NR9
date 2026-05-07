@@ -1,3 +1,29 @@
+// =========================================================================
+// STAGE 1A: Add memory bus ports to top.sv
+// =========================================================================
+// Changes Made:
+//
+// 1. Added 18 new fabric ports (lines 76-97):
+//    - ram_* (6 signals): SRAM/HyperRAM bus
+//    - flash_cfg_* (6 signals): Flash config bus
+//    - flash_xip_* (6 signals): Flash XIP bus
+//
+// 2. Changed 12 internal signals from 'reg' to 'wire' (lines 127-153):
+//    - i_mbus_sram_addr, wdata, wstrb, valid → wire
+//    - i_mbus_spimemcfg_addr, wdata, wstrb, valid → wire
+//    - i_mbus_spimemxip_addr, wdata, wstrb, valid → wire
+//    - Memory-response signals (rdata, ready) remain 'reg'
+//    - saxisce signals (lines 141-146) untouched
+//
+// 3. Added 18 assign statements (lines 469-493):
+//    - Connect flat ports to internal memory buses
+//    - SRAM uses [0] indexing to flatten [0:0][31:0] → [31:0]
+//    - Flash config and XIP connect directly
+//
+// Status: Stage 1A complete. Wrapper generators and user.sv still need ports.
+//         Build verification happens after Stage 1C.
+// =========================================================================
+
 // -------------------------------------------------------------------------
 // COPYRIGHT © 2025, BRISBANE SILICON, PTY LTD.
 //

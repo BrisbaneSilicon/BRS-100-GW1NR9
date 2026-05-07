@@ -101,7 +101,7 @@ module psram_controller #(
 
                 dq_oen <= 1;
             end
-            if (cycles_sr[9])
+            if (cycles_sr[2+LATENCY])
                 wait_for_rd_data <= 1;
             if (wait_for_rd_data && (rwds_in_ris ^ rwds_in_fal)) begin
                 dout        <= {dq_in_ris, dq_in_fal};
