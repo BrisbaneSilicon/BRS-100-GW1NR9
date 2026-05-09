@@ -99,6 +99,25 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
         eJEDEC_END,
         eJEDEC_RESTORE,
         eJEDEC_COMPARE,
+        eFW_INIT_EN,
+        eFW_INIT_OE,
+        eFW_INIT_CSB_HI,
+        eFW_SETUP_WREN_ERASE,
+        eFW_SETUP_ERASE,
+        eFW_SETUP_POLL_ERASE,
+        eFW_CHECK_POLL_ERASE,
+        eFW_SETUP_WREN_PROGRAM,
+        eFW_SETUP_PROGRAM,
+        eFW_SETUP_POLL_PROGRAM,
+        eFW_CHECK_POLL_PROGRAM,
+        eFW_SPI_CSB_LO,
+        eFW_SPI_BIT_LO,
+        eFW_SPI_BIT_HI,
+        eFW_SPI_BIT_CAP,
+        eFW_SPI_END,
+        eFW_RESTORE,
+        eFW_XIP_READ,
+        eFW_COMPARE,
         ePRINT_BUF,
         eIDLE
     } tDEMONSTRATE_SYSTEM_STATE;
@@ -112,6 +131,7 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
         eTEST_SRAM,
         eTEST_HRAM,
         eTEST_FLASH_ID,
+        eTEST_FLASH_WRV,
         eNONE
     } tSTARTUP_TASKS;
 
@@ -130,8 +150,8 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
 
     reg                         [31:0]                  readback;
     reg                         [7:0]                   print_buf [0:63];
-    reg                         [5:0]                   print_idx;
-    reg                         [5:0]                   print_len;
+    reg                         [6:0]                   print_idx;
+    reg                         [6:0]                   print_len;
     reg                         [7:0]                   hram_init_us;
 
     reg                         [5:0]                   jedec_bit_idx;
@@ -139,9 +159,24 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
 
     localparam [7:0]  JEDEC_CMD         = 8'h9F;
     localparam [23:0] EXPECTED_JEDEC_ID = 24'h85_6016;
+    localparam [23:0] FLASH_TEST_ADDR   = 24'h01_0000;
+    localparam [31:0] FLASH_TEST_DATA   = 32'hABCD_ABCD;
+    localparam [7:0]  FLASH_CMD_WREN    = 8'h06;
+    localparam [7:0]  FLASH_CMD_RDSR    = 8'h05;
+    localparam [7:0]  FLASH_CMD_ERASE   = 8'h20;
+    localparam [7:0]  FLASH_CMD_PROGRAM = 8'h02;
+    localparam [9:0]  FLASH_POLL_LIMIT  = 10'd1000;
 
     wire [2:0] jedec_tx_idx   = 3'd7 - jedec_bit_idx[2:0];
     wire       jedec_mosi_bit = (jedec_bit_idx < 6'd8) ? JEDEC_CMD[jedec_tx_idx] : 1'b0;
+
+    reg                         [63:0]                  fw_shift;
+    reg                         [6:0]                   fw_bit_idx;
+    reg                         [6:0]                   fw_bit_count;
+    reg                         [7:0]                   fw_status;
+    reg                         [9:0]                   fw_poll_ms;
+    reg                                                 fw_capture_status;
+    tDEMONSTRATE_SYSTEM_STATE                           fw_next_state;
 
     function automatic [7:0] hex_nibble;
         input [3:0] n;
@@ -227,10 +262,16 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                 end
 
                 if (i_next_startup_task == eTEST_FLASH_ID) begin
-                    i_next_startup_task <= eNONE;
+                    i_next_startup_task <= eTEST_FLASH_WRV;
                     jedec_bit_idx       <= 6'd0;
                     jedec_id_in         <= 24'h0;
                     i_demo_system_state <= eJEDEC_INIT_EN;
+                end
+
+                if (i_next_startup_task == eTEST_FLASH_WRV) begin
+                    i_next_startup_task <= eNONE;
+                    fw_poll_ms          <= 10'd0;
+                    i_demo_system_state <= eFW_INIT_EN;
                 end
 
                 if (i_next_startup_task == eNONE) begin
@@ -258,7 +299,7 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
             eSRAM_WRITE:                                                        begin
                 ram_valid <= 1'b1;
                 ram_addr  <= 32'h0000_0000;
-                ram_wdata <= 32'h5445_5354;
+                ram_wdata <= 32'hABCD_ABCD;
                 ram_wstrb <= 4'hF;
                 if (ram_ready) begin
                     i_demo_system_state <= eSRAM_READ;
@@ -283,13 +324,13 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                 print_buf[9]  <= "R"; print_buf[10] <= "A"; print_buf[11] <= "M";
                 print_buf[12] <= "."; print_buf[13] <= "."; print_buf[14] <= ".";
                 print_buf[15] <= " ";
-                if (readback == 32'h5445_5354) begin
+                if (readback == 32'hABCD_ABCD) begin
                     print_buf[16] <= "p"; print_buf[17] <= "a";
                     print_buf[18] <= "s"; print_buf[19] <= "s";
                     print_buf[20] <= 8'h0D; print_buf[21] <= 8'h0A;
-                    print_len <= 6'd22;
+                    print_len <= 7'd22;
                 end else begin
-                    // "FAIL (wrote 0x54455354 read 0xRRRRRRRR)\r\n"
+                    // "FAIL (wrote 0xABCDABCD read 0xRRRRRRRR)\r\n"
                     print_buf[16] <= "F"; print_buf[17] <= "A";
                     print_buf[18] <= "I"; print_buf[19] <= "L";
                     print_buf[20] <= " "; print_buf[21] <= "(";
@@ -297,10 +338,10 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                     print_buf[24] <= "o"; print_buf[25] <= "t";
                     print_buf[26] <= "e"; print_buf[27] <= " ";
                     print_buf[28] <= "0"; print_buf[29] <= "x";
-                    print_buf[30] <= "5"; print_buf[31] <= "4";
-                    print_buf[32] <= "4"; print_buf[33] <= "5";
-                    print_buf[34] <= "5"; print_buf[35] <= "3";
-                    print_buf[36] <= "5"; print_buf[37] <= "4";
+                    print_buf[30] <= "A"; print_buf[31] <= "B";
+                    print_buf[32] <= "C"; print_buf[33] <= "D";
+                    print_buf[34] <= "A"; print_buf[35] <= "B";
+                    print_buf[36] <= "C"; print_buf[37] <= "D";
                     print_buf[38] <= " "; print_buf[39] <= "r";
                     print_buf[40] <= "e"; print_buf[41] <= "a";
                     print_buf[42] <= "d"; print_buf[43] <= " ";
@@ -315,9 +356,9 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                     print_buf[53] <= hex_nibble(readback[3:0]);
                     print_buf[54] <= ")";
                     print_buf[55] <= 8'h0D; print_buf[56] <= 8'h0A;
-                    print_len <= 6'd57;
+                    print_len <= 7'd57;
                 end
-                print_idx <= 6'd0;
+                print_idx <= 7'd0;
                 i_demo_system_state <= ePRINT_BUF;
             end
 
@@ -336,7 +377,7 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
             eHRAM_WRITE:                                                        begin
                 ram_valid <= 1'b1;
                 ram_addr  <= 32'h0000_8000;
-                ram_wdata <= 32'h5445_5354;
+                ram_wdata <= 32'hABCD_ABCD;
                 ram_wstrb <= 4'hF;
                 if (ram_ready) begin
                     i_demo_system_state <= eHRAM_READ;
@@ -362,13 +403,13 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                 print_buf[12] <= "r"; print_buf[13] <= "R"; print_buf[14] <= "A";
                 print_buf[15] <= "M"; print_buf[16] <= "."; print_buf[17] <= ".";
                 print_buf[18] <= "."; print_buf[19] <= " ";
-                if (readback == 32'h5445_5354) begin
+                if (readback == 32'hABCD_ABCD) begin
                     print_buf[20] <= "p"; print_buf[21] <= "a";
                     print_buf[22] <= "s"; print_buf[23] <= "s";
                     print_buf[24] <= 8'h0D; print_buf[25] <= 8'h0A;
-                    print_len <= 6'd26;
+                    print_len <= 7'd26;
                 end else begin
-                    // "FAIL (wrote 0x54455354 read 0xRRRRRRRR)\r\n"
+                    // "FAIL (wrote 0xABCDABCD read 0xRRRRRRRR)\r\n"
                     print_buf[20] <= "F"; print_buf[21] <= "A";
                     print_buf[22] <= "I"; print_buf[23] <= "L";
                     print_buf[24] <= " "; print_buf[25] <= "(";
@@ -376,10 +417,10 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                     print_buf[28] <= "o"; print_buf[29] <= "t";
                     print_buf[30] <= "e"; print_buf[31] <= " ";
                     print_buf[32] <= "0"; print_buf[33] <= "x";
-                    print_buf[34] <= "5"; print_buf[35] <= "4";
-                    print_buf[36] <= "4"; print_buf[37] <= "5";
-                    print_buf[38] <= "5"; print_buf[39] <= "3";
-                    print_buf[40] <= "5"; print_buf[41] <= "4";
+                    print_buf[34] <= "A"; print_buf[35] <= "B";
+                    print_buf[36] <= "C"; print_buf[37] <= "D";
+                    print_buf[38] <= "A"; print_buf[39] <= "B";
+                    print_buf[40] <= "C"; print_buf[41] <= "D";
                     print_buf[42] <= " "; print_buf[43] <= "r";
                     print_buf[44] <= "e"; print_buf[45] <= "a";
                     print_buf[46] <= "d"; print_buf[47] <= " ";
@@ -394,9 +435,9 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                     print_buf[57] <= hex_nibble(readback[3:0]);
                     print_buf[58] <= ")";
                     print_buf[59] <= 8'h0D; print_buf[60] <= 8'h0A;
-                    print_len <= 6'd61;
+                    print_len <= 7'd61;
                 end
-                print_idx <= 6'd0;
+                print_idx <= 7'd0;
                 i_demo_system_state <= ePRINT_BUF;
             end
 
@@ -502,7 +543,7 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                     print_buf[20] <= "p"; print_buf[21] <= "a";
                     print_buf[22] <= "s"; print_buf[23] <= "s";
                     print_buf[24] <= 8'h0D; print_buf[25] <= 8'h0A;
-                    print_len <= 6'd26;
+                    print_len <= 7'd26;
                 end else begin
                     // "FAIL (read 0xXXXXXX expected 0xYYYYYY)\r\n"
                     print_buf[20] <= "F"; print_buf[21] <= "A";
@@ -532,9 +573,254 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                     print_buf[56] <= hex_nibble(EXPECTED_JEDEC_ID[3:0]);
                     print_buf[57] <= ")";
                     print_buf[58] <= 8'h0D; print_buf[59] <= 8'h0A;
-                    print_len <= 6'd60;
+                    print_len <= 7'd60;
                 end
-                print_idx <= 6'd0;
+                print_idx <= 7'd0;
+                i_demo_system_state <= ePRINT_BUF;
+            end
+
+            eFW_INIT_EN:                                                        begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b1000;
+                flash_cfg_wdata <= 32'h0000_0000;  // config_en = 0 (cfg-mode)
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= eFW_INIT_OE;
+                end
+            end
+
+            eFW_INIT_OE:                                                        begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0010;
+                flash_cfg_wdata <= 32'h0000_0100;  // oe = 4'b0001 (MOSI=out, MISO=in)
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= eFW_INIT_CSB_HI;
+                end
+            end
+
+            eFW_INIT_CSB_HI:                                                    begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0001;
+                flash_cfg_wdata <= 32'h0000_0020;  // CSB=1, CLK=0, MOSI=0
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= eFW_SETUP_WREN_ERASE;
+                end
+            end
+
+            eFW_SETUP_WREN_ERASE:                                               begin
+                fw_shift          <= {FLASH_CMD_WREN, 56'd0};
+                fw_bit_idx        <= 7'd0;
+                fw_bit_count      <= 7'd8;
+                fw_capture_status <= 1'b0;
+                fw_next_state     <= eFW_SETUP_ERASE;
+                i_demo_system_state <= eFW_SPI_CSB_LO;
+            end
+
+            eFW_SETUP_ERASE:                                                    begin
+                fw_shift          <= {FLASH_CMD_ERASE, FLASH_TEST_ADDR, 32'd0};
+                fw_bit_idx        <= 7'd0;
+                fw_bit_count      <= 7'd32;
+                fw_capture_status <= 1'b0;
+                fw_next_state     <= eFW_SETUP_POLL_ERASE;
+                fw_poll_ms        <= 10'd0;
+                i_demo_system_state <= eFW_SPI_CSB_LO;
+            end
+
+            eFW_SETUP_POLL_ERASE:                                               begin
+                fw_shift          <= {FLASH_CMD_RDSR, 56'd0};
+                fw_bit_idx        <= 7'd0;
+                fw_bit_count      <= 7'd16;
+                fw_status         <= 8'd0;
+                fw_capture_status <= 1'b1;
+                fw_next_state     <= eFW_CHECK_POLL_ERASE;
+                i_demo_system_state <= eFW_SPI_CSB_LO;
+            end
+
+            eFW_CHECK_POLL_ERASE:                                               begin
+                if (fw_status[0]) begin
+                    if (millisecond_tick) begin
+                        if (fw_poll_ms == FLASH_POLL_LIMIT) begin
+                            readback            <= {24'd0, fw_status};
+                            fw_next_state       <= eFW_COMPARE;
+                            i_demo_system_state <= eFW_RESTORE;
+                        end else begin
+                            fw_poll_ms          <= fw_poll_ms + 10'd1;
+                            i_demo_system_state <= eFW_SETUP_POLL_ERASE;
+                        end
+                    end
+                end else begin
+                    fw_poll_ms          <= 10'd0;
+                    i_demo_system_state <= eFW_SETUP_WREN_PROGRAM;
+                end
+            end
+
+            eFW_SETUP_WREN_PROGRAM:                                             begin
+                fw_shift          <= {FLASH_CMD_WREN, 56'd0};
+                fw_bit_idx        <= 7'd0;
+                fw_bit_count      <= 7'd8;
+                fw_capture_status <= 1'b0;
+                fw_next_state     <= eFW_SETUP_PROGRAM;
+                i_demo_system_state <= eFW_SPI_CSB_LO;
+            end
+
+            eFW_SETUP_PROGRAM:                                                  begin
+                fw_shift          <= {FLASH_CMD_PROGRAM, FLASH_TEST_ADDR,
+                                      FLASH_TEST_DATA[7:0],
+                                      FLASH_TEST_DATA[15:8],
+                                      FLASH_TEST_DATA[23:16],
+                                      FLASH_TEST_DATA[31:24]};
+                fw_bit_idx        <= 7'd0;
+                fw_bit_count      <= 7'd64;
+                fw_capture_status <= 1'b0;
+                fw_next_state     <= eFW_SETUP_POLL_PROGRAM;
+                fw_poll_ms        <= 10'd0;
+                i_demo_system_state <= eFW_SPI_CSB_LO;
+            end
+
+            eFW_SETUP_POLL_PROGRAM:                                             begin
+                fw_shift          <= {FLASH_CMD_RDSR, 56'd0};
+                fw_bit_idx        <= 7'd0;
+                fw_bit_count      <= 7'd16;
+                fw_status         <= 8'd0;
+                fw_capture_status <= 1'b1;
+                fw_next_state     <= eFW_CHECK_POLL_PROGRAM;
+                i_demo_system_state <= eFW_SPI_CSB_LO;
+            end
+
+            eFW_CHECK_POLL_PROGRAM:                                             begin
+                if (fw_status[0]) begin
+                    if (millisecond_tick) begin
+                        if (fw_poll_ms == FLASH_POLL_LIMIT) begin
+                            readback            <= {24'd0, fw_status};
+                            fw_next_state       <= eFW_COMPARE;
+                            i_demo_system_state <= eFW_RESTORE;
+                        end else begin
+                            fw_poll_ms          <= fw_poll_ms + 10'd1;
+                            i_demo_system_state <= eFW_SETUP_POLL_PROGRAM;
+                        end
+                    end
+                end else begin
+                    fw_next_state       <= eFW_XIP_READ;
+                    i_demo_system_state <= eFW_RESTORE;
+                end
+            end
+
+            eFW_SPI_CSB_LO:                                                     begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0001;
+                flash_cfg_wdata <= 32'h0000_0000;  // CSB=0, CLK=0, MOSI=0
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= eFW_SPI_BIT_LO;
+                end
+            end
+
+            eFW_SPI_BIT_LO:                                                     begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0001;
+                flash_cfg_wdata <= {26'h0, 1'b0, 1'b0, 3'h0, fw_shift[63]};
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= eFW_SPI_BIT_HI;
+                end
+            end
+
+            eFW_SPI_BIT_HI:                                                     begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0001;
+                flash_cfg_wdata <= {26'h0, 1'b0, 1'b1, 3'h0, fw_shift[63]};
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= eFW_SPI_BIT_CAP;
+                end
+            end
+
+            eFW_SPI_BIT_CAP:                                                    begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0000;
+                if (flash_cfg_ready) begin
+                    if (fw_capture_status && fw_bit_idx >= 7'd8) begin
+                        fw_status <= {fw_status[6:0], flash_cfg_rdata[1]};
+                    end
+                    fw_shift <= {fw_shift[62:0], 1'b0};
+                    if (fw_bit_idx + 7'd1 == fw_bit_count) begin
+                        i_demo_system_state <= eFW_SPI_END;
+                    end else begin
+                        fw_bit_idx          <= fw_bit_idx + 7'd1;
+                        i_demo_system_state <= eFW_SPI_BIT_LO;
+                    end
+                end
+            end
+
+            eFW_SPI_END:                                                        begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b0001;
+                flash_cfg_wdata <= 32'h0000_0020;  // CSB=1, CLK=0, MOSI=0
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= fw_next_state;
+                end
+            end
+
+            eFW_RESTORE:                                                        begin
+                flash_cfg_valid <= 1'b1;
+                flash_cfg_wstrb <= 4'b1000;
+                flash_cfg_wdata <= 32'h8000_0000;  // config_en = 1 (XIP mode)
+                if (flash_cfg_ready) begin
+                    i_demo_system_state <= fw_next_state;
+                end
+            end
+
+            eFW_XIP_READ:                                                       begin
+                flash_xip_valid <= 1'b1;
+                flash_xip_addr  <= {8'd0, FLASH_TEST_ADDR};
+                flash_xip_wstrb <= 4'h0;
+                if (flash_xip_ready) begin
+                    readback            <= flash_xip_rdata;
+                    i_demo_system_state <= eFW_COMPARE;
+                end
+            end
+
+            eFW_COMPARE:                                                        begin
+                // "Testing Flash W/R/V... "
+                print_buf[0]  <= "T"; print_buf[1]  <= "e"; print_buf[2]  <= "s";
+                print_buf[3]  <= "t"; print_buf[4]  <= "i"; print_buf[5]  <= "n";
+                print_buf[6]  <= "g"; print_buf[7]  <= " "; print_buf[8]  <= "F";
+                print_buf[9]  <= "l"; print_buf[10] <= "a"; print_buf[11] <= "s";
+                print_buf[12] <= "h"; print_buf[13] <= " "; print_buf[14] <= "W";
+                print_buf[15] <= "/"; print_buf[16] <= "R"; print_buf[17] <= "/";
+                print_buf[18] <= "V"; print_buf[19] <= "."; print_buf[20] <= ".";
+                print_buf[21] <= "."; print_buf[22] <= " ";
+                if (readback == FLASH_TEST_DATA) begin
+                    print_buf[23] <= "p"; print_buf[24] <= "a";
+                    print_buf[25] <= "s"; print_buf[26] <= "s";
+                    print_buf[27] <= 8'h0D; print_buf[28] <= 8'h0A;
+                    print_len <= 7'd29;
+                end else begin
+                    // "FAIL (wrote 0xABCDABCD read 0xRRRRRRRR)\r\n"
+                    print_buf[23] <= "F"; print_buf[24] <= "A";
+                    print_buf[25] <= "I"; print_buf[26] <= "L";
+                    print_buf[27] <= " "; print_buf[28] <= "(";
+                    print_buf[29] <= "w"; print_buf[30] <= "r";
+                    print_buf[31] <= "o"; print_buf[32] <= "t";
+                    print_buf[33] <= "e"; print_buf[34] <= " ";
+                    print_buf[35] <= "0"; print_buf[36] <= "x";
+                    print_buf[37] <= "A"; print_buf[38] <= "B";
+                    print_buf[39] <= "C"; print_buf[40] <= "D";
+                    print_buf[41] <= "A"; print_buf[42] <= "B";
+                    print_buf[43] <= "C"; print_buf[44] <= "D";
+                    print_buf[45] <= " "; print_buf[46] <= "r";
+                    print_buf[47] <= "e"; print_buf[48] <= "a";
+                    print_buf[49] <= "d"; print_buf[50] <= " ";
+                    print_buf[51] <= "0"; print_buf[52] <= "x";
+                    print_buf[53] <= hex_nibble(readback[31:28]);
+                    print_buf[54] <= hex_nibble(readback[27:24]);
+                    print_buf[55] <= hex_nibble(readback[23:20]);
+                    print_buf[56] <= hex_nibble(readback[19:16]);
+                    print_buf[57] <= hex_nibble(readback[15:12]);
+                    print_buf[58] <= hex_nibble(readback[11:8]);
+                    print_buf[59] <= hex_nibble(readback[7:4]);
+                    print_buf[60] <= hex_nibble(readback[3:0]);
+                    print_buf[61] <= ")";
+                    print_buf[62] <= 8'h0D; print_buf[63] <= 8'h0A;
+                    print_len <= 7'd64;
+                end
+                print_idx <= 7'd0;
                 i_demo_system_state <= ePRINT_BUF;
             end
 
@@ -542,11 +828,11 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                 uart_tx_valid <= 1'b1;
                 uart_tx_data  <= print_buf[print_idx];
                 if (uart_tx_valid && uart_tx_ready) begin
-                    if (print_idx + 6'd1 == print_len) begin
+                    if (print_idx + 7'd1 == print_len) begin
                         uart_tx_valid       <= 1'b0;
                         i_demo_system_state <= ePREP_NEXT_UART_STARTUP_MSG;
                     end else begin
-                        print_idx <= print_idx + 6'd1;
+                        print_idx <= print_idx + 7'd1;
                     end
                 end
             end
