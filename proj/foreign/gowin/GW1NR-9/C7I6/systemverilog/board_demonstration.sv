@@ -95,6 +95,15 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
         eSRAM_DEMO_READ_GAP,
         eSRAM_DEMO_PRINT_READ,
         eSRAM_DEMO_PRINT_RESULT,
+        eHRAM_DEMO_WRITE_PREP,
+        eHRAM_DEMO_WRITE,
+        eHRAM_DEMO_WRITE_GAP,
+        eHRAM_DEMO_PRINT_WRITE,
+        eHRAM_DEMO_READ_PREP,
+        eHRAM_DEMO_READ,
+        eHRAM_DEMO_READ_GAP,
+        eHRAM_DEMO_PRINT_READ,
+        eHRAM_DEMO_PRINT_RESULT,
         eHRAM_WAIT,
         eHRAM_WRITE,
         eHRAM_READ,
@@ -141,6 +150,7 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
         eTEST_SRAM,
         eDEMO_SRAM,
         eTEST_HRAM,
+        eDEMO_HRAM,
         eTEST_FLASH_ID,
         eTEST_FLASH_WRV,
         eNONE
@@ -172,6 +182,7 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
     localparam [7:0]  JEDEC_CMD         = 8'h9F;
     localparam [23:0] EXPECTED_JEDEC_ID = 24'h85_6016;
     localparam [31:0] SRAM_DEMO_ADDR    = 32'h0000_0010;
+    localparam [31:0] HRAM_DEMO_ADDR    = 32'h0000_8010;
     localparam [23:0] FLASH_TEST_ADDR   = 24'h01_0000;
     localparam [31:0] FLASH_TEST_DATA   = 32'hABCD_ABCD;
     localparam [7:0]  FLASH_CMD_WREN    = 8'h06;
@@ -311,9 +322,14 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
                 end
 
                 if (i_next_startup_task == eTEST_HRAM) begin
-                    i_next_startup_task <= eTEST_FLASH_ID;
+                    i_next_startup_task <= eDEMO_HRAM;
                     hram_init_us        <= 8'd0;
                     i_demo_system_state <= eHRAM_WAIT;
+                end
+
+                if (i_next_startup_task == eDEMO_HRAM) begin
+                    i_next_startup_task <= eTEST_FLASH_ID;
+                    i_demo_system_state <= eHRAM_DEMO_WRITE_PREP;
                 end
 
                 if (i_next_startup_task == eTEST_FLASH_ID) begin
@@ -529,6 +545,136 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
 
             eSRAM_DEMO_PRINT_RESULT:                                           begin
                 print_buf[0]  <= "S"; print_buf[1]  <= "R"; print_buf[2]  <= "A";
+                print_buf[3]  <= "M"; print_buf[4]  <= " "; print_buf[5]  <= "d";
+                print_buf[6]  <= "e"; print_buf[7]  <= "m"; print_buf[8]  <= "o";
+                print_buf[9]  <= "."; print_buf[10] <= "."; print_buf[11] <= ".";
+                print_buf[12] <= " ";
+                if (demo_pass) begin
+                    print_buf[13] <= "p"; print_buf[14] <= "a";
+                    print_buf[15] <= "s"; print_buf[16] <= "s";
+                end else begin
+                    print_buf[13] <= "F"; print_buf[14] <= "A";
+                    print_buf[15] <= "I"; print_buf[16] <= "L";
+                end
+                print_buf[17] <= 8'h0D;
+                print_buf[18] <= 8'h0A;
+                print_len         <= 7'd19;
+                print_idx         <= 7'd0;
+                print_next_state  <= ePREP_NEXT_UART_STARTUP_MSG;
+                i_demo_system_state <= ePRINT_BUF;
+            end
+
+            eHRAM_DEMO_WRITE_PREP:                                             begin
+                demo_word_idx       <= 5'd0;
+                demo_pass           <= 1'b1;
+                i_demo_system_state <= eHRAM_DEMO_WRITE;
+            end
+
+            eHRAM_DEMO_WRITE:                                                  begin
+                ram_valid <= 1'b1;
+                ram_addr  <= HRAM_DEMO_ADDR + {25'd0, demo_word_base};
+                ram_wdata <= version_word(demo_word_idx);
+                ram_wstrb <= 4'hF;
+                if (ram_valid && ram_ready) begin
+                    if (demo_word_idx + 5'd1 == DEMO_WORDS) begin
+                        i_demo_system_state <= eHRAM_DEMO_PRINT_WRITE;
+                    end else begin
+                        demo_word_idx       <= demo_word_idx + 5'd1;
+                        i_demo_system_state <= eHRAM_DEMO_WRITE_GAP;
+                    end
+                end
+            end
+
+            eHRAM_DEMO_WRITE_GAP:                                              begin
+                i_demo_system_state <= eHRAM_DEMO_WRITE;
+            end
+
+            eHRAM_DEMO_PRINT_WRITE:                                            begin
+                print_buf[0]  <= "H"; print_buf[1]  <= "R"; print_buf[2]  <= "A";
+                print_buf[3]  <= "M"; print_buf[4]  <= " "; print_buf[5]  <= "W";
+                print_buf[6]  <= " "; print_buf[7]  <= "@"; print_buf[8]  <= "0";
+                print_buf[9]  <= "x"; print_buf[10] <= "0"; print_buf[11] <= "0";
+                print_buf[12] <= "0"; print_buf[13] <= "0"; print_buf[14] <= "8";
+                print_buf[15] <= "0"; print_buf[16] <= "1"; print_buf[17] <= "0";
+                print_buf[18] <= ":"; print_buf[19] <= " ";
+                for (demo_i = 0; demo_i < DEMO_LEN; demo_i = demo_i + 1) begin
+                    print_buf[20 + demo_i] <= version_byte(demo_i[6:0]);
+                end
+                print_buf[20 + DEMO_LEN] <= 8'h0D;
+                print_buf[21 + DEMO_LEN] <= 8'h0A;
+                print_len         <= SRAM_DEMO_LINE_LEN;
+                print_idx         <= 7'd0;
+                print_next_state  <= eHRAM_DEMO_READ_PREP;
+                i_demo_system_state <= ePRINT_BUF;
+            end
+
+            eHRAM_DEMO_READ_PREP:                                              begin
+                demo_word_idx       <= 5'd0;
+                print_buf[0]  <= "H"; print_buf[1]  <= "R"; print_buf[2]  <= "A";
+                print_buf[3]  <= "M"; print_buf[4]  <= " "; print_buf[5]  <= "R";
+                print_buf[6]  <= " "; print_buf[7]  <= "@"; print_buf[8]  <= "0";
+                print_buf[9]  <= "x"; print_buf[10] <= "0"; print_buf[11] <= "0";
+                print_buf[12] <= "0"; print_buf[13] <= "0"; print_buf[14] <= "8";
+                print_buf[15] <= "0"; print_buf[16] <= "1"; print_buf[17] <= "0";
+                print_buf[18] <= ":"; print_buf[19] <= " ";
+                i_demo_system_state <= eHRAM_DEMO_READ;
+            end
+
+            eHRAM_DEMO_READ:                                                   begin
+                if (~(ram_valid && ram_ready)) begin
+                    ram_valid <= 1'b1;
+                end
+                ram_addr  <= HRAM_DEMO_ADDR + {25'd0, demo_word_base};
+                ram_wstrb <= 4'h0;
+                if (ram_valid && ram_ready) begin
+                    if (demo_word_base < DEMO_LEN) begin
+                        print_buf[20 + demo_word_base] <= ram_rdata[31:24];
+                        if (ram_rdata[31:24] != version_byte(demo_word_base)) begin
+                            demo_pass <= 1'b0;
+                        end
+                    end
+                    if (demo_word_base + 7'd1 < DEMO_LEN) begin
+                        print_buf[20 + demo_word_base + 7'd1] <= ram_rdata[23:16];
+                        if (ram_rdata[23:16] != version_byte(demo_word_base + 7'd1)) begin
+                            demo_pass <= 1'b0;
+                        end
+                    end
+                    if (demo_word_base + 7'd2 < DEMO_LEN) begin
+                        print_buf[20 + demo_word_base + 7'd2] <= ram_rdata[15:8];
+                        if (ram_rdata[15:8] != version_byte(demo_word_base + 7'd2)) begin
+                            demo_pass <= 1'b0;
+                        end
+                    end
+                    if (demo_word_base + 7'd3 < DEMO_LEN) begin
+                        print_buf[20 + demo_word_base + 7'd3] <= ram_rdata[7:0];
+                        if (ram_rdata[7:0] != version_byte(demo_word_base + 7'd3)) begin
+                            demo_pass <= 1'b0;
+                        end
+                    end
+                    if (demo_word_idx + 5'd1 == DEMO_WORDS) begin
+                        i_demo_system_state <= eHRAM_DEMO_PRINT_READ;
+                    end else begin
+                        demo_word_idx       <= demo_word_idx + 5'd1;
+                        i_demo_system_state <= eHRAM_DEMO_READ_GAP;
+                    end
+                end
+            end
+
+            eHRAM_DEMO_READ_GAP:                                               begin
+                i_demo_system_state <= eHRAM_DEMO_READ;
+            end
+
+            eHRAM_DEMO_PRINT_READ:                                             begin
+                print_buf[20 + DEMO_LEN] <= 8'h0D;
+                print_buf[21 + DEMO_LEN] <= 8'h0A;
+                print_len         <= SRAM_DEMO_LINE_LEN;
+                print_idx         <= 7'd0;
+                print_next_state  <= eHRAM_DEMO_PRINT_RESULT;
+                i_demo_system_state <= ePRINT_BUF;
+            end
+
+            eHRAM_DEMO_PRINT_RESULT:                                           begin
+                print_buf[0]  <= "H"; print_buf[1]  <= "R"; print_buf[2]  <= "A";
                 print_buf[3]  <= "M"; print_buf[4]  <= " "; print_buf[5]  <= "d";
                 print_buf[6]  <= "e"; print_buf[7]  <= "m"; print_buf[8]  <= "o";
                 print_buf[9]  <= "."; print_buf[10] <= "."; print_buf[11] <= ".";
