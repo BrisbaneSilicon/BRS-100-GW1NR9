@@ -37,6 +37,7 @@ $gitLocalChanges = git diff-index HEAD
 $gitDirty        = if ($gitLocalChanges) { "-dirty" } else { "" }
 $timeStr         = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 $buildVersion    = "FW: ${gitShortRev}${gitDirty}|${timeStr}"
+$buildVersionLen = $buildVersion.Length
 
 Write-Host "  Git commit  : $gitShortRev$gitDirty"
 Write-Host "  Build time  : $timeStr"
@@ -84,6 +85,7 @@ import util::*;
 
 module autogen_top_wrapper #(
     parameter reg   [(8*VERSION_CHARS)-1:0] VERSION                 = "$buildVersion",
+    parameter int                           VERSION_LEN             = $buildVersionLen,
 
     parameter int                           CLK_FREQUENCY_MHZ       = $ClockFrequencyMhz,
     parameter int                           UART_BAUD               = $UartBaud,
@@ -245,7 +247,8 @@ localparam CS_WIDTH         = 2;
             // ----------------------------------------------
 
             board_demonstration #(
-                .VERSION            (VERSION)
+                .VERSION            (VERSION),
+                .VERSION_LEN        (VERSION_LEN)
             ) board_demonstration_inst (
                 .sysclk             (i_sysclk),
                 .sysclk_resetn      (i_sysclk_resetn),
