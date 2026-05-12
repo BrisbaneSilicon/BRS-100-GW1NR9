@@ -1160,7 +1160,9 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = "BOARD: BRS-100-GW
             end
 
             ePRINT_BUF:                                                         begin
-                uart_tx_valid <= 1'b1;
+                if (~(uart_tx_valid && uart_tx_ready)) begin
+                    uart_tx_valid <= 1'b1;
+                end
                 uart_tx_data  <= print_buf[print_idx];
                 if (uart_tx_valid && uart_tx_ready) begin
                     if (print_idx + 7'd1 == print_len) begin
