@@ -154,7 +154,7 @@ localparam int UART_DIVIDER     = (CLK_FREQUENCY_HZ / UART_BAUD)-1;
 
     reg     [8:0]           i_microsecond_div_counter;
     reg     [19:0]          i_millisecond_div_counter;
-    reg     [9:0]           i_millisecond_counter;
+    reg     [11:0]          i_millisecond_counter;
 
 
     // ----------------------------------------------
