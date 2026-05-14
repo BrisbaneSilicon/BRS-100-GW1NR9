@@ -43,6 +43,7 @@ print_program_board_help () {
     echo -e "\t${boldf}-s, --check_if_target_supported${normf}\n\t\tPrint supported status of provided target board and exit.\n"
     echo -e "\t${boldf}-b, --check_if_target_built${normf}\n\t\tPrint firmware built status of provided target board and exit.\n"
     echo -e "\t${boldf}-t, --custom_target_device${normf} CUSTOM_TARGET\n\t\tInstead of the default target, target 'CUSTOM_TARGET'.\n"
+    echo -e "\t${boldf}-o, --open_fpga_loader${normf}\n\t\tProgram the BRS-100-GW1NR9 using 'openFPGALoader' instead of the GoWIN toolchain.\n"
     echo -e "${boldf}AUTHOR${normf}"
     echo -e "\tWritten by Craig Haywood\n"
     echo -e "${boldf}COPYRIGHT${normf}"
@@ -273,26 +274,22 @@ bitstream_ext_for_target_board_and_build_target() {
 }
 
 program_target_with_firmware() {
-    if [ $# -lt 5 ]; then
-        echo "Error, function 'program_target_with_firmware' requires minimum of five arguments: target_board build_target \
-device speed_grade program_flash [custom_bootrom]"
+    if [ $# -lt 6 ]; then
+        echo "Error, function 'program_target_with_firmware' requires six arguments: target_board build_target \
+device speed_grade program_flash use_open_fpga_loader"
 
         return 1
     fi
 
-    if [[ $# -gt 4 && $5 == "true" ]]; then
+    if [ $5 == "true" ]; then
         operation_index=5
+        ofl_prog_switch='-f'
     else
         operation_index=2
+        ofl_prog_switch='-m'
     fi
 
-    if [ $# -gt 5 ]; then
-        custom_bootrom=$6
-    else
-        custom_bootrom=false
-    fi
-
-    bitstream_fullpath=$(target_firmware_bitstream_fullpath "$1" "$2" "$3" "$4" $custom_bootrom)
+    bitstream_fullpath=$(target_firmware_bitstream_fullpath "$1" "$2" "$3" "$4")
     if [ $? -ne 0  ]; then
         return 2
     fi
@@ -303,27 +300,17 @@ device speed_grade program_flash [custom_bootrom]"
         fi
 
         if [ "$platform" == "gowin" ]; then
-            speed_grade_category=${speed_grade:0:1}
+            if [ $6 == "true" ]; then
+                echo "Program command line: '$open_fpga_loader_bin -b brs-100-gw1nr9 $ofl_prog_switch $bitstream_fullpath'"
+                $open_fpga_loader_bin -b brs-100-gw1nr9 $ofl_prog_switch $bitstream_fullpath
+            else
+                speed_grade_category=${speed_grade:0:1}
 
-            echo "Program command line: '$gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $bitstream_fullpath'"
-            $gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $bitstream_fullpath
+                echo "Program command line: '$gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $bitstream_fullpath'"
+                $gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $bitstream_fullpath
+            fi
 
             return $?
-        fi
-
-        if [ "$platform" == "xilinx" ]; then
-            if [ "$target_board" == "ARTYS7-25" ] || [ "$target_board" == "ARTYS7-50" ]; then
-                do_generic_xilinx_prog=true
-            fi
-
-            if [ -v do_generic_xilinx_prog ]; then
-                if [ $do_generic_xilinx_prog ]; then
-                    cd $program_dir/$foreign_folder/$platform/$scripts_folder/$generic_folder/
-                    source $program_board_script $3 $bitstream_fullpath
-
-                    return $?
-                fi
-            fi
         fi
     fi
 
@@ -334,43 +321,35 @@ device speed_grade program_flash [custom_bootrom]"
 program_target_with_custom_firmware() {
     if [ $# -lt 6 ]; then
         echo "Error, function 'program_target_with_custom_firmware' requires minimum of six arguments: target_board build_target \
-device speed_grade program_flash custom_bitfile_fullpath"
+device speed_grade program_flash custom_bitfile_fullpath use_open_fpga_loader"
 
         return 1
     fi
 
-    if [[ $# -gt 4 && $5 == "true" ]]; then
+    if [ $5 == "true" ]; then
         operation_index=5
+        ofl_prog_switch='-f'
     else
         operation_index=2
+        ofl_prog_switch='-m'
     fi
 
     platform=$(target_platform_for_target_board $1)
     if [ $? -ne 0  ]; then
         return 2
     fi
-        if [ "$platform" == "gowin" ]; then
+    if [ "$platform" == "gowin" ]; then
+        if [ $7 == "true" ]; then
+            echo "Program command line: '$open_fpga_loader_bin -b brs-100-gw1nr9 $ofl_prog_switch $6'"
+            $open_fpga_loader_bin -b brs-100-gw1nr9 $ofl_prog_switch $6
+        else
             speed_grade_category=${speed_grade:0:1}
 
             echo "Program command line: '$gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $6'"
             $gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $6
-
-            return $?
         fi
 
-    if [ "$platform" == "xilinx" ]; then
-        if [ "$target_board" == "ARTYS7-25" ] || [ "$target_board" == "ARTYS7-50" ]; then
-            do_generic_xilinx_prog=true
-        fi
-
-        if [ -v do_generic_xilinx_prog ]; then
-            if [ $do_generic_xilinx_prog ]; then
-                cd $program_dir/$foreign_folder/$platform/$scripts_folder/$generic_folder/
-                source $program_board_script $3 $6
-
-                return $?
-            fi
-        fi
+        return $?
     fi
 
     return 4

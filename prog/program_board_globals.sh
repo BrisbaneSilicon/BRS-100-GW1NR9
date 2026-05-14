@@ -31,6 +31,7 @@ gen_standalone_flash_script="gen_standalone_flash.sh"
 
 supported_boards_csv_filename="supported_boards.csv"
 
+open_fpga_loader_bin="openFPGALoader"
 gowin_programmer_cli_bin="programmer_cli"
 
 bitstream_ext="fs"

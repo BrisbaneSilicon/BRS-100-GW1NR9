@@ -8,6 +8,7 @@ source program_board_utils.sh
 
 target_board=BRS-100-GW1NR9
 program_flash=false
+use_open_fpga_loader=false
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -58,7 +59,9 @@ while [ $# -gt 0 ]; do
             target_board=$2
             shift 1
             ;;
-
+        -o|--open_fpga_loader)
+            use_open_fpga_loader=true
+            ;;
 
         -*)
             echo -e "Invalid option: '$1'."
@@ -162,7 +165,7 @@ fi
 
 if [ -v custom_bitfile ]; then
     if [ ! -v gen_dual_sw_fw_flash_file ]; then
-        program_target_with_custom_firmware "$target_board" "$target" "$device" "$speed_grade" "$program_flash" "$custom_bitfile_fullpath"
+        program_target_with_custom_firmware "$target_board" "$target" "$device" "$speed_grade" "$program_flash" "$custom_bitfile_fullpath" "$use_open_fpga_loader"
 
         err=$?
         if [ $err -ne 0 ]; then
@@ -235,7 +238,7 @@ if [ -v gen_dual_sw_fw_flash_file ]; then
     exit
 fi
 
-program_target_with_firmware "$target_board" "$target" "$device" "$speed_grade" "$program_flash"
+program_target_with_firmware "$target_board" "$target" "$device" "$speed_grade" "$program_flash" "$use_open_fpga_loader"
 err=$?
 if [ $err -ne 0 ]; then
     echo "Failed to program target board, error code="$err
