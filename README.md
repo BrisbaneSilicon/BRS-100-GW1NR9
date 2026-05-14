@@ -265,13 +265,13 @@ The most commonly used are listed below.
 
 | Build Argument | Description |
 | :----------: | :----------: |
+| -p, --proj_only | Only generate the project file, then exit. Useful if the user wishes to utilize GOWIN IDE.|
+| -s, --synth_only | Only proceed with build until synthesis is complete, then exit. Useful to check FPGA utilization, timing etc. |
 | -y, --list_supported_system_clock_frequencies | List the supported system clock frequencies and exit. |
 | -k, --clock_frequency FREQUENCY_MHZ | Use a frequency of FREQUENCY_MHZ for the system clock (default 51 MHz). |
 | -u, --uart_baud | Set the user comms baud rate (default 115200). |
 | -b, --board_demonstration | Perform a build of the board demonstration bitstream. |
 | -a, --clean_all_platforms | Perform cleanup of the entire build and exit. |
-| -p, --proj_only | Only generate the project file, then exit. Useful if the user wishes to utilize GOWIN IDE.|
-| -s, --synth_only | Only proceed with build until synthesis is complete, then exit. Useful to check FPGA utilization, timing etc. |
 
 ### Windows
 
@@ -314,6 +314,7 @@ The most commonly used are listed below.
 
 | Program Argument | Description |
 | :----------: | :----------: |
+| -f, --program_flash | Program the BRS-100-GW1NR9 embedded Flash, as opposed to the SRAM (default). |
 | -d, --list_default_target | List the default build target. |
 | -c, --clean_target_prior | Clean TARGET build prior to building and programming the BRS-100-GW1NR9 board. |
 | -b, --check_if_target_built | Print firmware built status of provided target board and exit. |
