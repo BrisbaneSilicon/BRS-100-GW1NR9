@@ -29,16 +29,16 @@ print_program_board_help () {
     echo -e "${boldf}NAME${normf}"
     echo -e "\tprogram_board - program a BRS-100-GW1NR9 board its FPGA firmware\n"
     echo -e "${boldf}SYNOPSIS${normf}"
-    echo -e "\t${boldf}program_board${normf} ${underlinef}[OPTIONS...]${normf} <TARGET_BOARD>\n"
+    echo -e "\t${boldf}program_board${normf} ${underlinef}[OPTIONS...]${normf}\n"
     echo -e "${boldf}DESCRIPTION${normf}"
-    echo -e "\tProgram TARGET_BOARD with its variant of the BRS-100-GW1NR9 FPGA firmware."
+    echo -e "\tProgram BRS-100-GW1NR9 with its variant of the BRS-100-GW1NR9 FPGA firmware."
     echo -e "\tAlternatively, query supported target boards and options.\n"
     echo -e "${boldf}OPTIONS${normf}"
     echo -e "\t${boldf}-h, --help${normf}\n\t\tDisplay this help and exit.\n"
     echo -e "\t${boldf}-d, --list_default_target${normf}\n\t\tList the default build target.\n"
-    echo -e "\t${boldf}-c, --clean_target_prior${normf}\n\t\tClean TARGET_BOARD build prior to building and programming the BRS-100-GW1NR9 board.\n"
-    echo -e "\t${boldf}-f, --update_flash_only${normf} MCS_FILE_FULLPATH\n\t\tUpdate TARGET_BOARD flash with provided MCS_FILE_FULL_PATH.\n"
-    echo -e "\t${boldf}-m, --custom_bitfile${normf} CUSTOM_BITFILE_FULLPATH\n\t\tProgram TARGET_BOARD with custom bitfile CUSTOM_BITFILE_FULLPATH.\n"
+    echo -e "\t${boldf}-c, --clean_target_prior${normf}\n\t\tClean BRS-100-GW1NR9 build prior to building and programming the BRS-100-GW1NR9 board.\n"
+    echo -e "\t${boldf}-f, --program_flash${normf}\n\t\tProgram embedded flash (default is SRAM).\n"
+    echo -e "\t${boldf}-m, --custom_bitfile${normf} CUSTOM_BITFILE_FULLPATH\n\t\tProgram BRS-100-GW1NR9 with custom bitfile CUSTOM_BITFILE_FULLPATH.\n"
     echo -e "\t${boldf}-l, --list_supported_targets${normf}\n\t\tList supported build targets and exit.\n"
     echo -e "\t${boldf}-s, --check_if_target_supported${normf}\n\t\tPrint supported status of provided target board and exit.\n"
     echo -e "\t${boldf}-b, --check_if_target_built${normf}\n\t\tPrint firmware built status of provided target board and exit.\n"
@@ -273,15 +273,21 @@ bitstream_ext_for_target_board_and_build_target() {
 }
 
 program_target_with_firmware() {
-    if [ $# -lt 4 ]; then
-        echo "Error, function 'program_target_with_firmware' requires minimum of four arguments: target_board build_target \
-device speed_grade [custom_bootrom]"
+    if [ $# -lt 5 ]; then
+        echo "Error, function 'program_target_with_firmware' requires minimum of five arguments: target_board build_target \
+device speed_grade program_flash [custom_bootrom]"
 
         return 1
     fi
 
-    if [ $# -gt 4 ]; then
-        custom_bootrom=$5
+    if [[ $# -gt 4 && $5 == "true" ]]; then
+        operation_index=5
+    else
+        operation_index=2
+    fi
+
+    if [ $# -gt 5 ]; then
+        custom_bootrom=$6
     else
         custom_bootrom=false
     fi
@@ -299,8 +305,8 @@ device speed_grade [custom_bootrom]"
         if [ "$platform" == "gowin" ]; then
             speed_grade_category=${speed_grade:0:1}
 
-            echo "Program command line: '$gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index 5 -f $bitstream_fullpath'"
-            $gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index 5 -f $bitstream_fullpath
+            echo "Program command line: '$gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $bitstream_fullpath'"
+            $gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $bitstream_fullpath
 
             return $?
         fi
@@ -326,11 +332,17 @@ device speed_grade [custom_bootrom]"
 
 # REVISIT: merge with above function...
 program_target_with_custom_firmware() {
-    if [ $# -lt 5 ]; then
-        echo "Error, function 'program_target_with_custom_firmware' requires minimum of five arguments: target_board build_target \
-device speed_grade custom_bitfile_fullpath"
+    if [ $# -lt 6 ]; then
+        echo "Error, function 'program_target_with_custom_firmware' requires minimum of six arguments: target_board build_target \
+device speed_grade program_flash custom_bitfile_fullpath"
 
         return 1
+    fi
+
+    if [[ $# -gt 4 && $5 == "true" ]]; then
+        operation_index=5
+    else
+        operation_index=2
     fi
 
     platform=$(target_platform_for_target_board $1)
@@ -340,8 +352,8 @@ device speed_grade custom_bitfile_fullpath"
         if [ "$platform" == "gowin" ]; then
             speed_grade_category=${speed_grade:0:1}
 
-            echo "Program command line: '$gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index 5 -f $custom_bitfile_fullpath'"
-            $gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index 5 -f $custom_bitfile_fullpath
+            echo "Program command line: '$gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $6'"
+            $gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $6
 
             return $?
         fi
@@ -354,7 +366,7 @@ device speed_grade custom_bitfile_fullpath"
         if [ -v do_generic_xilinx_prog ]; then
             if [ $do_generic_xilinx_prog ]; then
                 cd $program_dir/$foreign_folder/$platform/$scripts_folder/$generic_folder/
-                source $program_board_script $3 $custom_bitfile_fullpath
+                source $program_board_script $3 $6
 
                 return $?
             fi

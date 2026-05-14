@@ -7,6 +7,7 @@ source program_board_globals.sh
 source program_board_utils.sh
 
 target_board=BRS-100-GW1NR9
+program_flash=false
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -43,21 +44,8 @@ while [ $# -gt 0 ]; do
             custom_bitfile_fullpath=$2
             shift 1
             ;;
-        -f|--update_flash_only)
-            if [ $# -lt 2 ]; then
-                echo "Option '$1' requires argument: MCS_FILE_FULLPATH"
-                echo -e "Try './program_board.sh --help' for more information."
-
-                exit
-            fi
-
-            update_flash_only=true
-            mcs_file_fullpath=$2
-            shift 1
-
-            if [ -v target_board ]; then
-                break
-            fi
+        -f|--program_flash)
+            program_flash=true
             ;;
         -t|--custom_target)
             if [ $# -lt 2 ]; then
@@ -81,10 +69,6 @@ while [ $# -gt 0 ]; do
         *)
             if [ ! -v target_board ]; then
                 target_board=$1
-
-                if [ -v update_flash_only ]; then
-                    break
-                fi
             else
                 echo -e "Invalid option -- '$1'."
                 echo -e "Try './program_board.sh --help' for more information."
@@ -156,11 +140,6 @@ exec_from_build_directory "START"
 
     exec_end
 
-if [ -v update_flash_only ]; then
-    update_flash_for_target_board "$target_board" "$device" "$mcs_file_fullpath"
-
-    exit
-fi
 if [ -v clean_target_prior ]; then
     exec_from_build_directory "START"
         clean_platform_device "$platform" "$device" "$speed_grade"
@@ -183,7 +162,8 @@ fi
 
 if [ -v custom_bitfile ]; then
     if [ ! -v gen_dual_sw_fw_flash_file ]; then
-        program_target_with_custom_firmware "$target_board" "$target" "$device" "$speed_grade" "$custom_bitfile_fullpath"
+        program_target_with_custom_firmware "$target_board" "$target" "$device" "$speed_grade" "$program_flash" "$custom_bitfile_fullpath"
+
         err=$?
         if [ $err -ne 0 ]; then
             echo "Failed to program target board with custom bitfile, error code="$err
@@ -255,7 +235,7 @@ if [ -v gen_dual_sw_fw_flash_file ]; then
     exit
 fi
 
-program_target_with_firmware "$target_board" "$target" "$device" "$speed_grade"
+program_target_with_firmware "$target_board" "$target" "$device" "$speed_grade" "$program_flash"
 err=$?
 if [ $err -ne 0 ]; then
     echo "Failed to program target board, error code="$err
