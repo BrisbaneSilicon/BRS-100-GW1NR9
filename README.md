@@ -319,6 +319,7 @@ The most commonly used are listed below.
 | -c, --clean_target_prior | Clean TARGET build prior to building and programming the BRS-100-GW1NR9 board. |
 | -b, --check_if_target_built | Print firmware built status of provided target board and exit. |
 | -t, --custom_target_device CUSTOM_TARGET | Instead of the default target, target 'CUSTOM_TARGET'. |
+| -o, --open_fpga_loader CUSTOM_TARGET | Program the BRS-100-GW1NR9 using 'openFPGALoader' instead of the GoWIN toolchain. |
 <br>
 
 > [!WARNING]
