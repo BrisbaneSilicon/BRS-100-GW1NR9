@@ -276,18 +276,19 @@ if ($guiProcesses) {
 #   index 0 - JTAG  - used for programming
 #   index 1 - UART  - used for serial communication
 Write-Host ""
-Write-Host "Scanning for connected cables (ftd2xx)..."
-$scanOutput = & $ProgrammerCli --scan-cables F 2>&1
+Write-Host "Scanning for connected cables (WINUSB)..."
+Write-Host $ProgrammerCli
+$scanOutput = & $ProgrammerCli --scan-cables L 2>&1
 Write-Host $scanOutput
 
 # extract JTAG cable location from scan output
-# scan output format: "USB Debugger A/0/529/null (USB location:529)"
+# scan output format: "Gowin USB Cable(WINUSB)/0/529/null (USB location:529)"
 $locationMatch = ($scanOutput | Out-String)
-$regexMatch    = [regex]::Match($locationMatch, "USB Debugger A/0/(\d+)/null")
+$regexMatch    = [regex]::Match($locationMatch, "Gowin USB Cable\(WINUSB\)/0/(\d+)/null")
 
 if (-not $regexMatch.Success) {
     Write-Host ""
-    Write-Host "ERROR: Could not find JTAG interface (USB Debugger A, index 0)."
+    Write-Host "ERROR: Could not find JTAG interface (Gowin USB Cable(WINUSB), index 0)."
     Write-Host ""
     Write-Host "Common causes:"
     Write-Host "  1. Board not plugged in via USB-C"
@@ -362,11 +363,11 @@ if (-not $CustomBitfile) {
 }
 
 # ---- PROGRAM THE BOARD ----
-# on Windows, programmer_cli.exe defaults to the FT2CH cable type which does not
+# on Windows, programmer_cli.exe defaults to the WINUSB cable type which does not
 # work with the BRS-100-GW1NR9's USB Debugger A interface. three arguments are
 # required together to force the correct ftd2xx driver path:
-#   --cable-index 4  : selects "USB Debugger A" cable type (ftd2xx driver)
-#   --location <loc> : targets the specific USB device (from --scan-cables F)
+#   --cable-index 5  : selects "USB Debugger A" cable type (WINUSB driver)
+#   --location <loc> : targets the specific USB device (from --scan-cables L)
 #   --frequency      : JTAG clock speed (default 0.5MHz, configurable via -jtag_frequency)
 # without all three, programmer_cli falls back to FT2CH and fails with CRC errors.
 # operation_index 5 = embFlash Erase,Program (matches Linux build.sh behaviour)
@@ -375,7 +376,7 @@ Write-Host "====================================="
 Write-Host " BRS-100-GW1NR9 Windows Programmer"
 Write-Host "====================================="
 Write-Host "Device    : $DeviceArg"
-Write-Host "Cable     : USB Debugger A (cable-index 4, location $cableLocation - JTAG)"
+Write-Host "Cable     : Gowin USB Cable(WINUSB) (cable-index 5, location $cableLocation - JTAG)"
 Write-Host "Frequency : $JtagFrequency"
 Write-Host "Operation : embFlash Erase, Program (index 5)"
 Write-Host "Bitstream : $FsFile"
@@ -387,14 +388,14 @@ Write-Host "      will be attempted. Replug USB and re-run if recovery fails."
 Write-Host ""
 
 # echo exact command line before executing (matches Linux behaviour)
-Write-Host "Program command line: '$ProgrammerCli --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile'"
+Write-Host "Program command line: '$ProgrammerCli --device $DeviceArg --cable-index 5 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile'"
 Write-Host ""
 Write-Host "*** GOWIN programmer_cli Command Line Console ***"
 Write-Host ""
 
 $result = Invoke-ProgrammerCliWithStallDetection `
     -Exe $ProgrammerCli `
-    -Arguments @('--device', $DeviceArg, '--cable-index', '4',
+    -Arguments @('--device', $DeviceArg, '--cable-index', '5',
                  '--location', $cableLocation, '--frequency', $JtagFrequency,
                  '--operation_index', '5', '--fsFile', $FsFile)
 
@@ -402,7 +403,7 @@ $result = Invoke-ProgrammerCliWithStallDetection `
 # retry via a fresh console (WindowStyle Hidden) to recreate the isolation of
 # "open a new terminal" - empirically this wakes the wedged ftd2xx driver.
 # 60 s stall timeout gives the driver time to clear after each kill.
-$retryInner = "& '$ProgrammerCli' --device $DeviceArg --cable-index 4 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile '$FsFile'; exit `$LASTEXITCODE"
+$retryInner = "& '$ProgrammerCli' --device $DeviceArg --cable-index 5 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile '$FsFile'; exit `$LASTEXITCODE"
 
 for ($retry = 1; $retry -le 2 -and $result.Stalled; $retry++) {
     Write-Host ""
