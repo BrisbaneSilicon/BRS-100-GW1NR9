@@ -23,6 +23,7 @@ Example project for the [BRS-100-GW1NR9](https://brisbanesilicon.com.au/devboard
     *   [WINUSB Setup](#winusb-setup)
     *   [FTDI Setup](#ftdi-setup)
     *   [OpenOCD Setup](#openocd-setup)
+    *   [FcapZ Setup](#fcapz-setup)
 <br>
 
 ## Overview
@@ -63,7 +64,7 @@ Fulfill the below prerequisites.
 
 1. On Linux, an FTDI driver is required to communicate with the BRS-100-GW1NR9 via UART. On most Linux distributions they are part of the default installation of the OS (sudo modprobe ftdi_sio), however you may need to install the driver from [here](https://ftdichip.com/drivers/vcp-drivers/).
 2. If you want to program the BRS-100-GW1NR9 via the 'program.ps1' script on Windows (or probe an ELA, see section [Embedded Logic Analyzer](#embedded-logic-analyzer)) you will need to utilize the WINUSB driver (instead of an FTDI driver). To install WINUSB for the BRS-100-GW1NR9 on Windows, see section [WINUSB Setup](#winusb-setup).
-3. If you wish to use an FTDI driver with the BRS-100-GW1NR9 on Windows (i.e. program via GUI, communicate with the BRS-100-GW1NR9 via UART), see section [FTDI Setup](#ftdi-setup). 
+3. If you wish to use an FTDI driver with the BRS-100-GW1NR9 on Windows (i.e. no requirement for ELA usage), see section [FTDI Setup](#ftdi-setup). 
 
 <br>
 
@@ -186,8 +187,6 @@ Or for current user only:
 ```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
-
-
 
 <br>
 
@@ -343,6 +342,12 @@ The 'FW' tag can be described as follows:<br>
 So I built commit SHA ID [c2ce822](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9/commit/c2ce822baf2d6a4d22435ef2df5be94f321e9bb4), with no local changes, on the __12/09/2025__ at approximately __3:30pm__. Note, there may be more printed, see [roadmap](#roadmap).<br><br>
 In board demonstration mode, the state of GPIO<1..16> (the demonstration firmware configures these pins as inputs) will be reflected on GPIO<17..32> (the demonstration firmware configures these pins as outputs). For example, GPIO17 will reflect the state of GPIO1. To test this, simply connect GPIO1 alternatively to VCC or GND (both next to GPIO32) and monitor GPIO17 on your oscilloscope or multimeter.
 
+See the table below for details on the meaning of the LEDs for the '-d' build switch (overrides the '-e' switch for LED behaviour).
+
+| LED1 | LED2 | LED3 | LED4 | LED5 | LED6 |
+|:------:|:------:|:------:|:------:|:------:|:------:|
+|1 Second Heartbeat|UART Activity|Hyperram Activity|Flash Activity|Pin Activity|Unused|
+
 ### Windows
 
 Build the demonstration firmware:
@@ -376,7 +381,70 @@ The `FW` tag format is: `<git commit SHA> <-dirty if built with local changes> |
 
 ## Embedded Logic Analyzer
 
+This project can be built to include an Embedded Logic Analyzer showcase injecting and probing an fpgacapZero ELA core. Ensure you have completed [OpenOCD Setup](openocd-setup) and [FcapZ Setup](#fcapz-setup) prior to performing the steps below.
 
+To inject an ELA core into the firmware, build the firmware with the '-e' command line argument (below) and then program the board as per [program](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9?tab=readme-ov-file#program).<br>
+```bash
+./build.sh -e
+```
+Once the board has been programmed, run OpenOCD as per [OpenOCD Setup](openocd-setup), and then probe the ELA core via fpgacapZ:<br>
+```bash
+fcapz --backend openocd --port 6666 --tap GW1NR-9C.tap probe
+```
+This should produce the following:
+```
+{
+  "version_major": 0,
+  "version_minor": 4,
+  "core_id": 19521,
+  "sample_width": 8,
+  "depth": 64,
+  "num_channels": 6,
+  "trig_stages": 1,
+  "has_storage_qualification": false,
+  "has_decimation": false,
+  "has_ext_trigger": false,
+  "has_timestamp": false,
+  "timestamp_width": 0,
+  "num_segments": 1,
+  "probe_mux_w": 0,
+  "compare_caps": 197059,
+  "compare_modes": [
+    0,
+    1,
+    6,
+    7,
+    8
+  ],
+  "has_dual_compare": true
+}
+```
+Next, trigger on Channel 1 (index 0), which is an 8-bit counter (see the 'autogen_top_wrapper.sv' that was built).
+```
+fcapz --backend openocd --port 6666 --tap GW1NR-9C.tap capture --pretrigger 8 --posttrigger 16 --trigger-mode value_match --trigger-value 0 --depth 64 --format vcd --out capture.vcd --channel 0
+```
+Open the resulting capture (note the trigger location, and depth) in a waveform viewer, for example, [surfer](https://surfer-project.org/):
+```
+surfer capture.vcd
+```
+![Alt text](img/surfer.png)
+
+See the table below for details on the captured channels, and the configuration if the '-d' switch is also included. Note that you can manually trigger the ELA via:
+
+1. Holding Pushbutton 2.
+2. Running the 'fcapz' command, triggering on Channel 2 as '0'.
+3. Releasing Pushbutton 2.
+
+| Build Switches | fcapZ CH1 | fcapZ CH2 | fcapZ CH3 | fcapZ CH4 | fcapZ CH5 | fcapZ CH6|
+| :------:|:------:|:------:|:------:|:------:|:------:|:------:|
+| ./build.sh -e |8-bit Counter|Button 2 State|GPIO 1-8 State|GPIO 9-16 State|GPIO 17-24 State|GPIO 25-32 State|
+| ./build.sh -d -e |8-bit Counter|Button 2 State|GPIO 1-8 State|GPIO 9-16 State|GND|GND|
+
+See the table below for details on the meaning of the LEDs for the '-e' build switch (provided the '-d' switch isn't also present).
+
+| LED1 | LED2 | LED3 | LED4 | LED5 | LED6 |
+|:------:|:------:|:------:|:------:|:------:|:------:|
+|1/2 Second Heartbeat|JTAG Activity|Button 2 State|GPIO 1 State|GPIO 2 State|GPIO 3 State|
 
 ## Development
 
@@ -473,7 +541,7 @@ Ensure all listed driver versions match. If they do not, follow the full FTDI re
 
 ### OpenOCD Setup
 
-OpenOCD, the Open On-Chip Debugger, is used to connect fpgacapZero to the ELA (Embedded Logic Analyzer). Note that you must perform [WINUSB Setup](#winusb-setup) prior to setting up OpenOCD.
+OpenOCD, the Open On-Chip Debugger, is used to connect fpgacapZero to the ELA (Embedded Logic Analyzer). Note that on Windows you must perform [WINUSB Setup](#winusb-setup) prior to setting up OpenOCD.
 
 To install OpenOCD, simply follow the OS-specific instructions [here](https://github.com/openocd-org/openocd/#installing-openocd). Alternatively, if you are on Windows you can download a binary from [here](https://openocd.org/pages/getting-openocd.html). 
 
@@ -496,6 +564,12 @@ Warn : gdb services need one or more targets defined
 Info : Listening on port 6666 for tcl connections
 Info : Listening on port 4444 for telnet connections
 ```
+
+### FcapZ Setup
+
+FpgacapZero is an open-source, vendor-agnostic FPGA debug core, an Embedded Logic Analyzer (ELA) for waveform capture, an Embedded I/O (EIO) for runtime read/write of fabric signals.
+
+To install fpgacapZero, simply follow [OpenOCD Setup](#openocd-setup) and then the instructions available [here](https://github.com/lcapossio/fpgacapZero#quick-start). Once fpgacapZero is installed, follow [Embedded Logic Analyzer](#embedded-logic-analyzer) to inject and probe an ELA core.
 
 <br>
 
