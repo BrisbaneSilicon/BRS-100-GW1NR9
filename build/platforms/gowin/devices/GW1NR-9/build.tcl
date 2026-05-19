@@ -59,36 +59,39 @@ foreach src $srclist_vhdl {
 if {$embedded_logic_analyzer == "true"} {
     # NOTE: pull in required ELA files...
 
-    set fpgacapzero_folder "fpgacapZero"
+    set fpgacapzero_folder  "fpgacapZero"
+    set fpgacapzero_path    "$repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder"
 
-    # TODO: check the above folder exists... print error/suggestion
+    if {![file isdirectory $fpgacapzero_path]} {
+        puts "Error: dependency 'fpgacapZero' not found! Run 'git submodule update --init' to fetch it."
+        exit
+    }
+
 
     set fpgacapzero_verilog_files [list \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_version.vh \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/reset_sync.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/dpram.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/trig_compare.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_regbus_mux.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_ela.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_ela_gowin.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/jtag_reg_iface_gowin.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/jtag_pipe_iface.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/jtag_burst_read.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/jtag_tap/jtag_tap_gowin.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_async_fifo.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_ejtagaxi.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_eio.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_eio_gowin.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/dff_sync.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/dff_reg_sync.v \
-        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/gowin/gw_jtag.v
+        $fpgacapzero_path/rtl/fcapz_version.vh \
+        $fpgacapzero_path/rtl/reset_sync.v \
+        $fpgacapzero_path/rtl/dpram.v \
+        $fpgacapzero_path/rtl/trig_compare.v \
+        $fpgacapzero_path/rtl/fcapz_regbus_mux.v \
+        $fpgacapzero_path/rtl/fcapz_ela.v \
+        $fpgacapzero_path/rtl/fcapz_ela_gowin.v \
+        $fpgacapzero_path/rtl/jtag_reg_iface_gowin.v \
+        $fpgacapzero_path/rtl/jtag_pipe_iface.v \
+        $fpgacapzero_path/rtl/jtag_burst_read.v \
+        $fpgacapzero_path/rtl/jtag_tap/jtag_tap_gowin.v \
+        $fpgacapzero_path/rtl/fcapz_async_fifo.v \
+        $fpgacapzero_path/rtl/fcapz_ejtagaxi.v \
+        $fpgacapzero_path/rtl/fcapz_eio.v \
+        $fpgacapzero_path/rtl/fcapz_eio_gowin.v \
+        $fpgacapzero_path/rtl/dff_sync.v \
+        $fpgacapzero_path/rtl/dff_reg_sync.v \
+        $fpgacapzero_path/rtl/gowin/gw_jtag.v
     ]
 
     foreach src $fpgacapzero_verilog_files {
         add_file -type verilog $src
     }
-
-    add_file $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/timing_${system_clock_frequency_mhz}mhz.sdc
 }
 
 add_file "../../${constraints_folder}/location.cst"
