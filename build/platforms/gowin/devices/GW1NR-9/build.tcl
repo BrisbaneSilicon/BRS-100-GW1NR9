@@ -66,7 +66,7 @@ if {$embedded_logic_analyzer == "true"} {
 
     if {![file isdirectory $fcapzero_rtl_path]} {
         puts "Error: dependency 'fpgacapZero' not found! Run 'git submodule update --init' to fetch it."
-        exit
+        exit 1
     }
 
     set fpgacapzero_verilog_files [list \
