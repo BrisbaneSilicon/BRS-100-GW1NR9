@@ -89,7 +89,15 @@ module autogen_top_wrapper #(
     inout   [CS_WIDTH-1:0]              IO_psram_rwds,
     inout   [DQ_WIDTH-1:0]              IO_psram_dq,
     output  [CS_WIDTH-1:0]              O_psram_reset_n,
-    output  [CS_WIDTH-1:0]              O_psram_cs_n
+    output  [CS_WIDTH-1:0]              O_psram_cs_n,
+
+    // NOTE: these ports are needed,
+    // for the GW_JTAG module to be
+    // wired up transparently...
+    input   wire                        tms_pad_i,
+    input   wire                        tck_pad_i,
+    input   wire                        tdi_pad_i,
+    output  wire                        tdo_pad_o
 );
 localparam VERSION_CHARS    = 63;
 localparam DQ_WIDTH         = 16;
@@ -97,7 +105,7 @@ localparam CS_WIDTH         = 2;
 
 
     // ----------------------------------------------
-    //  Internal signals
+    //  Internal signals (non ELA-internal)
     // ----------------------------------------------
 
     reg [5:0]                                           i_top_leds;
@@ -109,6 +117,8 @@ localparam CS_WIDTH         = 2;
     reg                                                 i_microsecond_tick;
     reg                                                 i_millisecond_tick;
     reg                                                 i_second_tick;
+
+    reg                                                 i_jtag_activity;
 
     reg                                                 i_uart_tx_valid;
     reg                                                 i_uart_tx_ready;
@@ -263,7 +273,7 @@ localparam CS_WIDTH         = 2;
                 .flash_xip_ready    (i_flash_xip_ready)
             );
 
-            assign pad_leds_n = ~i_top_leds;
+            assign pad_leds_n = ~{i_jtag_activity, i_top_leds[4:0]};
                 // NOTE:
                 //          led[4]: pin activity
                 //          led[3]: flash activity
@@ -319,6 +329,75 @@ localparam CS_WIDTH         = 2;
             );
 
             assign pad_leds_n = ~i_user_leds;
+        end
+
+        if(EMBEDDED_LOGIC_ANALYZER) begin
+
+            // ----------------------------------------------
+            //  Internal signals (ELA-internal)
+            // ----------------------------------------------
+
+            localparam ELA_SAMPLE_WIDTH = 8;
+            localparam ELA_SAMPLE_DEPTH = 64;
+            localparam ELA_CHANNELS     = 64;
+
+            reg                                         i_sysclk_reset;
+
+            reg [1:0]                                   i_buttons;
+            reg [32-1:0]                                i_pad;
+            reg [ELA_SAMPLE_WIDTH-1:0]                  i_counter;
+
+            reg [(ELA_SAMPLE_WIDTH*ELA_CHANNELS)-1:0]   i_probe;
+
+
+            always @(posedge i_sysclk) begin
+                if (i_sysclk_resetn == 1'b0) begin
+                    i_counter   <= 0;
+                    i_buttons   <= 0;
+                    i_pad       <= 0;
+                end else begin
+                    i_counter   <= i_counter + 1'b1;
+                    i_buttons   <= ~pad_user_buttons_n;
+                    i_pad       <= pad_io[32:1];
+                end
+            end
+
+            assign i_probe = { i_pad, 6'b000000, i_buttons, i_counter};
+
+
+            // ----------------------------------------------
+            //  Embedded Logic Analyser
+            // ----------------------------------------------
+
+            assign i_sysclk_reset = ~i_sysclk_resetn;
+
+            fcapz_ela_gowin #(
+                .SAMPLE_W       (ELA_SAMPLE_WIDTH),
+                .DEPTH          (ELA_SAMPLE_DEPTH),
+                .NUM_CHANNELS   (ELA_CHANNELS),
+                .EIO_EN         (0)
+            ) u_ela (
+                .clk            (i_sysclk),
+                .jtag_activity  (i_jtag_activity),
+
+                .sample_clk     (i_sysclk),
+                .sample_rst     (i_sysclk_reset),
+                .probe_in       (i_probe),
+
+                .eio_probe_in   (0),
+                .eio_probe_out  (),
+                    // NOTE: external trigger ports
+                    // tie off if not used
+
+                .tms_pad_i      (tms_pad_i),
+                .tck_pad_i      (tck_pad_i),
+                .tdi_pad_i      (tdi_pad_i),
+                .tdo_pad_o      (tdo_pad_o)
+            );
+
+        end else begin
+
+            assign tdo_pad_o = 1'b0;
         end
     endgenerate
 

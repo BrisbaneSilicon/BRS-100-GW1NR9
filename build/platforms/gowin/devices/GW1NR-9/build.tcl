@@ -16,6 +16,7 @@ set artifacts_folder                ".artifacts"
 
 set lib_folder                      "lib"
 set device_security_wrapper_name    "device_security_wrapper"
+set ela_variant                     "fcapz"
 
 set project_name                    [lindex $argv 0]
 set repo_root_dir                   [lindex $argv 1]
@@ -45,7 +46,6 @@ set_option -use_done_as_gpio 1
 
 source ${repo_root_dir}/${proj_folder}/${common_folder}/${scripts_folder}/synth.tcl
 source ${repo_root_dir}/${proj_folder}/${foreign_folder}/${platform}/${target_part}/${speed_grade}/${scripts_folder}/synth.tcl
-
 foreach src $srclist_sv {
     add_file -type verilog $src
 }
@@ -56,12 +56,45 @@ foreach src $srclist_vhdl {
     add_file -type vhdl $src
 }
 
+if {$embedded_logic_analyzer == "true"} {
+    # NOTE: pull in required ELA files...
+
+    set fpgacapzero_folder "fpgacapZero"
+
+    # TODO: check the above folder exists... print error/suggestion
+
+    set fpgacapzero_verilog_files [list \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_version.vh \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/reset_sync.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/dpram.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/trig_compare.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_regbus_mux.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_ela.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_ela_gowin.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/jtag_reg_iface_gowin.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/jtag_pipe_iface.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/jtag_burst_read.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/jtag_tap/jtag_tap_gowin.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_async_fifo.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_ejtagaxi.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_eio.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/fcapz_eio_gowin.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/dff_sync.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/dff_reg_sync.v \
+        $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/rtl/gowin/gw_jtag.v
+    ]
+
+    foreach src $fpgacapzero_verilog_files {
+        add_file -type verilog $src
+    }
+
+    add_file $repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder/timing_${system_clock_frequency_mhz}mhz.sdc
+}
 
 add_file "../../${constraints_folder}/location.cst"
 add_file "../../${constraints_folder}/timing_${system_clock_frequency_mhz}mhz.sdc"
 
 add_file -type verilog ../${artifacts_folder}/autogen_top_wrapper.sv
-
 set_option -top_module autogen_top_wrapper
 
 puts "Project generation complete"
