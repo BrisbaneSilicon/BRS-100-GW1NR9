@@ -15,9 +15,14 @@ Example project for the [BRS-100-GW1NR9](https://brisbanesilicon.com.au/devboard
 *   [Build](#build)
 *   [Program](#program)
 *   [Board Demonstration](#board-demonstration)
+*   [Embedded Logic Analyzer](#embedded-logic-analyzer)
 *   [Development](#development)
 *   [Documentation](#documentation)
 *   [Roadmap](#roadmap)
+*   [HowTo](#howto)
+    *   [WINUSB Setup](#winusb-setup)
+    *   [FTDI Setup](#ftdi-setup)
+    *   [OpenOCD Setup](#openocd-setup)
 <br>
 
 ## Overview
@@ -56,64 +61,9 @@ Fulfill the below prerequisites.
 
 ### Other
 
-1. An FTDI driver is required if you wish to communicate with the BRS-100-GW1NR9 via UART. On most Linux distributions they are part of the default installation of the OS. On Windows, you may need to install the driver from [here](https://ftdichip.com/drivers/vcp-drivers/). FTDI also provide installation guides, available [here](https://ftdichip.com/document/installation-guides/).
-2. Windows version require matching FTDI driver versions, if you already have FTDI installed earlier. Mismatched FTDI driver versions can cause Windows to crash with `KERNEL_SECURITY_CHECK_FAILURE (0x139)`.
-
-To check for driver conflicts, run:
-```powershell
-pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5
-```
-Ensure all listed driver versions match. If they do not, follow the full FTDI reinstall procedure: 
-
-   1. Remove all FTDI devices and drivers
-    Open Device Manager (devmgmt.msc), then enable hidden devices via View > Show hidden devices. Look under:
-```
-    "Universal Serial Bus controllers" — any FTDI entries
-    "Ports (COM & LPT)" — any "USB Serial Port" entries
-    "USB Debugger A" entries
-    "USB Serial Converter" entries
-```
-
-  Right-click each device > Uninstall device > check "Attempt to remove the driver for this device".
-
-
-   2. Clear ghost devices
-
-  With the board unplugged, open an admin PowerShell:
-
-  ```pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5```
-
-  This lists any FTDI drivers still in the driver store. For each one, note the published name (e.g. oem12.inf) and remove it:
-
-  ```pnputil /delete-driver oem12.inf /force```
-
-   3. Clean leftover files
-
-  Check for stale copies:
-
-    Get-ChildItem C:\Windows\System32\drivers\ftd*.sys
-    Get-ChildItem C:\Windows\System32\ftd2xx*.dll
-    Get-ChildItem C:\Windows\SysWOW64\ftd2xx*.dll
-
-  These should be gone after step 2. If any remain, note the versions (Right-click > Properties > Details > File version) before deleting — this tells you what was installed.
-
-   4. Reboot
-
-    Reboot before reinstalling anything. This ensures the kernel fully unloads the old drivers.
-
-   5. Reinstall clean
-
-  Download the latest D2XX driver from FTDI: https://ftdichip.com/drivers/d2xx-drivers/
-
-  Run the installer. Then plug in the board. Windows should pick up the new drivers.
-
-   6. Verify versions match
-
-  After reinstall, check if the driver versions match by running: 
-  ```
-  pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5
-  ``` 
-
+1. On Linux, an FTDI driver is required to communicate with the BRS-100-GW1NR9 via UART. On most Linux distributions they are part of the default installation of the OS (sudo modprobe ftdi_sio), however you may need to install the driver from [here](https://ftdichip.com/drivers/vcp-drivers/).
+2. If you want to program the BRS-100-GW1NR9 via the 'program.ps1' script on Windows (or probe an ELA, see section [Embedded Logic Analyzer](#embedded-logic-analyzer)) you will need to utilize the WINUSB driver (instead of an FTDI driver). To install WINUSB for the BRS-100-GW1NR9 on Windows, see section [WINUSB Setup](#winusb-setup).
+3. If you wish to use an FTDI driver with the BRS-100-GW1NR9 on Windows (i.e. program via GUI, communicate with the BRS-100-GW1NR9 via UART), see section [FTDI Setup](#ftdi-setup). 
 
 <br>
 
@@ -320,7 +270,7 @@ The most commonly used are listed below.
 | -c, --clean_target_prior | Clean TARGET build prior to building and programming the BRS-100-GW1NR9 board. |
 | -b, --check_if_target_built | Print firmware built status of provided target board and exit. |
 | -t, --custom_target_device CUSTOM_TARGET | Instead of the default target, target 'CUSTOM_TARGET'. |
-| -o, --open_fpga_loader CUSTOM_TARGET | Program the BRS-100-GW1NR9 using 'openFPGALoader' instead of the GoWIN toolchain. |
+| -o, --open_fpga_loader CUSTOM_TARGET | Program the BRS-100-GW1NR9 using 'openFPGALoader' instead of the GoWIN toolchain (Linux only). |
 <br>
 
 > [!WARNING]
@@ -424,6 +374,10 @@ The `FW` tag format is: `<git commit SHA> <-dirty if built with local changes> |
 
 <br>
 
+## Embedded Logic Analyzer
+
+
+
 ## Development
 
 Extending the project with your custom firmware is quite straightforward, simply modify the __user.sv__ file (located in \<BRS-100-GW1NR9 repository directory>/BRS-100-GW1NR9/proj/common/systemverilog/). You can also instantiate your own Systemverilog or VHDL modules, but ensure you add them to the appropriate build script file __synth.tcl__ ('scripts' directories).
@@ -438,6 +392,113 @@ Official documentation for the BRS-100-GW1NR9 is available [here](https://brisba
 
 <br>
 
+## HowTo
+
+This section details the installation and setup of external requirements / tools.
+
+### WINUSB Setup
+
+To install the WINUSB driver for the BRS-100-GW1NR9 on Windows, perform the below steps.
+
+1. Download and install the latest version of the Zadig utility [here](https://zadig.akeo.ie/). If that link is broken, use the version in this repository (under foreign/zadig).
+2. Connect the BRS-100-GW1NR9 to your PC.
+3. Run Zadig as Administrator.
+4. From the top menu, click 'Options' and check 'List All Devices'.
+5. Select 'BRS-100-GW1NR9 (Interface 0)' from the drop down.
+6. Click 'Replace Driver' as per the below image.
+
+![Alt text](img/zadig.png)
+
+<br>
+
+### FTDI Setup
+
+On Windows, you may need to install the driver from [here](https://ftdichip.com/drivers/vcp-drivers/). FTDI also provide installation guides, available [here](https://ftdichip.com/document/installation-guides/).
+4. Windows version require matching FTDI driver versions, if you already have FTDI installed earlier. Mismatched FTDI driver versions can cause Windows to crash with `KERNEL_SECURITY_CHECK_FAILURE (0x139)`.
+
+To check for driver conflicts, run:
+```powershell
+pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5
+```
+Ensure all listed driver versions match. If they do not, follow the full FTDI reinstall procedure: 
+
+   1. Remove all FTDI devices and drivers
+    Open Device Manager (devmgmt.msc), then enable hidden devices via View > Show hidden devices. Look under:
+```
+    "Universal Serial Bus controllers" — any FTDI entries
+    "Ports (COM & LPT)" — any "USB Serial Port" entries
+    "USB Debugger A" entries
+    "USB Serial Converter" entries
+```
+
+  Right-click each device > Uninstall device > check "Attempt to remove the driver for this device".
+
+
+   2. Clear ghost devices
+
+  With the board unplugged, open an admin PowerShell:
+
+  ```pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5```
+
+  This lists any FTDI drivers still in the driver store. For each one, note the published name (e.g. oem12.inf) and remove it:
+
+  ```pnputil /delete-driver oem12.inf /force```
+
+   3. Clean leftover files
+
+  Check for stale copies:
+
+    Get-ChildItem C:\Windows\System32\drivers\ftd*.sys
+    Get-ChildItem C:\Windows\System32\ftd2xx*.dll
+    Get-ChildItem C:\Windows\SysWOW64\ftd2xx*.dll
+
+  These should be gone after step 2. If any remain, note the versions (Right-click > Properties > Details > File version) before deleting — this tells you what was installed.
+
+   4. Reboot
+
+    Reboot before reinstalling anything. This ensures the kernel fully unloads the old drivers.
+
+   5. Reinstall clean
+
+  Download the latest D2XX driver from FTDI: https://ftdichip.com/drivers/d2xx-drivers/
+
+  Run the installer. Then plug in the board. Windows should pick up the new drivers.
+
+   6. Verify versions match
+
+  After reinstall, check if the driver versions match by running: 
+  ```
+  pnputil /enum-drivers | Select-String -Pattern "ftdi" -Context 5
+  ```
+
+### OpenOCD Setup
+
+OpenOCD, the Open On-Chip Debugger, is used to connect fpgacapZero to the ELA (Embedded Logic Analyzer). Note that you must perform [WINUSB Setup](#winusb-setup) prior to setting up OpenOCD.
+
+To install OpenOCD, simply follow the OS-specific instructions [here](https://github.com/openocd-org/openocd/#installing-openocd). Alternatively, if you are on Windows you can download a binary from [here](https://openocd.org/pages/getting-openocd.html). 
+
+To connect OpenOCD to the BRS-100-GW1NR9, ensure it is plugged into the PC and then run the terminal command(s) below.
+
+```
+cd <this repository directory>
+openocd -f foreign/openocd/brs_100_gw1nr9.cfg
+```
+If OpenOCD has connected successfully, the output will be similar to the following.
+
+```
+Open On-Chip Debugger 0.12.0
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+Info : clock speed 5000 kHz
+Info : JTAG tap: GW1NR-9C.tap tap/device found: 0x1100481b (mfg: 0x40d (Gowin Semiconductor Corp), part: 0x1004, ver: 0x1)
+Warn : gdb services need one or more targets defined
+Info : Listening on port 6666 for tcl connections
+Info : Listening on port 4444 for telnet connections
+```
+
+<br>
+
 ## Roadmap
 
 1. Enhance board demonstration mode to exercise both PSRAM and Flash memory.
@@ -448,7 +509,7 @@ Official documentation for the BRS-100-GW1NR9 is available [here](https://brisba
 ## Authors
 
 - [@brisbanesilicon](https://github.com/BrisbaneSilicon)
-- [@Jingqim](https://github.com/Jingqim) (Windows Version)
+- [@Jingqim](https://github.com/Jingqim)
 
 <br>
 
