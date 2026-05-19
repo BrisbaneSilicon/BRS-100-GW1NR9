@@ -381,7 +381,7 @@ The `FW` tag format is: `<git commit SHA> <-dirty if built with local changes> |
 
 ## Embedded Logic Analyzer
 
-This project can be built to include an Embedded Logic Analyzer showcase injecting and probing an fpgacapZero ELA core. Ensure you have completed [OpenOCD Setup](#openocd-setup) and [FcapZ Setup](#fcapz-setup) and pulled the 'fpgaCapZero' foreign git submodule (command below) prior to performing the steps below.
+This project can be built to include an Embedded Logic Analyzer to showcase injecting and probing an fpgacapZero ELA core. Ensure you have completed [OpenOCD Setup](#openocd-setup) and [FcapZ Setup](#fcapz-setup) and pulled the 'fpgaCapZero' foreign git submodule (command below) prior to performing the steps below.
 ```bash
 cd <this repository directory>
 git submodule update --init
