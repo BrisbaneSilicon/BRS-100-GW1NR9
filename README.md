@@ -317,7 +317,7 @@ For more detailed windows troubleshooting steps, see TROUBLESHOOTING.txt.
 
 ### Linux
 
-This project can be built in 'board demonstration' mode to showcase the various hardware features (GPIO, UART, PSRAM - although as of 12/2025 not all features are demonstrated, see [roadmap](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9?tab=readme-ov-file#roadmap)). To run the board demonstration firmware, build the firmware with the '-b' command line argument (below) and then program the board as per [program](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9?tab=readme-ov-file#program).<br>
+This project can be built in 'board demonstration' mode to showcase the various hardware features (GPIO, UART, PSRAM - although as of 12/2025 not all features are demonstrated, see [roadmap](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9?tab=readme-ov-file#roadmap)). To run the board demonstration firmware, build the firmware with the '-b' command line argument (below) and then program the board as per [program](#program).<br>
 ```bash
 ./build.sh -b
 ```
@@ -387,7 +387,7 @@ cd <this repository directory>
 git submodule update --init
 ```
 
-To inject an ELA core into the firmware, build the firmware with the '-e' command line argument (below) and then program the board as per [program](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9?tab=readme-ov-file#program).<br>
+To inject an ELA core into the firmware, build the firmware with the '-e' command line argument (below) and then program the board as per [program](#program).<br>
 ```bash
 ./build.sh -e
 ```
