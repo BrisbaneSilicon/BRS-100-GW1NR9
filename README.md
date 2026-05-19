@@ -450,6 +450,8 @@ See the table below for details on the meaning of the LEDs for the '-e' build sw
 |:------:|:------:|:------:|:------:|:------:|:------:|
 |1/2 Second Heartbeat|JTAG Activity|Button 2 State|GPIO 1 State|GPIO 2 State|GPIO 3 State|
 
+<br>
+
 ## Development
 
 Extending the project with your custom firmware is quite straightforward, simply modify the __user.sv__ file (located in \<BRS-100-GW1NR9 repository directory>/BRS-100-GW1NR9/proj/common/systemverilog/). You can also instantiate your own Systemverilog or VHDL modules, but ensure you add them to the appropriate build script file __synth.tcl__ ('scripts' directories).
