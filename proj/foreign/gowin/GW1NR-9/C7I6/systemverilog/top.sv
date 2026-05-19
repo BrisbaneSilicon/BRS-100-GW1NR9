@@ -326,6 +326,7 @@ localparam int UART_DIVIDER     = (CLK_FREQUENCY_HZ / UART_BAUD)-1;
     end
     assign leds = i_leds;
         // NOTE:
+        //          led[5]: unused
         //          led[4]: pin activity
         //          led[3]: flash activity
         //          led[2]: hyperram activity
