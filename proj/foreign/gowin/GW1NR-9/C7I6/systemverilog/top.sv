@@ -66,6 +66,10 @@ module top #(
     output  reg                 millisecond_tick,
     output  reg                 second_tick,
 
+    output reg  [8:0]           microsecond_div_counter,
+    output reg  [19:0]          millisecond_div_counter,
+    output reg  [11:0]          millisecond_counter,
+
     input                       uart_tx_valid,
     output  reg                 uart_tx_ready,
     input       [7:0]           uart_tx_data,
@@ -151,10 +155,6 @@ localparam int UART_DIVIDER     = (CLK_FREQUENCY_HZ / UART_BAUD)-1;
     reg     [31:0]          i_mbus_spimemxip_rdata;
     wire                    i_mbus_spimemxip_valid;
     reg                     i_mbus_spimemxip_ready;
-
-    reg     [8:0]           i_microsecond_div_counter;
-    reg     [19:0]          i_millisecond_div_counter;
-    reg     [11:0]          i_millisecond_counter;
 
 
     // ----------------------------------------------
@@ -317,7 +317,7 @@ localparam int UART_DIVIDER     = (CLK_FREQUENCY_HZ / UART_BAUD)-1;
             i_leds[1] <= 1'b1;
         end
 
-        if (|i_millisecond_counter[6:0] == 1'b1) begin
+        if (|millisecond_counter[6:0] == 1'b1) begin
             i_leds[4:1] <= 0;
         end
         if (i_soft_reset_n == 1'b0) begin
@@ -340,40 +340,40 @@ localparam int UART_DIVIDER     = (CLK_FREQUENCY_HZ / UART_BAUD)-1;
 
     always @(posedge i_sysclk) begin
         if (i_soft_reset_n == 1'b0) begin
-            i_microsecond_div_counter   <= 0;
-            i_millisecond_div_counter   <= 0;
-            i_millisecond_counter       <= 0;
+            microsecond_div_counter <= 0;
+            millisecond_div_counter <= 0;
+            millisecond_counter     <= 0;
 
-            second_tick                 <= 1'b0;
-            millisecond_tick            <= 1'b0;
-            microsecond_tick            <= 1'b0;
+            second_tick             <= 1'b0;
+            millisecond_tick        <= 1'b0;
+            microsecond_tick        <= 1'b0;
         end else begin
             // defaults
             second_tick         <= 1'b0;
             millisecond_tick    <= 1'b0;
             microsecond_tick    <= 1'b0;
 
-            if (i_millisecond_div_counter == 0) begin
-                i_millisecond_div_counter   <= (CLK_FREQUENCY_HZ/1000)-1;
-                millisecond_tick            <= 1'b1;
+            if (millisecond_div_counter == 0) begin
+                millisecond_div_counter <= (CLK_FREQUENCY_HZ/1000)-1;
+                millisecond_tick        <= 1'b1;
             end else begin
-                i_millisecond_div_counter <= i_millisecond_div_counter - 1;
+                millisecond_div_counter <= millisecond_div_counter - 1;
             end
 
-            if (i_microsecond_div_counter == 0) begin
-                i_microsecond_div_counter   <= (CLK_FREQUENCY_HZ/1000000)-1;
-                microsecond_tick            <= 1'b1;
+            if (microsecond_div_counter == 0) begin
+                microsecond_div_counter <= (CLK_FREQUENCY_HZ/1000000)-1;
+                microsecond_tick        <= 1'b1;
             end else begin
-                i_microsecond_div_counter <= i_microsecond_div_counter - 1;
+                microsecond_div_counter <= microsecond_div_counter - 1;
             end
 
             if (millisecond_tick == 1'b1) begin
-                if (i_millisecond_counter == 1000-1) begin
-                    second_tick             <= 1'b1;
+                if (millisecond_counter == 1000-1) begin
+                    second_tick <= 1'b1;
 
-                    i_millisecond_counter   <= 0;
+                    millisecond_counter <= 0;
                 end else begin
-                    i_millisecond_counter <= i_millisecond_counter + 1;
+                    millisecond_counter <= millisecond_counter + 1;
                 end
             end
         end

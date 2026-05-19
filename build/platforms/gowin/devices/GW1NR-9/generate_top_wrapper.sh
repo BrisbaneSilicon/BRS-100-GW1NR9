@@ -75,6 +75,8 @@ module autogen_top_wrapper #(
     input                               pad_ser_rx,
     output                              pad_ser_tx,
     inout   [32:1]                      pad_io,
+        // NOTE: Indexed to patch PIN
+        // numbers...
 
     output                              pad_flash_clk,
     output                              pad_flash_csb,
@@ -105,11 +107,8 @@ localparam CS_WIDTH         = 2;
 
 
     // ----------------------------------------------
-    //  Internal signals (non ELA-internal)
+    //  Internal signals (common across generates)
     // ----------------------------------------------
-
-    reg [5:0]                                           i_top_leds;
-    reg [5:0]                                           i_user_leds;
 
     reg                                                 i_sysclk;
     reg                                                 i_sysclk_resetn  = 1'b0;
@@ -117,6 +116,10 @@ localparam CS_WIDTH         = 2;
     reg                                                 i_microsecond_tick;
     reg                                                 i_millisecond_tick;
     reg                                                 i_second_tick;
+
+    reg                         [11:0]                  i_millisecond_counter;
+
+    reg                         [31:0]                  i_io;
 
     reg                                                 i_jtag_activity;
 
@@ -147,6 +150,10 @@ localparam CS_WIDTH         = 2;
     reg                         [31:0]                  i_flash_xip_rdata;
     reg                                                 i_flash_xip_valid;
     reg                                                 i_flash_xip_ready;
+
+    reg [5:0]                                           i_top_leds;
+    reg [5:0]                                           i_user_leds;
+    reg [5:0]                                           i_ela_leds;
 
 
     // ----------------------------------------------
@@ -191,6 +198,8 @@ localparam CS_WIDTH         = 2;
         .microsecond_tick           (i_microsecond_tick),
         .millisecond_tick           (i_millisecond_tick),
         .second_tick                (i_second_tick),
+
+        .millisecond_counter        (i_millisecond_counter),
 
         .uart_tx_valid              (i_uart_tx_valid),
         .uart_tx_ready              (i_uart_tx_ready),
@@ -242,8 +251,6 @@ localparam CS_WIDTH         = 2;
                 .millisecond_tick   (i_millisecond_tick),
                 .second_tick        (i_second_tick),
 
-                .io                 (pad_io),
-
                 .uart_tx_valid      (i_uart_tx_valid),
                 .uart_tx_ready      (i_uart_tx_ready),
                 .uart_tx_data       (i_uart_tx_data),
@@ -272,14 +279,6 @@ localparam CS_WIDTH         = 2;
                 .flash_xip_valid    (i_flash_xip_valid),
                 .flash_xip_ready    (i_flash_xip_ready)
             );
-
-            assign pad_leds_n = ~{i_jtag_activity, i_top_leds[4:0]};
-                // NOTE:
-                //          led[4]: pin activity
-                //          led[3]: flash activity
-                //          led[2]: hyperram activity
-                //          led[1]: uart activity
-                //          led[0]: heartbeat
 
         end else begin
 
@@ -328,7 +327,6 @@ localparam CS_WIDTH         = 2;
                 .flash_xip_ready    (i_flash_xip_ready)
             );
 
-            assign pad_leds_n = ~i_user_leds;
         end
 
         if(EMBEDDED_LOGIC_ANALYZER) begin
@@ -339,12 +337,11 @@ localparam CS_WIDTH         = 2;
 
             localparam ELA_SAMPLE_WIDTH = 8;
             localparam ELA_SAMPLE_DEPTH = 64;
-            localparam ELA_CHANNELS     = 64;
+            localparam ELA_CHANNELS     = 6;
 
             reg                                         i_sysclk_reset;
 
             reg [1:0]                                   i_buttons;
-            reg [32-1:0]                                i_pad;
             reg [ELA_SAMPLE_WIDTH-1:0]                  i_counter;
 
             reg [(ELA_SAMPLE_WIDTH*ELA_CHANNELS)-1:0]   i_probe;
@@ -354,15 +351,13 @@ localparam CS_WIDTH         = 2;
                 if (i_sysclk_resetn == 1'b0) begin
                     i_counter   <= 0;
                     i_buttons   <= 0;
-                    i_pad       <= 0;
                 end else begin
                     i_counter   <= i_counter + 1'b1;
                     i_buttons   <= ~pad_user_buttons_n;
-                    i_pad       <= pad_io[32:1];
                 end
             end
 
-            assign i_probe = { i_pad, 6'b000000, i_buttons, i_counter};
+            assign i_probe = { i_io, 7'b0000000, i_buttons[1], i_counter};
 
 
             // ----------------------------------------------
@@ -395,9 +390,89 @@ localparam CS_WIDTH         = 2;
                 .tdo_pad_o      (tdo_pad_o)
             );
 
+            // NOTE: We control the
+            // leds in this case
+            // ---------------------
+
+            always @(posedge i_sysclk) begin
+                if (i_millisecond_tick == 1'b1) begin
+                    if (i_millisecond_counter == 0 || i_millisecond_counter == 500) begin
+                        i_ela_leds[0] <= ~i_ela_leds[0];
+                    end
+                end
+
+                if (i_jtag_activity == 1'b1) begin
+                    i_ela_leds[1] <= 1'b1;
+                end
+                if (|i_millisecond_counter[6:0] == 1'b0) begin
+                    i_ela_leds[1] <= 0;
+                end
+
+                i_ela_leds[2]   <= i_buttons[1];
+                i_ela_leds[5:3] <= i_io[2:0];
+
+                if (i_sysclk_resetn == 1'b0) begin
+                    i_ela_leds <= 0;
+                end
+            end
+
         end else begin
 
             assign tdo_pad_o = 1'b0;
+        end
+    endgenerate
+
+
+    // NOTE: I/O dependent
+    // on configuration
+    // ----------------------
+
+    generate
+        if(BOARD_DEMONSTRATION) begin
+
+            assign pad_io[15:1]     = 'z;
+            assign pad_io[32:16]    = i_io[15:0];
+
+            always @(posedge i_sysclk) begin
+                i_io[15:0] <= pad_io[16:1];
+
+                if (i_sysclk_resetn == 1'b0) begin
+                    i_io <= 0;
+                end
+            end
+
+            assign pad_leds_n = ~i_top_leds[4:0];
+                // NOTE:
+                //          led[5] : Unused
+                //          led[4] : Pin Activity
+                //          led[3] : Flash Activity
+                //          led[2] : Hyperram Activity
+                //          led[1] : UART Activity
+                //          led[0] : 1 Second Heartbeat
+
+        end else if(EMBEDDED_LOGIC_ANALYZER) begin
+
+            assign pad_io = 'z;
+
+            always @(posedge i_sysclk) begin
+                i_io <= pad_io;
+
+                if (i_sysclk_resetn == 1'b0) begin
+                    i_io <= 0;
+                end
+            end
+
+            assign pad_leds_n = ~i_ela_leds;
+                // NOTE:
+                //          led[5:3] : GPIO 3 - 1
+                //          led[2]   : Button 2
+                //          led[1]   : JTAG Activity
+                //          led[0]   : 1/2 Second Heartbeat
+
+        end else begin
+
+            assign pad_leds_n = ~i_user_leds;
+
         end
     endgenerate
 
