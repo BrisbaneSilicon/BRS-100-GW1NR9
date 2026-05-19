@@ -1,0 +1,4 @@
+[submodule "proj/foreign/fpgacapZero"]
+	path = proj/foreign/fpgacapZero
+	url = git@github.com:BrisbaneSilicon/fpgacapZero.git
+	branch = chaywood/pr/brs_100_gw1nr9_support
