@@ -82,7 +82,7 @@ check_target_supported_for_platform_exit_on_failure() {
     fi
 }
 
-
+embedded_logic_analyzer=0
 board_demonstration=0
 pushbutton_reset=1
 uart_baud=115200
@@ -172,6 +172,10 @@ while [ $# -gt 0 ]; do
             ;;
         -b|--board_demonstration)
             board_demonstration=1
+            shift 1
+            ;;
+        -e|--embedded_logic_analyzer)
+            embedded_logic_analyzer=1
             shift 1
             ;;
         -f|--platform)
@@ -302,9 +306,14 @@ arg4=$project_root_dir
 arg5=$odir
 arg6=$target
 arg7=$system_clock_frequency_mhz
-arg8=$do_project_gen_only
-arg9=$do_synthesis_only
-${platform}_build_target $arg1 $arg2 $arg3 $arg4 $arg5 $arg6 $arg7 $arg8 $arg9
+if [ $embedded_logic_analyzer -eq 0 ]; then
+    arg8=false
+else
+    arg8=true
+fi
+arg9=$do_project_gen_only
+arg10=$do_synthesis_only
+${platform}_build_target $arg1 $arg2 $arg3 $arg4 $arg5 $arg6 $arg7 $arg8 $arg9 $arg10
 
 # NOTE: post-build
 ${platform}_post_build_cleanup

@@ -271,6 +271,7 @@ The most commonly used are listed below.
 | -k, --clock_frequency FREQUENCY_MHZ | Use a frequency of FREQUENCY_MHZ for the system clock (default 51 MHz). |
 | -u, --uart_baud | Set the user comms baud rate (default 115200). |
 | -b, --board_demonstration | Perform a build of the board demonstration bitstream. |
+| -e, --embedded_logic_analyzer| Include an Embedded Logic Analyzer (fpgacapZero) in the bitstream. |
 | -a, --clean_all_platforms | Perform cleanup of the entire build and exit. |
 
 ### Windows

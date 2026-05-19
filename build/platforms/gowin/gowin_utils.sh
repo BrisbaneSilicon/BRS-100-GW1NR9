@@ -303,10 +303,10 @@ gowin_get_default_system_clock_frequency() {
 
 
 gowin_build_target() {
-    if [ $# -lt 9 ]; then
+    if [ $# -lt 10 ]; then
         echo "Error, function 'gowin_build_target' requires seven arguments: build_tool_binary \
 build_tcl_script project_name project_root_directory build_directory target_build_id system_clock_frequency_mhz \
-do_project_gen_only do_synthesis_only"
+embedded_logic_analyzer do_project_gen_only do_synthesis_only"
 
         return 1
     fi
@@ -318,15 +318,16 @@ do_project_gen_only do_synthesis_only"
     build_directory=$5
     target_build_id=$6
     system_clock_frequency_mhz=$7
-    do_project_gen_only=$8
-    do_synthesis_only=$9
+    embedded_logic_analyzer=$8
+    do_project_gen_only=$9
+    do_synthesis_only=$10
 
     part_number=$(gowin_part_number_for_target_build_id $target_build_id)
     device_version=$(gowin_device_version_for_target_build_id $target_build_id)
     speed_grade=$(gowin_speed_grade_for_target_build_id $target_build_id)
 
     $build_tool_binary $build_tcl_script $project_name $project_root_directory $build_directory $part_number \
-$device_version $speed_grade $system_clock_frequency_mhz $do_project_gen_only $do_synthesis_only
+$device_version $speed_grade $system_clock_frequency_mhz $embedded_logic_analyzer $do_project_gen_only $do_synthesis_only
 
     return 0
 }

@@ -23,9 +23,10 @@ set build_dir                       [lindex $argv 2]
 set target_part_number              [lindex $argv 3]
 set target_part_version             [lindex $argv 4]
 set speed_grade                     [lindex $argv 5]
-set system_clock_frequency_mhz                 [lindex $argv 6]
-set proj_only                       [lindex $argv 7]
-set synth_only                      [lindex $argv 8]
+set system_clock_frequency_mhz      [lindex $argv 6]
+set embedded_logic_analyzer         [lindex $argv 7]
+set proj_only                       [lindex $argv 8]
+set synth_only                      [lindex $argv 9]
 
 puts "Creating Gowin FPGA project '${project_name}' specs -"
 puts "\tTarget part number: ${target_part_number}"

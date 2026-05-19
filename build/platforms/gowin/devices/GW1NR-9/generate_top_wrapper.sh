@@ -64,7 +64,8 @@ module autogen_top_wrapper #(
     parameter int                           CLK_FREQUENCY_MHZ       = ${clock_frequency_mhz},
     parameter int                           UART_BAUD               = ${uart_baud},
     parameter int                           PUSHBUTTON0_AS_RESET    = ${pushbutton_reset},
-    parameter int                           BOARD_DEMONSTRATION     = ${board_demonstration}
+    parameter int                           BOARD_DEMONSTRATION     = ${board_demonstration},
+    parameter int                           EMBEDDED_LOGIC_ANALYZER = ${embedded_logic_analyzer}
 
 ) (
     input                               pad_clk_27Mhz,
