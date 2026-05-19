@@ -59,34 +59,35 @@ foreach src $srclist_vhdl {
 if {$embedded_logic_analyzer == "true"} {
     # NOTE: pull in required ELA files...
 
-    set fpgacapzero_folder  "fpgacapZero"
-    set fpgacapzero_path    "$repo_root_dir/$proj_folder/$foreign_folder/$fpgacapzero_folder"
+    set fcapzero_folder     "fpgacapZero"
+    set rtl_folder          "rtl"
 
-    if {![file isdirectory $fpgacapzero_path]} {
+    set fcapzero_rtl_path   "$repo_root_dir/$proj_folder/$foreign_folder/$fcapzero_folder/$rtl_folder"
+
+    if {![file isdirectory $fcapzero_rtl_path]} {
         puts "Error: dependency 'fpgacapZero' not found! Run 'git submodule update --init' to fetch it."
         exit
     }
 
-
     set fpgacapzero_verilog_files [list \
-        $fpgacapzero_path/rtl/fcapz_version.vh \
-        $fpgacapzero_path/rtl/reset_sync.v \
-        $fpgacapzero_path/rtl/dpram.v \
-        $fpgacapzero_path/rtl/trig_compare.v \
-        $fpgacapzero_path/rtl/fcapz_regbus_mux.v \
-        $fpgacapzero_path/rtl/fcapz_ela.v \
-        $fpgacapzero_path/rtl/fcapz_ela_gowin.v \
-        $fpgacapzero_path/rtl/jtag_reg_iface_gowin.v \
-        $fpgacapzero_path/rtl/jtag_pipe_iface.v \
-        $fpgacapzero_path/rtl/jtag_burst_read.v \
-        $fpgacapzero_path/rtl/jtag_tap/jtag_tap_gowin.v \
-        $fpgacapzero_path/rtl/fcapz_async_fifo.v \
-        $fpgacapzero_path/rtl/fcapz_ejtagaxi.v \
-        $fpgacapzero_path/rtl/fcapz_eio.v \
-        $fpgacapzero_path/rtl/fcapz_eio_gowin.v \
-        $fpgacapzero_path/rtl/dff_sync.v \
-        $fpgacapzero_path/rtl/dff_reg_sync.v \
-        $fpgacapzero_path/rtl/gowin/gw_jtag.v
+        $fcapzero_rtl_path/fcapz_version.vh \
+        $fcapzero_rtl_path/reset_sync.v \
+        $fcapzero_rtl_path/dpram.v \
+        $fcapzero_rtl_path/trig_compare.v \
+        $fcapzero_rtl_path/fcapz_regbus_mux.v \
+        $fcapzero_rtl_path/fcapz_ela.v \
+        $fcapzero_rtl_path/fcapz_ela_gowin.v \
+        $fcapzero_rtl_path/jtag_reg_iface_gowin.v \
+        $fcapzero_rtl_path/jtag_pipe_iface.v \
+        $fcapzero_rtl_path/jtag_burst_read.v \
+        $fcapzero_rtl_path/jtag_tap/jtag_tap_gowin.v \
+        $fcapzero_rtl_path/fcapz_async_fifo.v \
+        $fcapzero_rtl_path/fcapz_ejtagaxi.v \
+        $fcapzero_rtl_path/fcapz_eio.v \
+        $fcapzero_rtl_path/fcapz_eio_gowin.v \
+        $fcapzero_rtl_path/dff_sync.v \
+        $fcapzero_rtl_path/dff_reg_sync.v \
+        $fcapzero_rtl_path/gowin/gw_jtag.v
     ]
 
     foreach src $fpgacapzero_verilog_files {
