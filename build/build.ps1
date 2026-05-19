@@ -16,6 +16,9 @@ param (
     [switch]$h,
 
     # ---- IMPLEMENTED FLAGS ----
+    [Alias('embedded_logic_analyzer')]
+    [switch]$e,
+
     [Alias('proj_only')]
     [switch]$p,
 
@@ -40,7 +43,7 @@ param (
     [Alias('clean')]
     [switch]$c,
 
-    # ---- NOT YET IMPLEMENTED, NOT IMPORTANT FOR CURRNET BOARD----
+    # ---- NOT YET IMPLEMENTED, NOT IMPORTANT FOR CURRENT BOARD----
     [Alias('custom_target')]
     [string]$t          = "",
 
@@ -76,6 +79,7 @@ if ($h) {
     Write-Host "`t${boldf}-u, -uart_baud${normf} ${underlinef}UART_BAUD${normf}`n`t`tSet user comms baud rate (default 115200).`n"
     Write-Host "`t${boldf}-r, -disable_pushbutton_reset${normf}`n`t`tDisable pushbutton 1 as hard reset.`n"
     Write-Host "`t${boldf}-b, -board_demonstration${normf}`n`t`tPerform build of board demonstration bitstream.`n"
+    Write-Host "`t${boldf}-e, -embedded_logic_analyzer${normf}`n`t`tInclude an Embedded Logic Analyzer (fpgacapZero) in the bitstream.`n"
     Write-Host "`t${boldf}-t, -custom_target${normf} ${underlinef}CUSTOM_TARGET${normf}`n`t`tPerform build targeting CUSTOM_TARGET.`n"
     Write-Host "`t${boldf}-k, -clock_frequency${normf} ${underlinef}FREQUENCY_MHZ${normf}`n`t`tUse a frequency of FREQUENCY_MHZ for the system clock (default 51 MHz)."
     Write-Host "`t`tSee '-y, -list_supported_system_clock_frequencies' above, for more information.`n"
@@ -95,6 +99,7 @@ if ($h) {
 
 # ---- CORE PARAMS ----
 $BoardDemonstration = if ($b) { 1 } else { 0 }
+$EmbeddedLogicAnalyzer 	= if ($e) { 1 } else { 0 }
 $ClockMhz           = $k
 $UartBaud           = $u
 $PushbuttonReset    = if ($r) { 0 } else { 1 }
@@ -296,7 +301,8 @@ Write-Host "Generating autogen_top_wrapper.sv..."
     -ClockFrequencyMhz       $ClockMhz `
     -UartBaud                $UartBaud `
     -PushbuttonReset         $PushbuttonReset `
-    -BoardDemonstration      $BoardDemonstration
+    -BoardDemonstration      $BoardDemonstration `
+    -EmbeddedLogicAnalyzer   $EmbeddedLogicAnalyzer
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "ERROR: Failed to generate autogen_top_wrapper.sv"
@@ -316,6 +322,7 @@ Write-Host "Clock    : $ClockMhz MHz"
 Write-Host "UART     : $UartBaud baud"
 Write-Host "Reset    : $(if ($PushbuttonReset -eq 1) { 'enabled' } else { 'disabled' })"
 Write-Host "Mode     : $(if ($BoardDemonstration -eq 1) { 'board demonstration' } else { 'LED blink (user.sv)' })"
+Write-Host "ELA      : $(if ($EmbeddedLogicAnalyzer -eq 1) { 'enabled' } else { 'disabled' })"
 Write-Host "Build    : $(if ($p) { 'project only' } elseif ($s) { 'synthesis only' } else { 'full build' })"
 Write-Host "GOWIN    : $installFolderName"
 Write-Host "====================================="
@@ -325,7 +332,9 @@ Write-Host ""
 # ---- START TIMER ----
 $startTime = Get-Date
 
-& $GwSh $BuildTcl $ProjectName $RepoRoot $OutputDir $PartNumber $DeviceVersion $SpeedGrade $ClockMhz $DoProjectGenOnly $DoSynthOnly
+$EmbeddedLogicAnalyzerArg 	= if ($e) { "true" } else { "false" }
+
+& $GwSh $BuildTcl $ProjectName $RepoRoot $OutputDir $PartNumber $DeviceVersion $SpeedGrade $ClockMhz $EmbeddedLogicAnalyzerArg $DoProjectGenOnly $DoSynthOnly
 
 # ---- STOP TIMER ----
 $elapsed = (Get-Date) - $startTime
