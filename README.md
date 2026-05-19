@@ -381,13 +381,13 @@ The `FW` tag format is: `<git commit SHA> <-dirty if built with local changes> |
 
 ## Embedded Logic Analyzer
 
-This project can be built to include an Embedded Logic Analyzer showcase injecting and probing an fpgacapZero ELA core. Ensure you have completed [OpenOCD Setup](openocd-setup) and [FcapZ Setup](#fcapz-setup) prior to performing the steps below.
+This project can be built to include an Embedded Logic Analyzer showcase injecting and probing an fpgacapZero ELA core. Ensure you have completed [OpenOCD Setup](#openocd-setup) and [FcapZ Setup](#fcapz-setup) prior to performing the steps below.
 
 To inject an ELA core into the firmware, build the firmware with the '-e' command line argument (below) and then program the board as per [program](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9?tab=readme-ov-file#program).<br>
 ```bash
 ./build.sh -e
 ```
-Once the board has been programmed, run OpenOCD as per [OpenOCD Setup](openocd-setup), and then probe the ELA core via fpgacapZ:<br>
+Once the board has been programmed, run OpenOCD as per [OpenOCD Setup](#openocd-setup), and then probe the ELA core via fpgacapZ:<br>
 ```bash
 fcapz --backend openocd --port 6666 --tap GW1NR-9C.tap probe
 ```
