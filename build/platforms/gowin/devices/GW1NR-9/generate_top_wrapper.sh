@@ -373,6 +373,9 @@ localparam CS_WIDTH         = 2;
                 .EIO_EN         (0)
             ) u_ela (
                 .clk            (i_sysclk),
+                    // NOTE: this clock must be
+                    // at least ~10x the JTAG TCK
+                    // (~2 MHz for BR-100-GW1NR9)
                 .jtag_activity  (i_jtag_activity),
 
                 .sample_clk     (i_sysclk),
