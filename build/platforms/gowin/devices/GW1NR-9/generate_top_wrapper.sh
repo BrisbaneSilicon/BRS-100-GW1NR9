@@ -157,6 +157,18 @@ localparam CS_WIDTH         = 2;
 
 
     // ----------------------------------------------
+    //  Functions
+    // ----------------------------------------------
+
+    function automatic logic [15:0] lfsr_16bit_next;
+        input logic [15:0] lfsr_in;
+    begin
+        lfsr_16bit_next[15:1] = lfsr_in[14:0];
+        lfsr_16bit_next[0] = (lfsr_in[15] ^ lfsr_in[14] ^ lfsr_in[12] ^ lfsr_in[3]);
+    end endfunction : lfsr_16bit_next
+
+
+    // ----------------------------------------------
     //  Implementation
     // ----------------------------------------------
 
@@ -335,29 +347,25 @@ localparam CS_WIDTH         = 2;
             //  Internal signals (ELA-internal)
             // ----------------------------------------------
 
-            localparam ELA_SAMPLE_WIDTH = 8;
-            localparam ELA_SAMPLE_DEPTH = 64;
-            localparam ELA_CHANNELS     = 6;
+            localparam ELA_SAMPLE_WIDTH = 16;
+            localparam ELA_SAMPLE_DEPTH = 4096;
+            localparam ELA_CHANNELS     = 1;
 
-            reg                                         i_sysclk_reset;
+            reg                         i_sysclk_reset;
 
-            reg [1:0]                                   i_buttons;
-            reg [ELA_SAMPLE_WIDTH-1:0]                  i_counter;
-
-            reg [(ELA_SAMPLE_WIDTH*ELA_CHANNELS)-1:0]   i_probe;
+            reg [1:0]                   i_buttons;
+            reg [ELA_SAMPLE_WIDTH-1:0]  i_lfsr16;
 
 
             always @(posedge i_sysclk) begin
                 if (i_sysclk_resetn == 1'b0) begin
-                    i_counter   <= 0;
+                    i_lfsr16    <= 1;
                     i_buttons   <= 0;
                 end else begin
-                    i_counter   <= i_counter + 1'b1;
+                    i_lfsr16    <= lfsr_16bit_next(i_lfsr16);
                     i_buttons   <= ~pad_user_buttons_n;
                 end
             end
-
-            assign i_probe = { i_io, 7'b0000000, i_buttons[1], i_counter};
 
 
             // ----------------------------------------------
@@ -380,7 +388,7 @@ localparam CS_WIDTH         = 2;
 
                 .sample_clk     (i_sysclk),
                 .sample_rst     (i_sysclk_reset),
-                .probe_in       (i_probe),
+                .probe_in       (i_lfsr16),
 
                 .eio_probe_in   (0),
                 .eio_probe_out  (),
