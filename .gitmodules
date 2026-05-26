@@ -1,0 +1,3 @@
+[submodule "proj/foreign/fpgacapZero"]
+	path = proj/foreign/fpgacapZero
+	url = https://github.com/lcapossio/fpgacapZero
