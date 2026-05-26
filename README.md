@@ -582,7 +582,6 @@ To install fpgacapZero, simply follow [OpenOCD Setup](#openocd-setup) and then t
 ## Roadmap
 
 1. Enhance board demonstration mode to exercise both PSRAM and Flash memory.
-2. Add the ability to target different development boards / ecosystems, i.e. Digilent ARTY-S7 / Xilinx/AMD.
 
 <br>
 
