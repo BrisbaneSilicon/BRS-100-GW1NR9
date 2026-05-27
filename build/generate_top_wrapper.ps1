@@ -97,8 +97,8 @@ module autogen_top_wrapper #(
 ) (
     input                               pad_clk_27Mhz,
 
-    input   [1:0]                       pad_user_buttons_n,
-    inout   [5:0]                       pad_leds_n,
+    input   [2:1]                       pad_user_buttons_n,
+    inout   [6:1]                       pad_leds_n,
     input                               pad_ser_rx,
     output                              pad_ser_tx,
     inout   [32:1]                      pad_io,
@@ -198,8 +198,8 @@ localparam CS_WIDTH         = 2;
 
         .clk_27Mhz                  (pad_clk_27Mhz),
 
-        .user_pushbutton0_n         (pad_user_buttons_n[0]),
-        .user_pushbutton1_n         (pad_user_buttons_n[1]),
+        .user_pushbutton0_n         (pad_user_buttons_n[1]),
+        .user_pushbutton1_n         (pad_user_buttons_n[2]),
         .uart_rx                    (pad_ser_rx),
         .uart_tx                    (pad_ser_tx),
         .leds                       (i_top_leds),
