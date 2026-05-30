@@ -17,9 +17,7 @@ proc common_systemverilog {} {
         axis_skid_buffer_fp_opt.sv
         mbus_skid_buffer.sv
 
-        reg_sync.sv
         rst_sync.sv
-        dff_sync.sv
 
         muxes.sv
         uart.sv

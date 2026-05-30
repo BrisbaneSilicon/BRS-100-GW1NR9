@@ -14,7 +14,8 @@ param (
     [int]$ClockFrequencyMhz = 51,       # system clock frequency
     [int]$UartBaud          = 115200,   # uart baud rate
     [int]$PushbuttonReset   = 1,        # pushbutton reset enabled
-    [int]$BoardDemonstration = 0        # 0 = user.sv, 1 = board_demonstration.sv
+    [int]$BoardDemonstration = 0,       # 0 = user.sv, 1 = board_demonstration.sv
+    [int]$EmbeddedLogicAnalyzer = 0     # 0 = disabled, 1 = enabled
 )
 
 
@@ -90,16 +91,19 @@ module autogen_top_wrapper #(
     parameter int                           CLK_FREQUENCY_MHZ       = $ClockFrequencyMhz,
     parameter int                           UART_BAUD               = $UartBaud,
     parameter int                           PUSHBUTTON0_AS_RESET    = $PushbuttonReset,
-    parameter int                           BOARD_DEMONSTRATION     = $BoardDemonstration
+    parameter int                           BOARD_DEMONSTRATION     = $BoardDemonstration,
+    parameter int                           EMBEDDED_LOGIC_ANALYZER = $EmbeddedLogicAnalyzer
 
 ) (
     input                               pad_clk_27Mhz,
 
-    input   [1:0]                       pad_user_buttons_n,
-    inout   [5:0]                       pad_leds_n,
+    input   [2:1]                       pad_user_buttons_n,
+    inout   [6:1]                       pad_leds_n,
     input                               pad_ser_rx,
     output                              pad_ser_tx,
     inout   [32:1]                      pad_io,
+        // NOTE: Indexed to patch PIN
+        // numbers...
 
     output                              pad_flash_clk,
     output                              pad_flash_csb,
@@ -114,7 +118,15 @@ module autogen_top_wrapper #(
     inout   [CS_WIDTH-1:0]              IO_psram_rwds,
     inout   [DQ_WIDTH-1:0]              IO_psram_dq,
     output  [CS_WIDTH-1:0]              O_psram_reset_n,
-    output  [CS_WIDTH-1:0]              O_psram_cs_n
+    output  [CS_WIDTH-1:0]              O_psram_cs_n,
+
+    // NOTE: these ports are needed,
+    // for the GW_JTAG module to be
+    // wired up transparently...
+    input   wire                        tms_pad_i,
+    input   wire                        tck_pad_i,
+    input   wire                        tdi_pad_i,
+    output  wire                        tdo_pad_o
 );
 localparam VERSION_CHARS    = 63;
 localparam DQ_WIDTH         = 16;
@@ -122,11 +134,8 @@ localparam CS_WIDTH         = 2;
 
 
     // ----------------------------------------------
-    //  Internal signals
+    //  Internal signals (common across generates)
     // ----------------------------------------------
-
-    reg [5:0]                                           i_top_leds;
-    reg [5:0]                                           i_user_leds;
 
     reg                                                 i_sysclk;
     reg                                                 i_sysclk_resetn  = 1'b0;
@@ -134,6 +143,12 @@ localparam CS_WIDTH         = 2;
     reg                                                 i_microsecond_tick;
     reg                                                 i_millisecond_tick;
     reg                                                 i_second_tick;
+
+    reg                         [11:0]                  i_millisecond_counter;
+
+    reg                         [31:0]                  i_io;
+
+    reg                                                 i_jtag_activity;
 
     reg                                                 i_uart_tx_valid;
     reg                                                 i_uart_tx_ready;
@@ -163,6 +178,10 @@ localparam CS_WIDTH         = 2;
     reg                                                 i_flash_xip_valid;
     reg                                                 i_flash_xip_ready;
 
+    reg [5:0]                                           i_top_leds;
+    reg [5:0]                                           i_user_leds;
+    reg [5:0]                                           i_ela_leds;
+
 
     // ----------------------------------------------
     //  Implementation
@@ -179,8 +198,8 @@ localparam CS_WIDTH         = 2;
 
         .clk_27Mhz                  (pad_clk_27Mhz),
 
-        .user_pushbutton0_n         (pad_user_buttons_n[0]),
-        .user_pushbutton1_n         (pad_user_buttons_n[1]),
+        .user_pushbutton0_n         (pad_user_buttons_n[1]),
+        .user_pushbutton1_n         (pad_user_buttons_n[2]),
         .uart_rx                    (pad_ser_rx),
         .uart_tx                    (pad_ser_tx),
         .leds                       (i_top_leds),
@@ -206,6 +225,8 @@ localparam CS_WIDTH         = 2;
         .microsecond_tick           (i_microsecond_tick),
         .millisecond_tick           (i_millisecond_tick),
         .second_tick                (i_second_tick),
+
+        .millisecond_counter        (i_millisecond_counter),
 
         .uart_tx_valid              (i_uart_tx_valid),
         .uart_tx_ready              (i_uart_tx_ready),
@@ -257,8 +278,6 @@ localparam CS_WIDTH         = 2;
                 .millisecond_tick   (i_millisecond_tick),
                 .second_tick        (i_second_tick),
 
-                .io                 (pad_io),
-
                 .uart_tx_valid      (i_uart_tx_valid),
                 .uart_tx_ready      (i_uart_tx_ready),
                 .uart_tx_data       (i_uart_tx_data),
@@ -287,14 +306,6 @@ localparam CS_WIDTH         = 2;
                 .flash_xip_valid    (i_flash_xip_valid),
                 .flash_xip_ready    (i_flash_xip_ready)
             );
-
-            assign pad_leds_n = ~i_top_leds;
-                // NOTE:
-                //          led[4]: pin activity
-                //          led[3]: flash activity
-                //          led[2]: hyperram activity
-                //          led[1]: uart activity
-                //          led[0]: heartbeat
 
         end else begin
 
@@ -342,6 +353,150 @@ localparam CS_WIDTH         = 2;
                 .flash_xip_valid    (i_flash_xip_valid),
                 .flash_xip_ready    (i_flash_xip_ready)
             );
+
+        end
+
+        if(EMBEDDED_LOGIC_ANALYZER) begin
+
+            // ----------------------------------------------
+            //  Internal signals (ELA-internal)
+            // ----------------------------------------------
+
+            localparam ELA_SAMPLE_WIDTH = 8;
+            localparam ELA_SAMPLE_DEPTH = 64;
+            localparam ELA_CHANNELS     = 6;
+
+            reg                                         i_sysclk_reset;
+
+            reg [1:0]                                   i_buttons;
+            reg [ELA_SAMPLE_WIDTH-1:0]                  i_counter;
+
+            reg [(ELA_SAMPLE_WIDTH*ELA_CHANNELS)-1:0]   i_probe;
+
+
+            always @(posedge i_sysclk) begin
+                if (i_sysclk_resetn == 1'b0) begin
+                    i_counter   <= 0;
+                    i_buttons   <= 0;
+                end else begin
+                    i_counter   <= i_counter + 1'b1;
+                    i_buttons   <= ~pad_user_buttons_n;
+                end
+            end
+
+            assign i_probe = { i_io, 7'b0000000, i_buttons[1], i_counter};
+
+
+            // ----------------------------------------------
+            //  Embedded Logic Analyser
+            // ----------------------------------------------
+
+            assign i_sysclk_reset = ~i_sysclk_resetn;
+
+            fcapz_ela_gowin #(
+                .SAMPLE_W       (ELA_SAMPLE_WIDTH),
+                .DEPTH          (ELA_SAMPLE_DEPTH),
+                .NUM_CHANNELS   (ELA_CHANNELS),
+                .EIO_EN         (0)
+            ) u_ela (
+                .clk            (i_sysclk),
+                .jtag_activity  (i_jtag_activity),
+
+                .sample_clk     (i_sysclk),
+                .sample_rst     (i_sysclk_reset),
+                .probe_in       (i_probe),
+
+                .eio_probe_in   (0),
+                .eio_probe_out  (),
+                    // NOTE: external trigger ports
+                    // tie off if not used
+
+                .tms_pad_i      (tms_pad_i),
+                .tck_pad_i      (tck_pad_i),
+                .tdi_pad_i      (tdi_pad_i),
+                .tdo_pad_o      (tdo_pad_o)
+            );
+
+            // NOTE: We control the
+            // leds in this case
+            // ---------------------
+
+            always @(posedge i_sysclk) begin
+                if (i_millisecond_tick == 1'b1) begin
+                    if (i_millisecond_counter == 0 || i_millisecond_counter == 500) begin
+                        i_ela_leds[0] <= ~i_ela_leds[0];
+                    end
+                end
+
+                if (i_jtag_activity == 1'b1) begin
+                    i_ela_leds[1] <= 1'b1;
+                end
+                if (|i_millisecond_counter[6:0] == 1'b0) begin
+                    i_ela_leds[1] <= 0;
+                end
+
+                i_ela_leds[2]   <= i_buttons[1];
+                i_ela_leds[5:3] <= i_io[2:0];
+
+                if (i_sysclk_resetn == 1'b0) begin
+                    i_ela_leds <= 0;
+                end
+            end
+
+        end else begin
+
+            assign tdo_pad_o = 1'b0;
+        end
+    endgenerate
+
+
+    // NOTE: I/O dependent
+    // on configuration
+    // ----------------------
+
+    generate
+        if(BOARD_DEMONSTRATION) begin
+
+            assign pad_io[15:1]     = 'z;
+            assign pad_io[32:16]    = i_io[15:0];
+
+            always @(posedge i_sysclk) begin
+                i_io[15:0] <= pad_io[16:1];
+
+                if (i_sysclk_resetn == 1'b0) begin
+                    i_io <= 0;
+                end
+            end
+
+            assign pad_leds_n = ~i_top_leds[4:0];
+                // NOTE:
+                //          led[5] : Unused
+                //          led[4] : Pin Activity
+                //          led[3] : Flash Activity
+                //          led[2] : Hyperram Activity
+                //          led[1] : UART Activity
+                //          led[0] : 1 Second Heartbeat
+
+        end else if(EMBEDDED_LOGIC_ANALYZER) begin
+
+            assign pad_io = 'z;
+
+            always @(posedge i_sysclk) begin
+                i_io <= pad_io;
+
+                if (i_sysclk_resetn == 1'b0) begin
+                    i_io <= 0;
+                end
+            end
+
+            assign pad_leds_n = ~i_ela_leds;
+                // NOTE:
+                //          led[5:3] : GPIO 3 - 1
+                //          led[2]   : Button 2
+                //          led[1]   : JTAG Activity
+                //          led[0]   : 1/2 Second Heartbeat
+
+        end else begin
 
             assign pad_leds_n = ~i_user_leds;
         end

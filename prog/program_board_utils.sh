@@ -29,20 +29,21 @@ print_program_board_help () {
     echo -e "${boldf}NAME${normf}"
     echo -e "\tprogram_board - program a BRS-100-GW1NR9 board its FPGA firmware\n"
     echo -e "${boldf}SYNOPSIS${normf}"
-    echo -e "\t${boldf}program_board${normf} ${underlinef}[OPTIONS...]${normf} <TARGET_BOARD>\n"
+    echo -e "\t${boldf}program_board${normf} ${underlinef}[OPTIONS...]${normf}\n"
     echo -e "${boldf}DESCRIPTION${normf}"
-    echo -e "\tProgram TARGET_BOARD with its variant of the BRS-100-GW1NR9 FPGA firmware."
+    echo -e "\tProgram BRS-100-GW1NR9 with its variant of the BRS-100-GW1NR9 FPGA firmware."
     echo -e "\tAlternatively, query supported target boards and options.\n"
     echo -e "${boldf}OPTIONS${normf}"
     echo -e "\t${boldf}-h, --help${normf}\n\t\tDisplay this help and exit.\n"
     echo -e "\t${boldf}-d, --list_default_target${normf}\n\t\tList the default build target.\n"
-    echo -e "\t${boldf}-c, --clean_target_prior${normf}\n\t\tClean TARGET_BOARD build prior to building and programming the BRS-100-GW1NR9 board.\n"
-    echo -e "\t${boldf}-f, --update_flash_only${normf} MCS_FILE_FULLPATH\n\t\tUpdate TARGET_BOARD flash with provided MCS_FILE_FULL_PATH.\n"
-    echo -e "\t${boldf}-m, --custom_bitfile${normf} CUSTOM_BITFILE_FULLPATH\n\t\tProgram TARGET_BOARD with custom bitfile CUSTOM_BITFILE_FULLPATH.\n"
+    echo -e "\t${boldf}-c, --clean_target_prior${normf}\n\t\tClean BRS-100-GW1NR9 build prior to building and programming the BRS-100-GW1NR9 board.\n"
+    echo -e "\t${boldf}-f, --program_flash${normf}\n\t\tProgram embedded flash (default is SRAM).\n"
+    echo -e "\t${boldf}-m, --custom_bitfile${normf} CUSTOM_BITFILE_FULLPATH\n\t\tProgram BRS-100-GW1NR9 with custom bitfile CUSTOM_BITFILE_FULLPATH.\n"
     echo -e "\t${boldf}-l, --list_supported_targets${normf}\n\t\tList supported build targets and exit.\n"
     echo -e "\t${boldf}-s, --check_if_target_supported${normf}\n\t\tPrint supported status of provided target board and exit.\n"
     echo -e "\t${boldf}-b, --check_if_target_built${normf}\n\t\tPrint firmware built status of provided target board and exit.\n"
     echo -e "\t${boldf}-t, --custom_target_device${normf} CUSTOM_TARGET\n\t\tInstead of the default target, target 'CUSTOM_TARGET'.\n"
+    echo -e "\t${boldf}-o, --open_fpga_loader${normf}\n\t\tProgram the BRS-100-GW1NR9 using 'openFPGALoader' instead of the GoWIN toolchain.\n"
     echo -e "${boldf}AUTHOR${normf}"
     echo -e "\tWritten by Craig Haywood\n"
     echo -e "${boldf}COPYRIGHT${normf}"
@@ -273,20 +274,22 @@ bitstream_ext_for_target_board_and_build_target() {
 }
 
 program_target_with_firmware() {
-    if [ $# -lt 4 ]; then
-        echo "Error, function 'program_target_with_firmware' requires minimum of four arguments: target_board build_target \
-device speed_grade [custom_bootrom]"
+    if [ $# -lt 6 ]; then
+        echo "Error, function 'program_target_with_firmware' requires six arguments: target_board build_target \
+device speed_grade program_flash use_open_fpga_loader"
 
         return 1
     fi
 
-    if [ $# -gt 4 ]; then
-        custom_bootrom=$5
+    if [ $5 == "true" ]; then
+        operation_index=5
+        ofl_prog_switch='-f'
     else
-        custom_bootrom=false
+        operation_index=2
+        ofl_prog_switch='-m'
     fi
 
-    bitstream_fullpath=$(target_firmware_bitstream_fullpath "$1" "$2" "$3" "$4" $custom_bootrom)
+    bitstream_fullpath=$(target_firmware_bitstream_fullpath "$1" "$2" "$3" "$4")
     if [ $? -ne 0  ]; then
         return 2
     fi
@@ -297,27 +300,17 @@ device speed_grade [custom_bootrom]"
         fi
 
         if [ "$platform" == "gowin" ]; then
-            speed_grade_category=${speed_grade:0:1}
+            if [ $6 == "true" ]; then
+                echo "Program command line: '$open_fpga_loader_bin -b brs-100-gw1nr9 $ofl_prog_switch $bitstream_fullpath'"
+                $open_fpga_loader_bin -b brs-100-gw1nr9 $ofl_prog_switch $bitstream_fullpath
+            else
+                speed_grade_category=${speed_grade:0:1}
 
-            echo "Program command line: '$gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index 5 -f $bitstream_fullpath'"
-            $gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index 5 -f $bitstream_fullpath
+                echo "Program command line: '$gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $bitstream_fullpath'"
+                $gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $bitstream_fullpath
+            fi
 
             return $?
-        fi
-
-        if [ "$platform" == "xilinx" ]; then
-            if [ "$target_board" == "ARTYS7-25" ] || [ "$target_board" == "ARTYS7-50" ]; then
-                do_generic_xilinx_prog=true
-            fi
-
-            if [ -v do_generic_xilinx_prog ]; then
-                if [ $do_generic_xilinx_prog ]; then
-                    cd $program_dir/$foreign_folder/$platform/$scripts_folder/$generic_folder/
-                    source $program_board_script $3 $bitstream_fullpath
-
-                    return $?
-                fi
-            fi
         fi
     fi
 
@@ -326,39 +319,37 @@ device speed_grade [custom_bootrom]"
 
 # REVISIT: merge with above function...
 program_target_with_custom_firmware() {
-    if [ $# -lt 5 ]; then
-        echo "Error, function 'program_target_with_custom_firmware' requires minimum of five arguments: target_board build_target \
-device speed_grade custom_bitfile_fullpath"
+    if [ $# -lt 6 ]; then
+        echo "Error, function 'program_target_with_custom_firmware' requires minimum of six arguments: target_board build_target \
+device speed_grade program_flash custom_bitfile_fullpath use_open_fpga_loader"
 
         return 1
+    fi
+
+    if [ $5 == "true" ]; then
+        operation_index=5
+        ofl_prog_switch='-f'
+    else
+        operation_index=2
+        ofl_prog_switch='-m'
     fi
 
     platform=$(target_platform_for_target_board $1)
     if [ $? -ne 0  ]; then
         return 2
     fi
-        if [ "$platform" == "gowin" ]; then
+    if [ "$platform" == "gowin" ]; then
+        if [ $7 == "true" ]; then
+            echo "Program command line: '$open_fpga_loader_bin -b brs-100-gw1nr9 $ofl_prog_switch $6'"
+            $open_fpga_loader_bin -b brs-100-gw1nr9 $ofl_prog_switch $6
+        else
             speed_grade_category=${speed_grade:0:1}
 
-            echo "Program command line: '$gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index 5 -f $custom_bitfile_fullpath'"
-            $gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index 5 -f $custom_bitfile_fullpath
-
-            return $?
+            echo "Program command line: '$gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $6'"
+            $gowin_programmer_cli_bin --device $3$speed_grade_category --operation_index $operation_index -f $6
         fi
 
-    if [ "$platform" == "xilinx" ]; then
-        if [ "$target_board" == "ARTYS7-25" ] || [ "$target_board" == "ARTYS7-50" ]; then
-            do_generic_xilinx_prog=true
-        fi
-
-        if [ -v do_generic_xilinx_prog ]; then
-            if [ $do_generic_xilinx_prog ]; then
-                cd $program_dir/$foreign_folder/$platform/$scripts_folder/$generic_folder/
-                source $program_board_script $3 $custom_bitfile_fullpath
-
-                return $?
-            fi
-        fi
+        return $?
     fi
 
     return 4

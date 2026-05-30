@@ -37,8 +37,6 @@ module board_demonstration #(
     input               millisecond_tick,
     input               second_tick,
 
-    inout       [31:0]  io,
-
     output  reg         uart_tx_valid,
     input               uart_tx_ready,
     output  reg [7:0]   uart_tx_data,
@@ -173,8 +171,6 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
     reg                         [UART_TX_BUF_BITS-1:0]  i_uart_tx_buf;
     reg                         [6:0]                   i_uart_tx_buf_counter;
     reg                         [6:0]                   i_uart_tx_buf_count;
-
-    reg                         [31:0]                  i_io;
 
     reg                         [31:0]                  readback;
     tDEMONSTRATE_SYSTEM_STATE                           print_next_state;
@@ -1213,18 +1209,6 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
             i_uart_tx_buf_counter <= 0;
 
             i_demo_system_state <= eRESET;
-        end
-    end
-
-
-    assign io[15:0]     = 'z;
-    assign io[31:16]    = i_io[31:16];
-
-    always @(posedge sysclk) begin
-        i_io[31:16] <= io[15:0];
-
-        if (sysclk_resetn == 1'b0) begin
-            i_io <= 0;
         end
     end
 

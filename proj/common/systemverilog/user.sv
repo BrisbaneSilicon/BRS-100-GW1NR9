@@ -698,6 +698,4 @@ module user (
         end
     end
 
-    assign io = 0;
-
 endmodule
