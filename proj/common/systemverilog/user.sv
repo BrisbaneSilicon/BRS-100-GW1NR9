@@ -185,6 +185,10 @@ module user (
         flash_xip_wdata <= 0;
         flash_xip_wstrb <= 0;
 
+        if (second_tick) begin
+            leds <= ~leds;
+        end
+
         case (state)
 
             S_WRITE: begin
@@ -210,7 +214,6 @@ module user (
             end
 
             S_COMPARE: begin
-                leds[0] <= 1;
                 print_buf[0] <= "S"; print_buf[1] <= "R"; print_buf[2] <= "A";
                 print_buf[3] <= "M"; print_buf[4] <= ":"; print_buf[5] <= " ";
                 print_buf[6]  <= hex_nibble(readback[31:28]);
@@ -223,11 +226,9 @@ module user (
                 print_buf[13] <= hex_nibble(readback[3:0]);
                 print_buf[14] <= " ";
                 if (readback == MEM_TEST_DATA) begin
-                    leds[1] <= 1;
                     print_buf[15] <= "P"; print_buf[16] <= "A";
                     print_buf[17] <= "S"; print_buf[18] <= "S";
                 end else begin
-                    leds[2] <= 1;
                     print_buf[15] <= "F"; print_buf[16] <= "A";
                     print_buf[17] <= "I"; print_buf[18] <= "L";
                 end
@@ -270,7 +271,6 @@ module user (
             end
 
             S_HRAM_COMPARE: begin
-                leds[3] <= 1;
                 print_buf[0] <= "H"; print_buf[1] <= "R"; print_buf[2] <= "A";
                 print_buf[3] <= "M"; print_buf[4] <= ":"; print_buf[5] <= " ";
                 print_buf[6]  <= hex_nibble(readback[31:28]);
@@ -283,11 +283,9 @@ module user (
                 print_buf[13] <= hex_nibble(readback[3:0]);
                 print_buf[14] <= " ";
                 if (readback == MEM_TEST_DATA) begin
-                    leds[4] <= 1;
                     print_buf[15] <= "P"; print_buf[16] <= "A";
                     print_buf[17] <= "S"; print_buf[18] <= "S";
                 end else begin
-                    leds[5] <= 1;
                     print_buf[15] <= "F"; print_buf[16] <= "A";
                     print_buf[17] <= "I"; print_buf[18] <= "L";
                 end
