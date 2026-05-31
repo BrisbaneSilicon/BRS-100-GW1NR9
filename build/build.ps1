@@ -3,6 +3,8 @@ param (
     [Alias('board_demonstration')]
     [switch]$b,
 
+    [string]$teststring = "Default SRAM/HRAM Test Data",
+
     [Alias('clock_frequency')]
     [int]$k             = 51,
 
@@ -79,6 +81,7 @@ if ($h) {
     Write-Host "`t${boldf}-u, -uart_baud${normf} ${underlinef}UART_BAUD${normf}`n`t`tSet user comms baud rate (default 115200).`n"
     Write-Host "`t${boldf}-r, -disable_pushbutton_reset${normf}`n`t`tDisable pushbutton 1 as hard reset.`n"
     Write-Host "`t${boldf}-b, -board_demonstration${normf}`n`t`tPerform build of board demonstration bitstream.`n"
+    Write-Host "`t${boldf}-teststring${normf} ${underlinef}TEST_STRING${normf}`n`t`tSet board demonstration SRAM/HRAM/Flash test payload (1-32 printable ASCII chars, no slash in custom strings). Requires -b.`n"
     Write-Host "`t${boldf}-e, -embedded_logic_analyzer${normf}`n`t`tInclude an Embedded Logic Analyzer (fpgacapZero) in the bitstream.`n"
     Write-Host "`t${boldf}-t, -custom_target${normf} ${underlinef}CUSTOM_TARGET${normf}`n`t`tPerform build targeting CUSTOM_TARGET.`n"
     Write-Host "`t${boldf}-k, -clock_frequency${normf} ${underlinef}FREQUENCY_MHZ${normf}`n`t`tUse a frequency of FREQUENCY_MHZ for the system clock (default 51 MHz)."
@@ -105,6 +108,37 @@ $UartBaud           = $u
 $PushbuttonReset    = if ($r) { 0 } else { 1 }
 $DoProjectGenOnly   = if ($p) { "true" } else { "false" }
 $DoSynthOnly        = if ($s) { "true" } else { "false" }
+$TestStringWasProvided = $PSBoundParameters.ContainsKey('teststring')
+$TestStringLen      = if ($null -eq $teststring) { 0 } else { $teststring.Length }
+
+if ($TestStringWasProvided -and -not $b) {
+    Write-Host ""
+    Write-Host "ERROR: -teststring is only valid with -b / -board_demonstration."
+    Write-Host ""
+    exit 1
+}
+
+if ($b) {
+    if ([string]::IsNullOrEmpty($teststring) -or $teststring.Length -gt 32) {
+        Write-Host ""
+        Write-Host "ERROR: -teststring must be 1 to 32 characters."
+        Write-Host ""
+        exit 1
+    }
+
+    for ($charIndex = 0; $charIndex -lt $teststring.Length; $charIndex++) {
+        $code = [int][char]$teststring[$charIndex]
+        $CustomSlash = $TestStringWasProvided -and ($code -eq 0x2F)
+        if (($code -lt 0x20) -or ($code -gt 0x7E) -or ($code -eq 0x22) -or $CustomSlash -or ($code -eq 0x5C) -or ($code -eq 0x60)) {
+            Write-Host ""
+            Write-Host "ERROR: -teststring must contain only printable ASCII and custom strings cannot contain double quote, slash, backtick, backslash, CR, or LF."
+            Write-Host ""
+            exit 1
+        }
+    }
+
+    $TestStringLen = $teststring.Length
+}
 
 # ---- UTILS & GLOBALS ----
 . "$PSScriptRoot\build_utils.ps1"
@@ -302,6 +336,8 @@ Write-Host "Generating autogen_top_wrapper.sv..."
     -UartBaud                $UartBaud `
     -PushbuttonReset         $PushbuttonReset `
     -BoardDemonstration      $BoardDemonstration `
+    -TestString              $teststring `
+    -TestStringLen           $TestStringLen `
     -EmbeddedLogicAnalyzer   $EmbeddedLogicAnalyzer
 
 if ($LASTEXITCODE -ne 0) {

@@ -15,6 +15,8 @@ param (
     [int]$UartBaud          = 115200,   # uart baud rate
     [int]$PushbuttonReset   = 1,        # pushbutton reset enabled
     [int]$BoardDemonstration = 0,       # 0 = user.sv, 1 = board_demonstration.sv
+    [string]$TestString     = "Default SRAM/HRAM Test Data",
+    [int]$TestStringLen     = 27,
     [int]$EmbeddedLogicAnalyzer = 0     # 0 = disabled, 1 = enabled
 )
 
@@ -87,6 +89,9 @@ import util::*;
 module autogen_top_wrapper #(
     parameter reg   [(8*VERSION_CHARS)-1:0] VERSION                 = "$buildVersion",
     parameter int                           VERSION_LEN             = $buildVersionLen,
+    parameter int                           TEST_STRING_CHARS       = 32,
+    parameter reg   [(8*TEST_STRING_CHARS)-1:0] TEST_STRING         = "$TestString",
+    parameter int                           TEST_STRING_LEN         = $TestStringLen,
 
     parameter int                           CLK_FREQUENCY_MHZ       = $ClockFrequencyMhz,
     parameter int                           UART_BAUD               = $UartBaud,
@@ -269,7 +274,10 @@ localparam CS_WIDTH         = 2;
 
             board_demonstration #(
                 .VERSION            (VERSION),
-                .VERSION_LEN        (VERSION_LEN)
+                .VERSION_LEN        (VERSION_LEN),
+                .TEST_STRING_CHARS  (TEST_STRING_CHARS),
+                .TEST_STRING        (TEST_STRING),
+                .TEST_STRING_LEN    (TEST_STRING_LEN)
             ) board_demonstration_inst (
                 .sysclk             (i_sysclk),
                 .sysclk_resetn      (i_sysclk_resetn),

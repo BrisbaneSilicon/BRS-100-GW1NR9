@@ -28,7 +28,10 @@
 module board_demonstration #(
     parameter int VERSION_CHARS = 63,
     parameter reg [(8*VERSION_CHARS)-1:0] VERSION,
-    parameter int VERSION_LEN = 0
+    parameter int VERSION_LEN = 0,
+    parameter int TEST_STRING_CHARS = 32,
+    parameter reg [(8*TEST_STRING_CHARS)-1:0] TEST_STRING = "Default SRAM/HRAM Test Data",
+    parameter int TEST_STRING_LEN = 27
 ) (
     input               sysclk,
     input               sysclk_resetn,
@@ -142,6 +145,8 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
         eFW_RESTORE,
         eFW_XIP_READ,
         eFW_COMPARE,
+        eFW_DEMO_PRINT_WRITE,
+        eFW_DEMO_READ_PREP,
         ePRINT_BUF,
         eIDLE
     } tDEMONSTRATE_SYSTEM_STATE;
@@ -158,8 +163,14 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
         eDEMO_HRAM,
         eTEST_FLASH_ID,
         eTEST_FLASH_WRV,
+        eDEMO_FLASH,
         eNONE
     } tSTARTUP_TASKS;
+
+    typedef enum {
+        eFW_OP_TEST,
+        eFW_OP_DEMO
+    } tFLASH_OPERATION;
 
 
     // ----------------------------------------------
@@ -185,6 +196,7 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
     localparam [31:0] HRAM_DEMO_ADDR    = 32'h0000_8010;
     localparam [23:0] FLASH_TEST_ADDR   = 24'h01_0000;
     localparam [31:0] FLASH_TEST_DATA   = 32'hABCD_ABCD;
+    localparam [23:0] FLASH_DEMO_ADDR   = 24'h01_0010;
     localparam [7:0]  FLASH_CMD_WREN    = 8'h06;
     localparam [7:0]  FLASH_CMD_RDSR    = 8'h05;
     localparam [7:0]  FLASH_CMD_ERASE   = 8'h20;
@@ -201,11 +213,13 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
     reg                         [9:0]                   fw_poll_ms;
     reg                                                 fw_capture_status;
     tDEMONSTRATE_SYSTEM_STATE                           fw_next_state;
+    tFLASH_OPERATION                                    fw_operation;
 
-    localparam int DEMO_MAX_LEN       = VERSION_CHARS;
-    localparam int DEMO_LEN           = (VERSION_LEN > DEMO_MAX_LEN) ? DEMO_MAX_LEN : VERSION_LEN;
-    localparam int DEMO_WORDS         = (DEMO_LEN + 3) / 4;
-    localparam int SRAM_DEMO_LINE_LEN = 20 + DEMO_LEN + 2;
+    localparam int VERSION_SAFE_LEN = (VERSION_LEN > VERSION_CHARS) ? VERSION_CHARS : VERSION_LEN;
+    localparam int TEST_LEN         = (TEST_STRING_LEN > TEST_STRING_CHARS) ? TEST_STRING_CHARS : TEST_STRING_LEN;
+    localparam int TEST_WORDS       = (TEST_LEN + 3) / 4;
+    localparam int DEMO_LINE_LEN    = 20 + TEST_LEN + 2;
+    localparam int FLASH_DEMO_LINE_LEN = 21 + TEST_LEN + 2;
 
     reg                         [4:0]                   demo_word_idx;
     reg                                                 demo_pass;
@@ -220,25 +234,53 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
     function automatic [7:0] version_byte;
         input [6:0] idx;
         begin
-            if (idx < DEMO_LEN) begin
-                version_byte = (VERSION >> ((VERSION_LEN - idx - 1) * 8)) & 8'hFF;
+            if (idx < VERSION_SAFE_LEN) begin
+                version_byte = (VERSION >> ((VERSION_SAFE_LEN - idx - 1) * 8)) & 8'hFF;
             end else begin
                 version_byte = 8'h00;
             end
         end
     endfunction
 
-    function automatic [31:0] version_word;
+    function automatic [7:0] test_byte;
+        input [6:0] idx;
+        begin
+            if (idx < TEST_LEN) begin
+                test_byte = (TEST_STRING >> ((TEST_LEN - idx - 1) * 8)) & 8'hFF;
+            end else begin
+                test_byte = 8'h00;
+            end
+        end
+    endfunction
+
+    function automatic [31:0] test_word;
         input [4:0] word_idx;
         reg [6:0] base;
         begin
             base = {word_idx, 2'b00};
-            version_word = {
-                version_byte(base),
-                version_byte(base + 7'd1),
-                version_byte(base + 7'd2),
-                version_byte(base + 7'd3)
+            test_word = {
+                test_byte(base),
+                test_byte(base + 7'd1),
+                test_byte(base + 7'd2),
+                test_byte(base + 7'd3)
             };
+        end
+    endfunction
+
+    function automatic [23:0] flash_demo_addr;
+        input [4:0] word_idx;
+        begin
+            flash_demo_addr = FLASH_DEMO_ADDR + {17'd0, word_idx, 2'b00};
+        end
+    endfunction
+
+    function automatic [63:0] flash_program_shift;
+        input [23:0] flash_addr;
+        input [31:0] word_data;
+        begin
+            flash_program_shift = {FLASH_CMD_PROGRAM, flash_addr,
+                                   word_data[7:0], word_data[15:8],
+                                   word_data[23:16], word_data[31:24]};
         end
     endfunction
 
@@ -307,10 +349,10 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
                 end
                 if (i_next_startup_task == eOUTPUT_VERSION_MSG) begin
                     i_uart_tx_buf       <= 0;
-                    for (demo_i = 0; demo_i < VERSION_LEN; demo_i = demo_i + 1) begin
+                    for (demo_i = 0; demo_i < VERSION_SAFE_LEN; demo_i = demo_i + 1) begin
                         `UART_TX_BUF_BYTE(demo_i) <= version_byte(demo_i[6:0]);
                     end
-                    i_uart_tx_buf_count <= VERSION_LEN[6:0];
+                    i_uart_tx_buf_count <= VERSION_SAFE_LEN[6:0];
                     i_next_startup_task <= eOUTPUT_NLCR_2;
                 end
                 if (i_next_startup_task == eOUTPUT_NLCR_2) begin
@@ -349,7 +391,18 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
                 end
 
                 if (i_next_startup_task == eTEST_FLASH_WRV) begin
+                    i_next_startup_task <= eDEMO_FLASH;
+                    demo_word_idx       <= 5'd0;
+                    demo_pass           <= 1'b1;
+                    fw_operation        <= eFW_OP_TEST;
+                    fw_poll_ms          <= 10'd0;
+                    i_demo_system_state <= eFW_INIT_EN;
+                end
+
+                if (i_next_startup_task == eDEMO_FLASH) begin
                     i_next_startup_task <= eNONE;
+                    demo_word_idx       <= 5'd0;
+                    fw_operation        <= eFW_OP_DEMO;
                     fw_poll_ms          <= 10'd0;
                     i_demo_system_state <= eFW_INIT_EN;
                 end
@@ -457,10 +510,10 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
             eSRAM_DEMO_WRITE:                                                  begin
                 ram_valid <= 1'b1;
                 ram_addr  <= SRAM_DEMO_ADDR + {25'd0, demo_word_base};
-                ram_wdata <= version_word(demo_word_idx);
+                ram_wdata <= test_word(demo_word_idx);
                 ram_wstrb <= 4'hF;
                 if (ram_valid && ram_ready) begin
-                    if (demo_word_idx + 5'd1 == DEMO_WORDS) begin
+                    if (demo_word_idx + 5'd1 == TEST_WORDS) begin
                         i_demo_system_state <= eSRAM_DEMO_PRINT_WRITE;
                     end else begin
                         demo_word_idx       <= demo_word_idx + 5'd1;
@@ -481,12 +534,12 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
                 `UART_TX_BUF_BYTE(12) <= "0"; `UART_TX_BUF_BYTE(13) <= "0"; `UART_TX_BUF_BYTE(14) <= "0";
                 `UART_TX_BUF_BYTE(15) <= "0"; `UART_TX_BUF_BYTE(16) <= "1"; `UART_TX_BUF_BYTE(17) <= "0";
                 `UART_TX_BUF_BYTE(18) <= ":"; `UART_TX_BUF_BYTE(19) <= " ";
-                for (demo_i = 0; demo_i < DEMO_LEN; demo_i = demo_i + 1) begin
-                    `UART_TX_BUF_BYTE(20 + demo_i) <= version_byte(demo_i[6:0]);
+                for (demo_i = 0; demo_i < TEST_LEN; demo_i = demo_i + 1) begin
+                    `UART_TX_BUF_BYTE(20 + demo_i) <= test_byte(demo_i[6:0]);
                 end
-                `UART_TX_BUF_BYTE(20 + DEMO_LEN) <= 8'h0D;
-                `UART_TX_BUF_BYTE(21 + DEMO_LEN) <= 8'h0A;
-                i_uart_tx_buf_count <= SRAM_DEMO_LINE_LEN;
+                `UART_TX_BUF_BYTE(20 + TEST_LEN) <= 8'h0D;
+                `UART_TX_BUF_BYTE(21 + TEST_LEN) <= 8'h0A;
+                i_uart_tx_buf_count <= DEMO_LINE_LEN;
                 i_uart_tx_buf_counter <= 7'd0;
                 print_next_state  <= eSRAM_DEMO_READ_PREP;
                 i_demo_system_state <= ePRINT_BUF;
@@ -511,31 +564,31 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
                 ram_addr  <= SRAM_DEMO_ADDR + {25'd0, demo_word_base};
                 ram_wstrb <= 4'h0;
                 if (ram_valid && ram_ready) begin
-                    if (demo_word_base < DEMO_LEN) begin
+                    if (demo_word_base < TEST_LEN) begin
                         `UART_TX_BUF_BYTE(20 + demo_word_base) <= ram_rdata[31:24];
-                        if (ram_rdata[31:24] != version_byte(demo_word_base)) begin
+                        if (ram_rdata[31:24] != test_byte(demo_word_base)) begin
                             demo_pass <= 1'b0;
                         end
                     end
-                    if (demo_word_base + 7'd1 < DEMO_LEN) begin
+                    if (demo_word_base + 7'd1 < TEST_LEN) begin
                         `UART_TX_BUF_BYTE(20 + demo_word_base + 7'd1) <= ram_rdata[23:16];
-                        if (ram_rdata[23:16] != version_byte(demo_word_base + 7'd1)) begin
+                        if (ram_rdata[23:16] != test_byte(demo_word_base + 7'd1)) begin
                             demo_pass <= 1'b0;
                         end
                     end
-                    if (demo_word_base + 7'd2 < DEMO_LEN) begin
+                    if (demo_word_base + 7'd2 < TEST_LEN) begin
                         `UART_TX_BUF_BYTE(20 + demo_word_base + 7'd2) <= ram_rdata[15:8];
-                        if (ram_rdata[15:8] != version_byte(demo_word_base + 7'd2)) begin
+                        if (ram_rdata[15:8] != test_byte(demo_word_base + 7'd2)) begin
                             demo_pass <= 1'b0;
                         end
                     end
-                    if (demo_word_base + 7'd3 < DEMO_LEN) begin
+                    if (demo_word_base + 7'd3 < TEST_LEN) begin
                         `UART_TX_BUF_BYTE(20 + demo_word_base + 7'd3) <= ram_rdata[7:0];
-                        if (ram_rdata[7:0] != version_byte(demo_word_base + 7'd3)) begin
+                        if (ram_rdata[7:0] != test_byte(demo_word_base + 7'd3)) begin
                             demo_pass <= 1'b0;
                         end
                     end
-                    if (demo_word_idx + 5'd1 == DEMO_WORDS) begin
+                    if (demo_word_idx + 5'd1 == TEST_WORDS) begin
                         i_demo_system_state <= eSRAM_DEMO_PRINT_READ;
                     end else begin
                         demo_word_idx       <= demo_word_idx + 5'd1;
@@ -549,9 +602,9 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
             end
 
             eSRAM_DEMO_PRINT_READ:                                             begin
-                `UART_TX_BUF_BYTE(20 + DEMO_LEN) <= 8'h0D;
-                `UART_TX_BUF_BYTE(21 + DEMO_LEN) <= 8'h0A;
-                i_uart_tx_buf_count <= SRAM_DEMO_LINE_LEN;
+                `UART_TX_BUF_BYTE(20 + TEST_LEN) <= 8'h0D;
+                `UART_TX_BUF_BYTE(21 + TEST_LEN) <= 8'h0A;
+                i_uart_tx_buf_count <= DEMO_LINE_LEN;
                 i_uart_tx_buf_counter <= 7'd0;
                 print_next_state  <= eSRAM_DEMO_PRINT_RESULT;
                 i_demo_system_state <= ePRINT_BUF;
@@ -587,10 +640,10 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
             eHRAM_DEMO_WRITE:                                                  begin
                 ram_valid <= 1'b1;
                 ram_addr  <= HRAM_DEMO_ADDR + {25'd0, demo_word_base};
-                ram_wdata <= version_word(demo_word_idx);
+                ram_wdata <= test_word(demo_word_idx);
                 ram_wstrb <= 4'hF;
                 if (ram_valid && ram_ready) begin
-                    if (demo_word_idx + 5'd1 == DEMO_WORDS) begin
+                    if (demo_word_idx + 5'd1 == TEST_WORDS) begin
                         i_demo_system_state <= eHRAM_DEMO_PRINT_WRITE;
                     end else begin
                         demo_word_idx       <= demo_word_idx + 5'd1;
@@ -611,12 +664,12 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
                 `UART_TX_BUF_BYTE(12) <= "0"; `UART_TX_BUF_BYTE(13) <= "0"; `UART_TX_BUF_BYTE(14) <= "8";
                 `UART_TX_BUF_BYTE(15) <= "0"; `UART_TX_BUF_BYTE(16) <= "1"; `UART_TX_BUF_BYTE(17) <= "0";
                 `UART_TX_BUF_BYTE(18) <= ":"; `UART_TX_BUF_BYTE(19) <= " ";
-                for (demo_i = 0; demo_i < DEMO_LEN; demo_i = demo_i + 1) begin
-                    `UART_TX_BUF_BYTE(20 + demo_i) <= version_byte(demo_i[6:0]);
+                for (demo_i = 0; demo_i < TEST_LEN; demo_i = demo_i + 1) begin
+                    `UART_TX_BUF_BYTE(20 + demo_i) <= test_byte(demo_i[6:0]);
                 end
-                `UART_TX_BUF_BYTE(20 + DEMO_LEN) <= 8'h0D;
-                `UART_TX_BUF_BYTE(21 + DEMO_LEN) <= 8'h0A;
-                i_uart_tx_buf_count <= SRAM_DEMO_LINE_LEN;
+                `UART_TX_BUF_BYTE(20 + TEST_LEN) <= 8'h0D;
+                `UART_TX_BUF_BYTE(21 + TEST_LEN) <= 8'h0A;
+                i_uart_tx_buf_count <= DEMO_LINE_LEN;
                 i_uart_tx_buf_counter <= 7'd0;
                 print_next_state  <= eHRAM_DEMO_READ_PREP;
                 i_demo_system_state <= ePRINT_BUF;
@@ -641,31 +694,31 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
                 ram_addr  <= HRAM_DEMO_ADDR + {25'd0, demo_word_base};
                 ram_wstrb <= 4'h0;
                 if (ram_valid && ram_ready) begin
-                    if (demo_word_base < DEMO_LEN) begin
+                    if (demo_word_base < TEST_LEN) begin
                         `UART_TX_BUF_BYTE(20 + demo_word_base) <= ram_rdata[31:24];
-                        if (ram_rdata[31:24] != version_byte(demo_word_base)) begin
+                        if (ram_rdata[31:24] != test_byte(demo_word_base)) begin
                             demo_pass <= 1'b0;
                         end
                     end
-                    if (demo_word_base + 7'd1 < DEMO_LEN) begin
+                    if (demo_word_base + 7'd1 < TEST_LEN) begin
                         `UART_TX_BUF_BYTE(20 + demo_word_base + 7'd1) <= ram_rdata[23:16];
-                        if (ram_rdata[23:16] != version_byte(demo_word_base + 7'd1)) begin
+                        if (ram_rdata[23:16] != test_byte(demo_word_base + 7'd1)) begin
                             demo_pass <= 1'b0;
                         end
                     end
-                    if (demo_word_base + 7'd2 < DEMO_LEN) begin
+                    if (demo_word_base + 7'd2 < TEST_LEN) begin
                         `UART_TX_BUF_BYTE(20 + demo_word_base + 7'd2) <= ram_rdata[15:8];
-                        if (ram_rdata[15:8] != version_byte(demo_word_base + 7'd2)) begin
+                        if (ram_rdata[15:8] != test_byte(demo_word_base + 7'd2)) begin
                             demo_pass <= 1'b0;
                         end
                     end
-                    if (demo_word_base + 7'd3 < DEMO_LEN) begin
+                    if (demo_word_base + 7'd3 < TEST_LEN) begin
                         `UART_TX_BUF_BYTE(20 + demo_word_base + 7'd3) <= ram_rdata[7:0];
-                        if (ram_rdata[7:0] != version_byte(demo_word_base + 7'd3)) begin
+                        if (ram_rdata[7:0] != test_byte(demo_word_base + 7'd3)) begin
                             demo_pass <= 1'b0;
                         end
                     end
-                    if (demo_word_idx + 5'd1 == DEMO_WORDS) begin
+                    if (demo_word_idx + 5'd1 == TEST_WORDS) begin
                         i_demo_system_state <= eHRAM_DEMO_PRINT_READ;
                     end else begin
                         demo_word_idx       <= demo_word_idx + 5'd1;
@@ -679,9 +732,9 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
             end
 
             eHRAM_DEMO_PRINT_READ:                                             begin
-                `UART_TX_BUF_BYTE(20 + DEMO_LEN) <= 8'h0D;
-                `UART_TX_BUF_BYTE(21 + DEMO_LEN) <= 8'h0A;
-                i_uart_tx_buf_count <= SRAM_DEMO_LINE_LEN;
+                `UART_TX_BUF_BYTE(20 + TEST_LEN) <= 8'h0D;
+                `UART_TX_BUF_BYTE(21 + TEST_LEN) <= 8'h0A;
+                i_uart_tx_buf_count <= DEMO_LINE_LEN;
                 i_uart_tx_buf_counter <= 7'd0;
                 print_next_state  <= eHRAM_DEMO_PRINT_RESULT;
                 i_demo_system_state <= ePRINT_BUF;
@@ -950,7 +1003,11 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
                 flash_cfg_wstrb <= 4'b0001;
                 flash_cfg_wdata <= 32'h0000_0020;  // CSB=1, CLK=0, MOSI=0
                 if (flash_cfg_ready) begin
-                    i_demo_system_state <= eFW_SETUP_WREN_ERASE;
+                    if (fw_operation == eFW_OP_TEST) begin
+                        i_demo_system_state <= eFW_SETUP_WREN_ERASE;
+                    end else begin
+                        i_demo_system_state <= eFW_SETUP_WREN_PROGRAM;
+                    end
                 end
             end
 
@@ -1011,11 +1068,11 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
             end
 
             eFW_SETUP_PROGRAM:                                                  begin
-                fw_shift          <= {FLASH_CMD_PROGRAM, FLASH_TEST_ADDR,
-                                      FLASH_TEST_DATA[7:0],
-                                      FLASH_TEST_DATA[15:8],
-                                      FLASH_TEST_DATA[23:16],
-                                      FLASH_TEST_DATA[31:24]};
+                if (fw_operation == eFW_OP_TEST) begin
+                    fw_shift      <= flash_program_shift(FLASH_TEST_ADDR, FLASH_TEST_DATA);
+                end else begin
+                    fw_shift      <= flash_program_shift(flash_demo_addr(demo_word_idx), test_word(demo_word_idx));
+                end
                 fw_bit_idx        <= 7'd0;
                 fw_bit_count      <= 7'd64;
                 fw_capture_status <= 1'b0;
@@ -1047,8 +1104,17 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
                         end
                     end
                 end else begin
-                    fw_next_state       <= eFW_XIP_READ;
-                    i_demo_system_state <= eFW_RESTORE;
+                    if (fw_operation == eFW_OP_TEST) begin
+                        fw_next_state       <= eFW_XIP_READ;
+                        i_demo_system_state <= eFW_RESTORE;
+                    end else begin
+                        if (demo_word_idx + 5'd1 == TEST_WORDS) begin
+                            i_demo_system_state <= eFW_DEMO_PRINT_WRITE;
+                        end else begin
+                            demo_word_idx       <= demo_word_idx + 5'd1;
+                            i_demo_system_state <= eFW_SETUP_WREN_PROGRAM;
+                        end
+                    end
                 end
             end
 
@@ -1116,7 +1182,11 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
 
             eFW_XIP_READ:                                                       begin
                 flash_xip_valid <= 1'b1;
-                flash_xip_addr  <= {8'd0, FLASH_TEST_ADDR};
+                if (fw_operation == eFW_OP_TEST) begin
+                    flash_xip_addr <= {8'd0, FLASH_TEST_ADDR};
+                end else begin
+                    flash_xip_addr <= {8'd0, flash_demo_addr(demo_word_idx)};
+                end
                 flash_xip_wstrb <= 4'h0;
                 if (flash_xip_ready) begin
                     readback            <= flash_xip_rdata;
@@ -1125,52 +1195,88 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
             end
 
             eFW_COMPARE:                                                        begin
-                // "Testing Flash W/R/V... "
-                `UART_TX_BUF_BYTE(0) <= "T"; `UART_TX_BUF_BYTE(1) <= "e"; `UART_TX_BUF_BYTE(2) <= "s";
-                `UART_TX_BUF_BYTE(3) <= "t"; `UART_TX_BUF_BYTE(4) <= "i"; `UART_TX_BUF_BYTE(5) <= "n";
-                `UART_TX_BUF_BYTE(6) <= "g"; `UART_TX_BUF_BYTE(7) <= " "; `UART_TX_BUF_BYTE(8) <= "F";
-                `UART_TX_BUF_BYTE(9) <= "l"; `UART_TX_BUF_BYTE(10) <= "a"; `UART_TX_BUF_BYTE(11) <= "s";
-                `UART_TX_BUF_BYTE(12) <= "h"; `UART_TX_BUF_BYTE(13) <= " "; `UART_TX_BUF_BYTE(14) <= "W";
-                `UART_TX_BUF_BYTE(15) <= "/"; `UART_TX_BUF_BYTE(16) <= "R"; `UART_TX_BUF_BYTE(17) <= "/";
-                `UART_TX_BUF_BYTE(18) <= "V"; `UART_TX_BUF_BYTE(19) <= "."; `UART_TX_BUF_BYTE(20) <= ".";
-                `UART_TX_BUF_BYTE(21) <= "."; `UART_TX_BUF_BYTE(22) <= " ";
-                if (readback == FLASH_TEST_DATA) begin
-                    `UART_TX_BUF_BYTE(23) <= "p"; `UART_TX_BUF_BYTE(24) <= "a";
-                    `UART_TX_BUF_BYTE(25) <= "s"; `UART_TX_BUF_BYTE(26) <= "s";
+                if (fw_operation == eFW_OP_TEST) begin
+                    // "Testing Flash W/R/V... "
+                    `UART_TX_BUF_BYTE(0) <= "T"; `UART_TX_BUF_BYTE(1) <= "e"; `UART_TX_BUF_BYTE(2) <= "s";
+                    `UART_TX_BUF_BYTE(3) <= "t"; `UART_TX_BUF_BYTE(4) <= "i"; `UART_TX_BUF_BYTE(5) <= "n";
+                    `UART_TX_BUF_BYTE(6) <= "g"; `UART_TX_BUF_BYTE(7) <= " "; `UART_TX_BUF_BYTE(8) <= "F";
+                    `UART_TX_BUF_BYTE(9) <= "l"; `UART_TX_BUF_BYTE(10) <= "a"; `UART_TX_BUF_BYTE(11) <= "s";
+                    `UART_TX_BUF_BYTE(12) <= "h"; `UART_TX_BUF_BYTE(13) <= " "; `UART_TX_BUF_BYTE(14) <= "W";
+                    `UART_TX_BUF_BYTE(15) <= "/"; `UART_TX_BUF_BYTE(16) <= "R"; `UART_TX_BUF_BYTE(17) <= "/";
+                    `UART_TX_BUF_BYTE(18) <= "V"; `UART_TX_BUF_BYTE(19) <= "."; `UART_TX_BUF_BYTE(20) <= ".";
+                    `UART_TX_BUF_BYTE(21) <= "."; `UART_TX_BUF_BYTE(22) <= " ";
+                    if (readback == FLASH_TEST_DATA) begin
+                        `UART_TX_BUF_BYTE(23) <= "p"; `UART_TX_BUF_BYTE(24) <= "a";
+                        `UART_TX_BUF_BYTE(25) <= "s"; `UART_TX_BUF_BYTE(26) <= "s";
+                    end else begin
+                        `UART_TX_BUF_BYTE(23) <= "F"; `UART_TX_BUF_BYTE(24) <= "A";
+                        `UART_TX_BUF_BYTE(25) <= "I"; `UART_TX_BUF_BYTE(26) <= "L";
+                    end
                     `UART_TX_BUF_BYTE(27) <= 8'h0D; `UART_TX_BUF_BYTE(28) <= 8'h0A;
                     i_uart_tx_buf_count <= 7'd29;
+                    i_uart_tx_buf_counter <= 7'd0;
+                    print_next_state <= ePREP_NEXT_UART_STARTUP_MSG;
+                    i_demo_system_state <= ePRINT_BUF;
                 end else begin
-                    // "FAIL (wrote 0xABCDABCD read 0xRRRRRRRR)\r\n"
-                    `UART_TX_BUF_BYTE(23) <= "F"; `UART_TX_BUF_BYTE(24) <= "A";
-                    `UART_TX_BUF_BYTE(25) <= "I"; `UART_TX_BUF_BYTE(26) <= "L";
-                    `UART_TX_BUF_BYTE(27) <= " "; `UART_TX_BUF_BYTE(28) <= "(";
-                    `UART_TX_BUF_BYTE(29) <= "w"; `UART_TX_BUF_BYTE(30) <= "r";
-                    `UART_TX_BUF_BYTE(31) <= "o"; `UART_TX_BUF_BYTE(32) <= "t";
-                    `UART_TX_BUF_BYTE(33) <= "e"; `UART_TX_BUF_BYTE(34) <= " ";
-                    `UART_TX_BUF_BYTE(35) <= "0"; `UART_TX_BUF_BYTE(36) <= "x";
-                    `UART_TX_BUF_BYTE(37) <= "A"; `UART_TX_BUF_BYTE(38) <= "B";
-                    `UART_TX_BUF_BYTE(39) <= "C"; `UART_TX_BUF_BYTE(40) <= "D";
-                    `UART_TX_BUF_BYTE(41) <= "A"; `UART_TX_BUF_BYTE(42) <= "B";
-                    `UART_TX_BUF_BYTE(43) <= "C"; `UART_TX_BUF_BYTE(44) <= "D";
-                    `UART_TX_BUF_BYTE(45) <= " "; `UART_TX_BUF_BYTE(46) <= "r";
-                    `UART_TX_BUF_BYTE(47) <= "e"; `UART_TX_BUF_BYTE(48) <= "a";
-                    `UART_TX_BUF_BYTE(49) <= "d"; `UART_TX_BUF_BYTE(50) <= " ";
-                    `UART_TX_BUF_BYTE(51) <= "0"; `UART_TX_BUF_BYTE(52) <= "x";
-                    `UART_TX_BUF_BYTE(53) <= hex_nibble(readback[31:28]);
-                    `UART_TX_BUF_BYTE(54) <= hex_nibble(readback[27:24]);
-                    `UART_TX_BUF_BYTE(55) <= hex_nibble(readback[23:20]);
-                    `UART_TX_BUF_BYTE(56) <= hex_nibble(readback[19:16]);
-                    `UART_TX_BUF_BYTE(57) <= hex_nibble(readback[15:12]);
-                    `UART_TX_BUF_BYTE(58) <= hex_nibble(readback[11:8]);
-                    `UART_TX_BUF_BYTE(59) <= hex_nibble(readback[7:4]);
-                    `UART_TX_BUF_BYTE(60) <= hex_nibble(readback[3:0]);
-                    `UART_TX_BUF_BYTE(61) <= ")";
-                    `UART_TX_BUF_BYTE(62) <= 8'h0D; `UART_TX_BUF_BYTE(63) <= 8'h0A;
-                    i_uart_tx_buf_count <= 7'd64;
+                    if (demo_word_base < TEST_LEN) begin
+                        `UART_TX_BUF_BYTE(21 + demo_word_base) <= readback[31:24];
+                    end
+                    if (demo_word_base + 7'd1 < TEST_LEN) begin
+                        `UART_TX_BUF_BYTE(21 + demo_word_base + 7'd1) <= readback[23:16];
+                    end
+                    if (demo_word_base + 7'd2 < TEST_LEN) begin
+                        `UART_TX_BUF_BYTE(21 + demo_word_base + 7'd2) <= readback[15:8];
+                    end
+                    if (demo_word_base + 7'd3 < TEST_LEN) begin
+                        `UART_TX_BUF_BYTE(21 + demo_word_base + 7'd3) <= readback[7:0];
+                    end
+
+                    if (demo_word_idx + 5'd1 == TEST_WORDS) begin
+                        `UART_TX_BUF_BYTE(21 + TEST_LEN) <= 8'h0D;
+                        `UART_TX_BUF_BYTE(22 + TEST_LEN) <= 8'h0A;
+                        i_uart_tx_buf_count <= FLASH_DEMO_LINE_LEN;
+                        i_uart_tx_buf_counter <= 7'd0;
+                        print_next_state <= ePREP_NEXT_UART_STARTUP_MSG;
+                        i_demo_system_state <= ePRINT_BUF;
+                    end else begin
+                        demo_word_idx       <= demo_word_idx + 5'd1;
+                        i_demo_system_state <= eFW_XIP_READ;
+                    end
                 end
+            end
+
+            eFW_DEMO_PRINT_WRITE:                                               begin
+                `UART_TX_BUF_BYTE(0) <= "F"; `UART_TX_BUF_BYTE(1) <= "L"; `UART_TX_BUF_BYTE(2) <= "A";
+                `UART_TX_BUF_BYTE(3) <= "S"; `UART_TX_BUF_BYTE(4) <= "H"; `UART_TX_BUF_BYTE(5) <= " ";
+                `UART_TX_BUF_BYTE(6) <= "W"; `UART_TX_BUF_BYTE(7) <= " "; `UART_TX_BUF_BYTE(8) <= "@";
+                `UART_TX_BUF_BYTE(9) <= "0"; `UART_TX_BUF_BYTE(10) <= "x"; `UART_TX_BUF_BYTE(11) <= "0";
+                `UART_TX_BUF_BYTE(12) <= "0"; `UART_TX_BUF_BYTE(13) <= "0"; `UART_TX_BUF_BYTE(14) <= "1";
+                `UART_TX_BUF_BYTE(15) <= "0"; `UART_TX_BUF_BYTE(16) <= "0"; `UART_TX_BUF_BYTE(17) <= "1";
+                `UART_TX_BUF_BYTE(18) <= "0"; `UART_TX_BUF_BYTE(19) <= ":"; `UART_TX_BUF_BYTE(20) <= " ";
+                for (demo_i = 0; demo_i < TEST_LEN; demo_i = demo_i + 1) begin
+                    `UART_TX_BUF_BYTE(21 + demo_i) <= test_byte(demo_i[6:0]);
+                end
+                `UART_TX_BUF_BYTE(21 + TEST_LEN) <= 8'h0D;
+                `UART_TX_BUF_BYTE(22 + TEST_LEN) <= 8'h0A;
+                i_uart_tx_buf_count <= FLASH_DEMO_LINE_LEN;
                 i_uart_tx_buf_counter <= 7'd0;
-                print_next_state <= ePREP_NEXT_UART_STARTUP_MSG;
+                demo_word_idx <= 5'd0;
+                fw_next_state <= eFW_DEMO_READ_PREP;
+                print_next_state <= eFW_RESTORE;
                 i_demo_system_state <= ePRINT_BUF;
+            end
+
+            eFW_DEMO_READ_PREP:                                                 begin
+                i_uart_tx_buf <= 0;
+                `UART_TX_BUF_BYTE(0) <= "F"; `UART_TX_BUF_BYTE(1) <= "L"; `UART_TX_BUF_BYTE(2) <= "A";
+                `UART_TX_BUF_BYTE(3) <= "S"; `UART_TX_BUF_BYTE(4) <= "H"; `UART_TX_BUF_BYTE(5) <= " ";
+                `UART_TX_BUF_BYTE(6) <= "R"; `UART_TX_BUF_BYTE(7) <= " "; `UART_TX_BUF_BYTE(8) <= "@";
+                `UART_TX_BUF_BYTE(9) <= "0"; `UART_TX_BUF_BYTE(10) <= "x"; `UART_TX_BUF_BYTE(11) <= "0";
+                `UART_TX_BUF_BYTE(12) <= "0"; `UART_TX_BUF_BYTE(13) <= "0"; `UART_TX_BUF_BYTE(14) <= "1";
+                `UART_TX_BUF_BYTE(15) <= "0"; `UART_TX_BUF_BYTE(16) <= "0"; `UART_TX_BUF_BYTE(17) <= "1";
+                `UART_TX_BUF_BYTE(18) <= "0"; `UART_TX_BUF_BYTE(19) <= ":"; `UART_TX_BUF_BYTE(20) <= " ";
+                demo_word_idx <= 5'd0;
+                i_demo_system_state <= eFW_XIP_READ;
             end
 
             ePRINT_BUF:                                                         begin
