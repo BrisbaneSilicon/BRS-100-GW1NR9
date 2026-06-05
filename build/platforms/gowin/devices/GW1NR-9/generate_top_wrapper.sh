@@ -11,6 +11,8 @@ build_artifacts_directory=$1
 top_wrapper_filename=$2
 target=$3
 clock_frequency_mhz=$4
+test_string="${5:-Default SRAM/HRAM Test Data}"
+test_string_len="${6:-27}"
 
 git_shortrev=$(git rev-parse --short HEAD)
 git_local_changes=$(git diff-index HEAD)
@@ -60,6 +62,9 @@ import util::*;
 module autogen_top_wrapper #(
     parameter reg   [(8*VERSION_CHARS)-1:0] VERSION                 = \"${build_version}\",
     parameter int                           VERSION_LEN             = ${build_version_len},
+    parameter int                           TEST_STRING_CHARS       = 32,
+    parameter reg   [(8*TEST_STRING_CHARS)-1:0] TEST_STRING         = \"${test_string}\",
+    parameter int                           TEST_STRING_LEN         = ${test_string_len},
 
     parameter int                           CLK_FREQUENCY_MHZ       = ${clock_frequency_mhz},
     parameter int                           UART_BAUD               = ${uart_baud},
@@ -242,7 +247,10 @@ localparam CS_WIDTH         = 2;
 
             board_demonstration #(
                 .VERSION            (VERSION),
-                .VERSION_LEN        (VERSION_LEN)
+                .VERSION_LEN        (VERSION_LEN),
+                .TEST_STRING_CHARS  (TEST_STRING_CHARS),
+                .TEST_STRING        (TEST_STRING),
+                .TEST_STRING_LEN    (TEST_STRING_LEN)
             ) board_demonstration_inst (
                 .sysclk             (i_sysclk),
                 .sysclk_resetn      (i_sysclk_resetn),
