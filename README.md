@@ -330,7 +330,19 @@ sudo tio -b 115200 /dev/ttyUSB1 --output-delay 20
 Next, reset the board by pressing pushbutton one (the pushbutton closest to Pin 1). The terminal should clear and then print out something similar to the following:
 ```bash
 BOARD: BRS-100-GW1NR9
-FW: c2ce822|2025-12-09 15:30:43
+FW: 3d33625|2026-06-05 16:21:51
+Testing SRAM... pass
+SRAM W @0x00000010: Default SRAM/HRAM Test Data
+SRAM R @0x00000010: Default SRAM/HRAM Test Data
+SRAM demo... pass
+Testing HyperRAM... pass
+HRAM W @0x00008010: Default SRAM/HRAM Test Data
+HRAM R @0x00008010: Default SRAM/HRAM Test Data
+HRAM demo... pass
+Testing Flash ID... pass
+Testing Flash W/R/V... pass
+FLASH W @0x00010010: Default SRAM/HRAM Test Data
+FLASH R @0x00010010: Default SRAM/HRAM Test Data
 ```
 
 The 'FW' tag can be described as follows:<br>
@@ -366,7 +378,19 @@ Connect a serial terminal (e.g. PuTTY, Tera Term) to the board's UART at **11520
 
 ```
 BOARD: BRS-100-GW1NR9
-FW: c2ce822|2025-12-09 15:30:43
+FW: 3d33625|2026-06-05 16:21:51
+Testing SRAM... pass
+SRAM W @0x00000010: Default SRAM/HRAM Test Data
+SRAM R @0x00000010: Default SRAM/HRAM Test Data
+SRAM demo... pass
+Testing HyperRAM... pass
+HRAM W @0x00008010: Default SRAM/HRAM Test Data
+HRAM R @0x00008010: Default SRAM/HRAM Test Data
+HRAM demo... pass
+Testing Flash ID... pass
+Testing Flash W/R/V... pass
+FLASH W @0x00010010: Default SRAM/HRAM Test Data
+FLASH R @0x00010010: Default SRAM/HRAM Test Data
 ```
 
 The `FW` tag format is: `<git commit SHA> <-dirty if built with local changes> | <build date> <build time>`.
