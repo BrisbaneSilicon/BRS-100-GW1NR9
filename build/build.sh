@@ -177,7 +177,7 @@ while [ $# -gt 0 ]; do
             board_demonstration=1
             shift 1
             ;;
-        -teststring|--teststring)
+        -o|-teststring|--teststring)
             chk_opt $@
 
             test_string=$2

@@ -3,6 +3,7 @@ param (
     [Alias('board_demonstration')]
     [switch]$b,
 
+    [Alias('o')]
     [string]$teststring = "Default SRAM/HRAM Test Data",
 
     [Alias('clock_frequency')]
@@ -81,7 +82,7 @@ if ($h) {
     Write-Host "`t${boldf}-u, -uart_baud${normf} ${underlinef}UART_BAUD${normf}`n`t`tSet user comms baud rate (default 115200).`n"
     Write-Host "`t${boldf}-r, -disable_pushbutton_reset${normf}`n`t`tDisable pushbutton 1 as hard reset.`n"
     Write-Host "`t${boldf}-b, -board_demonstration${normf}`n`t`tPerform build of board demonstration bitstream.`n"
-    Write-Host "`t${boldf}-teststring${normf} ${underlinef}TEST_STRING${normf}`n`t`tSet board demonstration SRAM/HRAM/Flash test payload (1-32 printable ASCII chars, no slash in custom strings). Requires -b.`n"
+    Write-Host "`t${boldf}-o, -teststring${normf} ${underlinef}TEST_STRING${normf}`n`t`tSet board demonstration SRAM/HRAM/Flash test payload (1-32 printable ASCII chars, no slash in custom strings). Requires -b.`n"
     Write-Host "`t${boldf}-e, -embedded_logic_analyzer${normf}`n`t`tInclude an Embedded Logic Analyzer (fpgacapZero) in the bitstream.`n"
     Write-Host "`t${boldf}-t, -custom_target${normf} ${underlinef}CUSTOM_TARGET${normf}`n`t`tPerform build targeting CUSTOM_TARGET.`n"
     Write-Host "`t${boldf}-k, -clock_frequency${normf} ${underlinef}FREQUENCY_MHZ${normf}`n`t`tUse a frequency of FREQUENCY_MHZ for the system clock (default 51 MHz)."
