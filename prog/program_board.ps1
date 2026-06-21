@@ -22,8 +22,10 @@ param(
     [Alias('clock_frequency')]
     [int]$k = 0,
 
+    [Alias('j')]
     [string]$jtag_frequency,
 
+    [Alias('i')]
     [switch]$ftdi,
 
     [Parameter(ValueFromRemainingArguments=$true)]
@@ -79,18 +81,18 @@ function Show-Help {
     Write-Host "`t${boldf}-t, -custom_target${normf} CUSTOM_TARGET`n`t`tInstead of the default target, target 'CUSTOM_TARGET'. (not implemented on Windows)`n"
     Write-Host "`t${boldf}-k, -clock_frequency${normf} ${underlinef}FREQUENCY_MHZ${normf}`n`t`tSystem clock frequency in MHz passed to the build script when auto-triggering a build."
     Write-Host "`t`tIgnored when using -m. Valid values: 51, 66, 75, 81, 87 (default: 51).`n"
-    Write-Host "`t${boldf}-jtag_frequency${normf} ${underlinef}FREQ${normf}`n`t`tOverride the JTAG programming clock frequency (default: 0.02MHz)."
+    Write-Host "`t${boldf}-j, -jtag_frequency${normf} ${underlinef}FREQ${normf}`n`t`tOverride the JTAG programming clock frequency (default: 0.02MHz)."
     Write-Host "`t`tValid values: $($ValidJtagFrequencies -join ', ')."
-    Write-Host "`t`tWindows-only flag - no short form to avoid collision with -f.`n"
-    Write-Host "`t${boldf}-ftdi, --ftdi${normf}`n`t`tUse the ftd2xx/USB Debugger A cable path instead of the default WinUSB path.`n"
+    Write-Host "`t`tWindows only flag.`n"
+    Write-Host "`t${boldf}-i, -ftdi, --ftdi${normf}`n`t`tUse the ftd2xx/USB Debugger A cable path instead of the default WinUSB path. Windows only flag.`n"
     Write-Host "${boldf}EXAMPLES${normf}"
     Write-Host "`t${boldf}.\program_board.ps1${normf}`n`t`tBuild (if needed) and program the board.`n"
     Write-Host "`t${boldf}.\program_board.ps1 -c${normf}`n`t`tClean, rebuild, and program the board.`n"
     Write-Host "`t${boldf}.\program_board.ps1 -b${normf}`n`t`tCheck whether firmware is built without programming.`n"
     Write-Host "`t${boldf}.\program_board.ps1 -m C:\path\to\custom.fs${normf}`n`t`tProgram the board with a custom bitstream file.`n"
     Write-Host "`t${boldf}.\program_board.ps1 -k 66${normf}`n`t`tBuild at 66 MHz and program the board.`n"
-    Write-Host "`t${boldf}.\program_board.ps1 -jtag_frequency 2.5MHz${normf}`n`t`tProgram at 2.5MHz JTAG speed. Faster but less reliable.`n"
-    Write-Host "`t${boldf}.\program_board.ps1 --ftdi${normf}`n`t`tProgram via USB Debugger A using the ftd2xx driver.`n"
+    Write-Host "`t${boldf}.\program_board.ps1 -j 2.5MHz${normf}`n`t`tProgram at 2.5MHz JTAG speed. Faster but less reliable.`n"
+    Write-Host "`t${boldf}.\program_board.ps1 -i${normf}`n`t`tProgram via USB Debugger A using the ftd2xx driver.`n"
     Write-Host "${boldf}IMPORTANT NOTICE${normf}"
     Write-Host "`tThe Windows ftd2xx driver may cause programmer_cli.exe to hang at embFlash Erase."
     Write-Host "`tThis script detects the hang automatically (no progress for 3 seconds) and"
