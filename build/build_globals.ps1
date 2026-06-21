@@ -174,8 +174,12 @@ Write-Host "  Device ID      : $DeviceId"
 
 # ---- DERIVE PATHS FROM CSV VALUES ----
 # construct paths according to detected environment
-$BuildTcl  = "$RepoRoot\build\platforms\gowin\devices\$DeviceId\build.tcl"
-$OutputDir = "$RepoRoot\build\platforms\gowin\devices\$DeviceId\$SpeedGrade\output"
+$DeviceDir                      = "$RepoRoot\build\platforms\gowin\devices\$DeviceId"
+$DeviceGenerateTopWrapperScript = "generate_top_wrapper.ps1"
+$DeviceTopWrapperFilename       = "autogen_top_wrapper.sv"
+$GenerateTopWrapperScript       = "$DeviceDir\$DeviceGenerateTopWrapperScript"
+$BuildTcl                       = "$DeviceDir\build.tcl"
+$OutputDir                      = "$DeviceDir\$SpeedGrade\output"
 $ArtifactsDir = "$OutputDir\.artifacts"
 
 # ---- LOAD SUPPORTED CLOCK FREQUENCIES FROM CSV ----

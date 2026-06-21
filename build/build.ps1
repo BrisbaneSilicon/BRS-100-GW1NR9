@@ -304,9 +304,9 @@ if ($m) { Write-Host "NOTE: -m / -clean_platform is not yet implemented."; exit 
 # ---- PRE-FLIGHT CHECKS ----
 
 ## generate_top_wrapper.ps1 — match Linux pattern of checking script exists
-if (-not (Test-Path "$PSScriptRoot\generate_top_wrapper.ps1")) {
-    Write-Host "ERROR: generate_top_wrapper.ps1 not found at: $PSScriptRoot"
-    Write-Host "Make sure generate_top_wrapper.ps1 is in the same folder as this script."
+if (-not (Test-Path -LiteralPath $GenerateTopWrapperScript)) {
+    Write-Host "ERROR: generate_top_wrapper.ps1 not found at: $GenerateTopWrapperScript"
+    Write-Host "Expected device generator in: $DeviceDir"
     exit 1
 }
 
@@ -333,9 +333,9 @@ Write-Host "  Created artifacts dir: $ArtifactsDir"
 
 ## generate autogen_top_wrapper.sv
 Write-Host "Generating autogen_top_wrapper.sv..."
-& "$PSScriptRoot\generate_top_wrapper.ps1" `
+& $GenerateTopWrapperScript `
     -BuildArtifactsDirectory $ArtifactsDir `
-    -TopWrapperFilename      "autogen_top_wrapper.sv" `
+    -TopWrapperFilename      $DeviceTopWrapperFilename `
     -ClockFrequencyMhz       $ClockMhz `
     -UartBaud                $UartBaud `
     -PushbuttonReset         $PushbuttonReset `

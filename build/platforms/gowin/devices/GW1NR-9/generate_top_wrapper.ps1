@@ -1,12 +1,9 @@
 ﻿# =============================================================
 # generate_top_wrapper.ps1
 # Generates autogen_top_wrapper.sv with current build settings.
-# Called by build_win_v2.ps1 before running gw_sh.exe
+# Called by build.ps1 before running gw_sh.exe.
 # =============================================================
-#
-# Stage 1B: Added 18 memory bus internal wires and wired them to top_inst,
-# user_inst (user branch), and tied idle in board_demonstration_inst (demo branch).
-# =============================================================
+
 
 param (
     [string]$BuildArtifactsDirectory,   # where to save the file
