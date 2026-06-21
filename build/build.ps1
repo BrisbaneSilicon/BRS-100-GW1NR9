@@ -114,7 +114,8 @@ $TestStringLen      = if ($null -eq $teststring) { 0 } else { $teststring.Length
 
 if ($TestStringWasProvided -and -not $b) {
     Write-Host ""
-    Write-Host "ERROR: -teststring is only valid with -b / -board_demonstration."
+    Write-Host "Teststring is only valid with -b / --board_demonstration."
+    Write-Host "Try '.\build.ps1 -h' or '.\build.bat -h' for more information."
     Write-Host ""
     exit 1
 }
@@ -122,7 +123,8 @@ if ($TestStringWasProvided -and -not $b) {
 if ($b) {
     if ([string]::IsNullOrEmpty($teststring) -or $teststring.Length -gt 32) {
         Write-Host ""
-        Write-Host "ERROR: -teststring must be 1 to 32 characters."
+        Write-Host "Teststring must be 1 to 32 characters."
+        Write-Host "Try '.\build.ps1 -h' or '.\build.bat -h' for more information."
         Write-Host ""
         exit 1
     }
@@ -132,7 +134,8 @@ if ($b) {
         $CustomSlash = $TestStringWasProvided -and ($code -eq 0x2F)
         if (($code -lt 0x20) -or ($code -gt 0x7E) -or ($code -eq 0x22) -or $CustomSlash -or ($code -eq 0x5C) -or ($code -eq 0x60)) {
             Write-Host ""
-            Write-Host "ERROR: -teststring must contain only printable ASCII and custom strings cannot contain double quote, slash, backtick, backslash, CR, or LF."
+            Write-Host "Teststring must contain only printable ASCII and custom strings cannot contain double quote, slash, backtick, backslash, CR, or LF."
+            Write-Host "Try '.\build.ps1 -h' or '.\build.bat -h' for more information."
             Write-Host ""
             exit 1
         }

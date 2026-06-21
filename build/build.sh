@@ -239,7 +239,8 @@ done
 
 if [ $test_string_was_provided -eq 1 ] && [ $board_demonstration -eq 0 ]; then
     echo ""
-    echo "ERROR: --teststring is only valid with -b / --board_demonstration."
+    echo "Teststring is only valid with -b / --board_demonstration."
+    echo -e "Try './build.sh --help' for more information."
     echo ""
     exit 1
 fi
@@ -247,7 +248,8 @@ fi
 if [ $board_demonstration -eq 1 ] && [ $test_string_was_provided -eq 1 ]; then
     if [ -z "$test_string" ] || [ ${#test_string} -gt 32 ]; then
         echo ""
-        echo "ERROR: --teststring must be 1 to 32 characters."
+        echo "Teststring must be 1 to 32 characters."
+        echo -e "Try './build.sh --help' for more information."
         echo ""
         exit 1
     fi
@@ -271,7 +273,8 @@ if [ $board_demonstration -eq 1 ] && [ $test_string_was_provided -eq 1 ]; then
 
     if [ $test_string_has_invalid_chars -eq 1 ]; then
         echo ""
-        echo "ERROR: --teststring must contain only printable ASCII and custom strings cannot contain double quote, slash, backtick, backslash, CR, or LF."
+        echo "Teststring must contain only printable ASCII and custom strings cannot contain double quote, slash, backtick, backslash, CR, or LF."
+        echo -e "Try './build.sh --help' for more information."
         echo ""
         exit 1
     fi
