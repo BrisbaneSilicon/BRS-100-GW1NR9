@@ -12,8 +12,8 @@ param (
     [int]$UartBaud          = 115200,   # uart baud rate
     [int]$PushbuttonReset   = 1,        # pushbutton reset enabled
     [int]$BoardDemonstration = 0,       # 0 = user.sv, 1 = board_demonstration.sv
-    [string]$TestString     = "Default SRAM/HRAM Test Data",
-    [int]$TestStringLen     = 27,
+    [string]$TestString     = "abcdefghijklmnopqrstuvwxyz123456",
+    [int]$TestStringLen     = 32,
     [int]$EmbeddedLogicAnalyzer = 0     # 0 = disabled, 1 = enabled
 )
 

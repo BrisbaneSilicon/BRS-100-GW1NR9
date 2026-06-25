@@ -11,8 +11,8 @@ build_artifacts_directory=$1
 top_wrapper_filename=$2
 target=$3
 clock_frequency_mhz=$4
-test_string="${5:-Default SRAM/HRAM Test Data}"
-test_string_len="${6:-27}"
+test_string="${5:-abcdefghijklmnopqrstuvwxyz123456}"
+test_string_len="${6:-32}"
 
 git_shortrev=$(git rev-parse --short HEAD)
 git_local_changes=$(git diff-index HEAD)

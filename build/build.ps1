@@ -4,7 +4,7 @@ param (
     [switch]$b,
 
     [Alias('o')]
-    [string]$teststring = "Default SRAM/HRAM Test Data",
+    [string]$teststring = "abcdefghijklmnopqrstuvwxyz123456",
 
     [Alias('clock_frequency')]
     [int]$k             = 51,

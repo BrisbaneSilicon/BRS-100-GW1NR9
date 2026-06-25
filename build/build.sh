@@ -87,8 +87,8 @@ board_demonstration=0
 pushbutton_reset=1
 uart_baud=115200
 target=BRS-100-GW1NR9
-test_string="Default SRAM/HRAM Test Data"
-test_string_len=27
+test_string="abcdefghijklmnopqrstuvwxyz123456"
+test_string_len=32
 test_string_was_provided=0
 
 while [ $# -gt 0 ]; do
