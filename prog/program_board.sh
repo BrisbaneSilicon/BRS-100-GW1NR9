@@ -170,7 +170,7 @@ if [ -v custom_bitfile ]; then
         err=$?
         if [ $err -ne 0 ]; then
             if [ $err -eq 50 ]; then
-                echo "Check 'ftdi_sio' is unloaded."
+                echo "Error: Cable failed to open via the channel. Check 'ftdi_sio' is unloaded"
             else
                 echo "Failed to program target board with custom bitfile, error code="$err
             fi
@@ -205,7 +205,7 @@ else
         err=$?
         if [ $err -ne 0 ]; then
             if [ $err -eq 50 ]; then
-                echo "Check 'ftdi_sio' is unloaded."
+                echo "Error: Cable failed to open via the channel. Check 'ftdi_sio' is unloaded"
             else
                 echo "Failed to program target board after bootrom update, error code="$err
             fi
@@ -250,7 +250,7 @@ program_target_with_firmware "$target_board" "$target" "$device" "$speed_grade" 
 err=$?
 if [ $err -ne 0 ]; then
     if [ $err -eq 50 ]; then
-        echo "Check 'ftdi_sio' is unloaded."
+        echo "Error: Cable failed to open via the channel. Check 'ftdi_sio' is unloaded"
     else
         echo "Failed to program target board, error code="$err
     fi
