@@ -7,3 +7,7 @@ stress_test_program_board.ps1
 stage0_debug.md
 ram_demo_1.md
 /.codex
+.planning/2026-06-25-flash-readback-investigation/task_plan.md
+.planning/2026-06-25-flash-readback-investigation/progress.md
+.planning/2026-06-25-flash-readback-investigation/findings.md
+.planning/.active_plan
