@@ -82,6 +82,30 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
                                                                {(UART_TX_BUF_CHARS-BEGIN_MSG_CHARS){8'h00}}};
 
 `define UART_TX_BUF_BYTE(_idx) i_uart_tx_buf[UART_TX_BUF_BITS-1 - ((_idx) * 8) -: 8]
+`define FLASH_UART_TX_DEMO_PREFIX(_rw_char) \
+    `UART_TX_BUF_BYTE(0) <= "F"; `UART_TX_BUF_BYTE(1) <= "L"; `UART_TX_BUF_BYTE(2) <= "A"; \
+    `UART_TX_BUF_BYTE(3) <= "S"; `UART_TX_BUF_BYTE(4) <= "H"; `UART_TX_BUF_BYTE(5) <= " "; \
+    `UART_TX_BUF_BYTE(6) <= _rw_char; `UART_TX_BUF_BYTE(7) <= " "; `UART_TX_BUF_BYTE(8) <= "@"; \
+    `UART_TX_BUF_BYTE(9) <= "0"; `UART_TX_BUF_BYTE(10) <= "x"; `UART_TX_BUF_BYTE(11) <= "0"; \
+    `UART_TX_BUF_BYTE(12) <= "0"; `UART_TX_BUF_BYTE(13) <= "0"; `UART_TX_BUF_BYTE(14) <= "1"; \
+    `UART_TX_BUF_BYTE(15) <= "0"; `UART_TX_BUF_BYTE(16) <= "0"; `UART_TX_BUF_BYTE(17) <= "1"; \
+    `UART_TX_BUF_BYTE(18) <= "0"; `UART_TX_BUF_BYTE(19) <= ":"; `UART_TX_BUF_BYTE(20) <= " ";
+`define FLASH_UART_TX_WORD_BYTES(_word_base, _word_data) \
+    if ((_word_base) < TEST_LEN) begin \
+        `UART_TX_BUF_BYTE(FLASH_DEMO_PREFIX_LEN + (_word_base)) <= _word_data[31:24]; \
+    end \
+    if ((_word_base) + 7'd1 < TEST_LEN) begin \
+        `UART_TX_BUF_BYTE(FLASH_DEMO_PREFIX_LEN + (_word_base) + 7'd1) <= _word_data[23:16]; \
+    end \
+    if ((_word_base) + 7'd2 < TEST_LEN) begin \
+        `UART_TX_BUF_BYTE(FLASH_DEMO_PREFIX_LEN + (_word_base) + 7'd2) <= _word_data[15:8]; \
+    end \
+    if ((_word_base) + 7'd3 < TEST_LEN) begin \
+        `UART_TX_BUF_BYTE(FLASH_DEMO_PREFIX_LEN + (_word_base) + 7'd3) <= _word_data[7:0]; \
+    end
+`define FLASH_UART_TX_CRLF(_idx) \
+    `UART_TX_BUF_BYTE(_idx) <= UART_CR; \
+    `UART_TX_BUF_BYTE((_idx) + 7'd1) <= UART_LF;
 
 
     // ----------------------------------------------
@@ -420,19 +444,6 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
             flash_program_shift = {FLASH_CMD_PROGRAM, flash_addr,
                                    word_data[7:0], word_data[15:8],
                                    word_data[23:16], word_data[31:24]};
-        end
-    endfunction
-
-    function automatic [63:0] flash_demo_program_shift;
-        input [4:0] word_idx;
-        reg [6:0] base;
-        begin
-            base = {word_idx, 2'b00};
-            flash_demo_program_shift = {FLASH_CMD_PROGRAM, flash_demo_addr(word_idx),
-                                        test_byte(base + 7'd3),
-                                        test_byte(base + 7'd2),
-                                        test_byte(base + 7'd1),
-                                        test_byte(base)};
         end
     endfunction
 
@@ -1098,7 +1109,7 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
                 if (fw_operation == eFW_OP_TEST) begin
                     fw_shift      <= flash_program_shift(FLASH_TEST_ADDR, FLASH_TEST_DATA);
                 end else begin
-                    fw_shift      <= flash_demo_program_shift(demo_word_idx);
+                    fw_shift      <= flash_program_shift(flash_demo_addr(demo_word_idx), test_word(demo_word_idx));
                 end
                 fw_bit_idx        <= 7'd0;
                 fw_bit_count      <= 7'd64;
@@ -1230,19 +1241,15 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
                     end
                     start_uart_tx_buf_print(7'd29, ePREP_NEXT_UART_STARTUP_MSG);
                 end else begin
+                    `FLASH_UART_TX_WORD_BYTES(demo_word_base, readback)
+
                     if (demo_word_idx + 5'd1 == TEST_WORDS) begin
-                        i_uart_tx_buf <= uart_tx_set_byte(
-                            uart_tx_set_byte(
-                                uart_tx_set_word_bytes(i_uart_tx_buf, FLASH_DEMO_PREFIX_LEN,
-                                                       demo_word_base, readback),
-                                FLASH_DEMO_PREFIX_LEN + TEST_LEN_7,
-                                UART_CR),
-                            FLASH_DEMO_PREFIX_LEN + TEST_LEN_7 + 7'd1,
-                            UART_LF);
-                        start_uart_tx_buf_print(FLASH_DEMO_LINE_LEN_7, ePREP_NEXT_UART_STARTUP_MSG);
+                        `FLASH_UART_TX_CRLF(FLASH_DEMO_PREFIX_LEN + TEST_LEN_7)
+                        i_uart_tx_buf_count <= FLASH_DEMO_LINE_LEN;
+                        i_uart_tx_buf_counter <= 7'd0;
+                        print_next_state <= ePREP_NEXT_UART_STARTUP_MSG;
+                        i_demo_system_state <= ePRINT_BUF;
                     end else begin
-                        i_uart_tx_buf <= uart_tx_set_word_bytes(i_uart_tx_buf, FLASH_DEMO_PREFIX_LEN,
-                                                                demo_word_base, readback);
                         demo_word_idx       <= demo_word_idx + 5'd1;
                         i_demo_system_state <= eFW_XIP_READ;
                     end
@@ -1250,22 +1257,22 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
             end
 
             eFW_DEMO_PRINT_WRITE:                                               begin
-                set_uart_tx_buf(
-                    uart_tx_set_byte(
-                        uart_tx_set_byte(
-                            uart_tx_set_test_string(FLASH_DEMO_WRITE_PREFIX, FLASH_DEMO_PREFIX_LEN),
-                            FLASH_DEMO_PREFIX_LEN + TEST_LEN_7,
-                            UART_CR),
-                        FLASH_DEMO_PREFIX_LEN + TEST_LEN_7 + 7'd1,
-                        UART_LF),
-                    FLASH_DEMO_LINE_LEN_7);
+                `FLASH_UART_TX_DEMO_PREFIX("W")
+                for (demo_i = 0; demo_i < TEST_LEN; demo_i = demo_i + 1) begin
+                    `UART_TX_BUF_BYTE(FLASH_DEMO_PREFIX_LEN + demo_i) <= test_byte(demo_i[6:0]);
+                end
+                `FLASH_UART_TX_CRLF(FLASH_DEMO_PREFIX_LEN + TEST_LEN_7)
+                i_uart_tx_buf_count <= FLASH_DEMO_LINE_LEN;
+                i_uart_tx_buf_counter <= 7'd0;
                 demo_word_idx <= 5'd0;
                 fw_next_state <= eFW_DEMO_READ_PREP;
-                start_uart_tx_buf_print(FLASH_DEMO_LINE_LEN_7, eFW_RESTORE);
+                print_next_state <= eFW_RESTORE;
+                i_demo_system_state <= ePRINT_BUF;
             end
 
             eFW_DEMO_READ_PREP:                                                 begin
-                i_uart_tx_buf <= FLASH_DEMO_READ_PREFIX;
+                i_uart_tx_buf <= 0;
+                `FLASH_UART_TX_DEMO_PREFIX("R")
                 demo_word_idx <= 5'd0;
                 i_demo_system_state <= eFW_XIP_READ;
             end
@@ -1311,4 +1318,7 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
 
 endmodule
 
+`undef FLASH_UART_TX_CRLF
+`undef FLASH_UART_TX_WORD_BYTES
+`undef FLASH_UART_TX_DEMO_PREFIX
 `undef UART_TX_BUF_BYTE
