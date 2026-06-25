@@ -169,7 +169,11 @@ if [ -v custom_bitfile ]; then
 
         err=$?
         if [ $err -ne 0 ]; then
-            echo "Failed to program target board with custom bitfile, error code="$err
+            if [ $err -eq 50 ]; then
+                echo "Check 'ftdi_sio' is unloaded."
+            else
+                echo "Failed to program target board with custom bitfile, error code="$err
+            fi
         fi
 
         exit
@@ -200,7 +204,11 @@ else
         program_target_with_firmware "$target_board" "$target" "$device" "$speed_grade" true
         err=$?
         if [ $err -ne 0 ]; then
-            echo "Failed to program target board after bootrom update, error code="$err
+            if [ $err -eq 50 ]; then
+                echo "Check 'ftdi_sio' is unloaded."
+            else
+                echo "Failed to program target board after bootrom update, error code="$err
+            fi
 
             exit
         fi
@@ -241,7 +249,11 @@ fi
 program_target_with_firmware "$target_board" "$target" "$device" "$speed_grade" "$program_flash" "$use_open_fpga_loader"
 err=$?
 if [ $err -ne 0 ]; then
-    echo "Failed to program target board, error code="$err
+    if [ $err -eq 50 ]; then
+        echo "Check 'ftdi_sio' is unloaded."
+    else
+        echo "Failed to program target board, error code="$err
+    fi
 
     exit
 fi
