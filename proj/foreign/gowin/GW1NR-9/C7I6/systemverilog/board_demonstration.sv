@@ -74,6 +74,8 @@ localparam                              UART_TX_BUF_CHARS   = 96;
 localparam                              UART_TX_BUF_BITS    = UART_TX_BUF_CHARS * 8;
 localparam                              RST_SCRN_CHARS      = 14;
 localparam                              BEGIN_MSG_CHARS     = 21;
+localparam [7:0]                        UART_CR             = 8'h0D;
+localparam [7:0]                        UART_LF             = 8'h0A;
 localparam reg  [UART_TX_BUF_BITS-1:0]  RST_SCRN            = {"\033[2J\033[3J\033[0;0H",
                                                                {(UART_TX_BUF_CHARS-RST_SCRN_CHARS){8'h00}}};
 localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-GW1NR9",
@@ -220,6 +222,26 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
     localparam int TEST_WORDS       = (TEST_LEN + 3) / 4;
     localparam int DEMO_LINE_LEN    = 20 + TEST_LEN + 2;
     localparam int FLASH_DEMO_LINE_LEN = 21 + TEST_LEN + 2;
+    localparam [6:0] TEST_LEN_7           = TEST_LEN;
+    localparam [6:0] DEMO_LINE_LEN_7      = DEMO_LINE_LEN;
+    localparam [6:0] SRAM_DEMO_PREFIX_LEN = 7'd20;
+
+    localparam reg [UART_TX_BUF_BITS-1:0] SRAM_BIST_PASS_MSG =
+        {"Testing SRAM... pass", UART_CR, UART_LF,
+         {(UART_TX_BUF_CHARS-22){8'h00}}};
+    localparam reg [UART_TX_BUF_BITS-1:0] SRAM_BIST_FAIL_MSG =
+        {"Testing SRAM... FAIL (wrote 0xABCDABCD read 0x00000000)", UART_CR, UART_LF,
+         {(UART_TX_BUF_CHARS-57){8'h00}}};
+    localparam reg [UART_TX_BUF_BITS-1:0] SRAM_DEMO_WRITE_PREFIX =
+        {"SRAM W @0x00000010: ", {(UART_TX_BUF_CHARS-20){8'h00}}};
+    localparam reg [UART_TX_BUF_BITS-1:0] SRAM_DEMO_READ_PREFIX =
+        {"SRAM R @0x00000010: ", {(UART_TX_BUF_CHARS-20){8'h00}}};
+    localparam reg [UART_TX_BUF_BITS-1:0] SRAM_DEMO_PASS_MSG =
+        {"SRAM demo... pass", UART_CR, UART_LF,
+         {(UART_TX_BUF_CHARS-19){8'h00}}};
+    localparam reg [UART_TX_BUF_BITS-1:0] SRAM_DEMO_FAIL_MSG =
+        {"SRAM demo... FAIL", UART_CR, UART_LF,
+         {(UART_TX_BUF_CHARS-19){8'h00}}};
 
     reg                         [4:0]                   demo_word_idx;
     reg                                                 demo_pass;
@@ -266,6 +288,94 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
             };
         end
     endfunction
+
+    function automatic [UART_TX_BUF_BITS-1:0] uart_tx_set_byte;
+        input [UART_TX_BUF_BITS-1:0] tx_buf;
+        input [6:0] idx;
+        input [7:0] value;
+        begin
+            uart_tx_set_byte = tx_buf;
+            uart_tx_set_byte[UART_TX_BUF_BITS-1 - (idx * 8) -: 8] = value;
+        end
+    endfunction
+
+    function automatic [UART_TX_BUF_BITS-1:0] uart_tx_set_hex32;
+        input [UART_TX_BUF_BITS-1:0] tx_buf;
+        input [6:0] idx;
+        input [31:0] value;
+        reg [UART_TX_BUF_BITS-1:0] next_buf;
+        begin
+            next_buf = tx_buf;
+            next_buf = uart_tx_set_byte(next_buf, idx,        hex_nibble(value[31:28]));
+            next_buf = uart_tx_set_byte(next_buf, idx + 7'd1, hex_nibble(value[27:24]));
+            next_buf = uart_tx_set_byte(next_buf, idx + 7'd2, hex_nibble(value[23:20]));
+            next_buf = uart_tx_set_byte(next_buf, idx + 7'd3, hex_nibble(value[19:16]));
+            next_buf = uart_tx_set_byte(next_buf, idx + 7'd4, hex_nibble(value[15:12]));
+            next_buf = uart_tx_set_byte(next_buf, idx + 7'd5, hex_nibble(value[11:8]));
+            next_buf = uart_tx_set_byte(next_buf, idx + 7'd6, hex_nibble(value[7:4]));
+            next_buf = uart_tx_set_byte(next_buf, idx + 7'd7, hex_nibble(value[3:0]));
+            uart_tx_set_hex32 = next_buf;
+        end
+    endfunction
+
+    function automatic [UART_TX_BUF_BITS-1:0] uart_tx_set_test_string;
+        input [UART_TX_BUF_BITS-1:0] tx_buf;
+        input [6:0] idx;
+        integer test_i;
+        reg [UART_TX_BUF_BITS-1:0] next_buf;
+        begin
+            next_buf = tx_buf;
+            for (test_i = 0; test_i < TEST_LEN; test_i = test_i + 1) begin
+                next_buf = uart_tx_set_byte(next_buf, idx + test_i[6:0], test_byte(test_i[6:0]));
+            end
+            uart_tx_set_test_string = next_buf;
+        end
+    endfunction
+
+    function automatic [UART_TX_BUF_BITS-1:0] uart_tx_set_word_bytes;
+        input [UART_TX_BUF_BITS-1:0] tx_buf;
+        input [6:0] idx;
+        input [6:0] word_base;
+        input [31:0] word_data;
+        reg [UART_TX_BUF_BITS-1:0] next_buf;
+        begin
+            next_buf = tx_buf;
+            if (word_base < TEST_LEN) begin
+                next_buf = uart_tx_set_byte(next_buf, idx + word_base, word_data[31:24]);
+            end
+            if (word_base + 7'd1 < TEST_LEN) begin
+                next_buf = uart_tx_set_byte(next_buf, idx + word_base + 7'd1, word_data[23:16]);
+            end
+            if (word_base + 7'd2 < TEST_LEN) begin
+                next_buf = uart_tx_set_byte(next_buf, idx + word_base + 7'd2, word_data[15:8]);
+            end
+            if (word_base + 7'd3 < TEST_LEN) begin
+                next_buf = uart_tx_set_byte(next_buf, idx + word_base + 7'd3, word_data[7:0]);
+            end
+            uart_tx_set_word_bytes = next_buf;
+        end
+    endfunction
+
+    task automatic set_uart_tx_buf;
+        input [UART_TX_BUF_BITS-1:0] tx_buf;
+        input [6:0] len;
+        begin
+            i_uart_tx_buf         <= tx_buf;
+            i_uart_tx_buf_count   <= len;
+            i_uart_tx_buf_counter <= 7'd0;
+        end
+    endtask
+
+    task automatic start_uart_tx_buf_print;
+        input [6:0] len;
+        input tDEMONSTRATE_SYSTEM_STATE next_state;
+        begin
+            i_uart_tx_buf_count   <= len;
+            i_uart_tx_buf_counter <= 7'd0;
+            print_next_state      <= next_state;
+            i_demo_system_state   <= ePRINT_BUF;
+        end
+    endtask
 
     function automatic [23:0] flash_demo_addr;
         input [4:0] word_idx;
@@ -455,50 +565,13 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
             end
 
             eSRAM_COMPARE:                                                      begin
-                // "Testing SRAM... "
-                `UART_TX_BUF_BYTE(0) <= "T"; `UART_TX_BUF_BYTE(1) <= "e"; `UART_TX_BUF_BYTE(2) <= "s";
-                `UART_TX_BUF_BYTE(3) <= "t"; `UART_TX_BUF_BYTE(4) <= "i"; `UART_TX_BUF_BYTE(5) <= "n";
-                `UART_TX_BUF_BYTE(6) <= "g"; `UART_TX_BUF_BYTE(7) <= " "; `UART_TX_BUF_BYTE(8) <= "S";
-                `UART_TX_BUF_BYTE(9) <= "R"; `UART_TX_BUF_BYTE(10) <= "A"; `UART_TX_BUF_BYTE(11) <= "M";
-                `UART_TX_BUF_BYTE(12) <= "."; `UART_TX_BUF_BYTE(13) <= "."; `UART_TX_BUF_BYTE(14) <= ".";
-                `UART_TX_BUF_BYTE(15) <= " ";
                 if (readback == 32'hABCD_ABCD) begin
-                    `UART_TX_BUF_BYTE(16) <= "p"; `UART_TX_BUF_BYTE(17) <= "a";
-                    `UART_TX_BUF_BYTE(18) <= "s"; `UART_TX_BUF_BYTE(19) <= "s";
-                    `UART_TX_BUF_BYTE(20) <= 8'h0D; `UART_TX_BUF_BYTE(21) <= 8'h0A;
-                    i_uart_tx_buf_count <= 7'd22;
+                    set_uart_tx_buf(SRAM_BIST_PASS_MSG, 7'd22);
+                    start_uart_tx_buf_print(7'd22, ePREP_NEXT_UART_STARTUP_MSG);
                 end else begin
-                    // "FAIL (wrote 0xABCDABCD read 0xRRRRRRRR)\r\n"
-                    `UART_TX_BUF_BYTE(16) <= "F"; `UART_TX_BUF_BYTE(17) <= "A";
-                    `UART_TX_BUF_BYTE(18) <= "I"; `UART_TX_BUF_BYTE(19) <= "L";
-                    `UART_TX_BUF_BYTE(20) <= " "; `UART_TX_BUF_BYTE(21) <= "(";
-                    `UART_TX_BUF_BYTE(22) <= "w"; `UART_TX_BUF_BYTE(23) <= "r";
-                    `UART_TX_BUF_BYTE(24) <= "o"; `UART_TX_BUF_BYTE(25) <= "t";
-                    `UART_TX_BUF_BYTE(26) <= "e"; `UART_TX_BUF_BYTE(27) <= " ";
-                    `UART_TX_BUF_BYTE(28) <= "0"; `UART_TX_BUF_BYTE(29) <= "x";
-                    `UART_TX_BUF_BYTE(30) <= "A"; `UART_TX_BUF_BYTE(31) <= "B";
-                    `UART_TX_BUF_BYTE(32) <= "C"; `UART_TX_BUF_BYTE(33) <= "D";
-                    `UART_TX_BUF_BYTE(34) <= "A"; `UART_TX_BUF_BYTE(35) <= "B";
-                    `UART_TX_BUF_BYTE(36) <= "C"; `UART_TX_BUF_BYTE(37) <= "D";
-                    `UART_TX_BUF_BYTE(38) <= " "; `UART_TX_BUF_BYTE(39) <= "r";
-                    `UART_TX_BUF_BYTE(40) <= "e"; `UART_TX_BUF_BYTE(41) <= "a";
-                    `UART_TX_BUF_BYTE(42) <= "d"; `UART_TX_BUF_BYTE(43) <= " ";
-                    `UART_TX_BUF_BYTE(44) <= "0"; `UART_TX_BUF_BYTE(45) <= "x";
-                    `UART_TX_BUF_BYTE(46) <= hex_nibble(readback[31:28]);
-                    `UART_TX_BUF_BYTE(47) <= hex_nibble(readback[27:24]);
-                    `UART_TX_BUF_BYTE(48) <= hex_nibble(readback[23:20]);
-                    `UART_TX_BUF_BYTE(49) <= hex_nibble(readback[19:16]);
-                    `UART_TX_BUF_BYTE(50) <= hex_nibble(readback[15:12]);
-                    `UART_TX_BUF_BYTE(51) <= hex_nibble(readback[11:8]);
-                    `UART_TX_BUF_BYTE(52) <= hex_nibble(readback[7:4]);
-                    `UART_TX_BUF_BYTE(53) <= hex_nibble(readback[3:0]);
-                    `UART_TX_BUF_BYTE(54) <= ")";
-                    `UART_TX_BUF_BYTE(55) <= 8'h0D; `UART_TX_BUF_BYTE(56) <= 8'h0A;
-                    i_uart_tx_buf_count <= 7'd57;
+                    set_uart_tx_buf(uart_tx_set_hex32(SRAM_BIST_FAIL_MSG, 7'd46, readback), 7'd57);
+                    start_uart_tx_buf_print(7'd57, ePREP_NEXT_UART_STARTUP_MSG);
                 end
-                i_uart_tx_buf_counter <= 7'd0;
-                print_next_state <= ePREP_NEXT_UART_STARTUP_MSG;
-                i_demo_system_state <= ePRINT_BUF;
             end
 
             eSRAM_DEMO_WRITE_PREP:                                             begin
@@ -527,33 +600,21 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
             end
 
             eSRAM_DEMO_PRINT_WRITE:                                            begin
-                `UART_TX_BUF_BYTE(0) <= "S"; `UART_TX_BUF_BYTE(1) <= "R"; `UART_TX_BUF_BYTE(2) <= "A";
-                `UART_TX_BUF_BYTE(3) <= "M"; `UART_TX_BUF_BYTE(4) <= " "; `UART_TX_BUF_BYTE(5) <= "W";
-                `UART_TX_BUF_BYTE(6) <= " "; `UART_TX_BUF_BYTE(7) <= "@"; `UART_TX_BUF_BYTE(8) <= "0";
-                `UART_TX_BUF_BYTE(9) <= "x"; `UART_TX_BUF_BYTE(10) <= "0"; `UART_TX_BUF_BYTE(11) <= "0";
-                `UART_TX_BUF_BYTE(12) <= "0"; `UART_TX_BUF_BYTE(13) <= "0"; `UART_TX_BUF_BYTE(14) <= "0";
-                `UART_TX_BUF_BYTE(15) <= "0"; `UART_TX_BUF_BYTE(16) <= "1"; `UART_TX_BUF_BYTE(17) <= "0";
-                `UART_TX_BUF_BYTE(18) <= ":"; `UART_TX_BUF_BYTE(19) <= " ";
-                for (demo_i = 0; demo_i < TEST_LEN; demo_i = demo_i + 1) begin
-                    `UART_TX_BUF_BYTE(20 + demo_i) <= test_byte(demo_i[6:0]);
-                end
-                `UART_TX_BUF_BYTE(20 + TEST_LEN) <= 8'h0D;
-                `UART_TX_BUF_BYTE(21 + TEST_LEN) <= 8'h0A;
-                i_uart_tx_buf_count <= DEMO_LINE_LEN;
-                i_uart_tx_buf_counter <= 7'd0;
-                print_next_state  <= eSRAM_DEMO_READ_PREP;
-                i_demo_system_state <= ePRINT_BUF;
+                set_uart_tx_buf(
+                    uart_tx_set_byte(
+                        uart_tx_set_byte(
+                            uart_tx_set_test_string(SRAM_DEMO_WRITE_PREFIX, SRAM_DEMO_PREFIX_LEN),
+                            SRAM_DEMO_PREFIX_LEN + TEST_LEN_7,
+                            UART_CR),
+                        SRAM_DEMO_PREFIX_LEN + TEST_LEN_7 + 7'd1,
+                        UART_LF),
+                    DEMO_LINE_LEN_7);
+                start_uart_tx_buf_print(DEMO_LINE_LEN_7, eSRAM_DEMO_READ_PREP);
             end
 
             eSRAM_DEMO_READ_PREP:                                              begin
                 demo_word_idx       <= 5'd0;
-                `UART_TX_BUF_BYTE(0) <= "S"; `UART_TX_BUF_BYTE(1) <= "R"; `UART_TX_BUF_BYTE(2) <= "A";
-                `UART_TX_BUF_BYTE(3) <= "M"; `UART_TX_BUF_BYTE(4) <= " "; `UART_TX_BUF_BYTE(5) <= "R";
-                `UART_TX_BUF_BYTE(6) <= " "; `UART_TX_BUF_BYTE(7) <= "@"; `UART_TX_BUF_BYTE(8) <= "0";
-                `UART_TX_BUF_BYTE(9) <= "x"; `UART_TX_BUF_BYTE(10) <= "0"; `UART_TX_BUF_BYTE(11) <= "0";
-                `UART_TX_BUF_BYTE(12) <= "0"; `UART_TX_BUF_BYTE(13) <= "0"; `UART_TX_BUF_BYTE(14) <= "0";
-                `UART_TX_BUF_BYTE(15) <= "0"; `UART_TX_BUF_BYTE(16) <= "1"; `UART_TX_BUF_BYTE(17) <= "0";
-                `UART_TX_BUF_BYTE(18) <= ":"; `UART_TX_BUF_BYTE(19) <= " ";
+                i_uart_tx_buf       <= SRAM_DEMO_READ_PREFIX;
                 i_demo_system_state <= eSRAM_DEMO_READ;
             end
 
@@ -564,26 +625,24 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
                 ram_addr  <= SRAM_DEMO_ADDR + {25'd0, demo_word_base};
                 ram_wstrb <= 4'h0;
                 if (ram_valid && ram_ready) begin
+                    i_uart_tx_buf <= uart_tx_set_word_bytes(i_uart_tx_buf, SRAM_DEMO_PREFIX_LEN,
+                                                            demo_word_base, ram_rdata);
                     if (demo_word_base < TEST_LEN) begin
-                        `UART_TX_BUF_BYTE(20 + demo_word_base) <= ram_rdata[31:24];
                         if (ram_rdata[31:24] != test_byte(demo_word_base)) begin
                             demo_pass <= 1'b0;
                         end
                     end
                     if (demo_word_base + 7'd1 < TEST_LEN) begin
-                        `UART_TX_BUF_BYTE(20 + demo_word_base + 7'd1) <= ram_rdata[23:16];
                         if (ram_rdata[23:16] != test_byte(demo_word_base + 7'd1)) begin
                             demo_pass <= 1'b0;
                         end
                     end
                     if (demo_word_base + 7'd2 < TEST_LEN) begin
-                        `UART_TX_BUF_BYTE(20 + demo_word_base + 7'd2) <= ram_rdata[15:8];
                         if (ram_rdata[15:8] != test_byte(demo_word_base + 7'd2)) begin
                             demo_pass <= 1'b0;
                         end
                     end
                     if (demo_word_base + 7'd3 < TEST_LEN) begin
-                        `UART_TX_BUF_BYTE(20 + demo_word_base + 7'd3) <= ram_rdata[7:0];
                         if (ram_rdata[7:0] != test_byte(demo_word_base + 7'd3)) begin
                             demo_pass <= 1'b0;
                         end
@@ -602,33 +661,20 @@ localparam reg  [UART_TX_BUF_BITS-1:0]  BEGIN_MSG           = {"BOARD: BRS-100-G
             end
 
             eSRAM_DEMO_PRINT_READ:                                             begin
-                `UART_TX_BUF_BYTE(20 + TEST_LEN) <= 8'h0D;
-                `UART_TX_BUF_BYTE(21 + TEST_LEN) <= 8'h0A;
-                i_uart_tx_buf_count <= DEMO_LINE_LEN;
-                i_uart_tx_buf_counter <= 7'd0;
-                print_next_state  <= eSRAM_DEMO_PRINT_RESULT;
-                i_demo_system_state <= ePRINT_BUF;
+                i_uart_tx_buf <= uart_tx_set_byte(
+                    uart_tx_set_byte(i_uart_tx_buf, SRAM_DEMO_PREFIX_LEN + TEST_LEN_7, UART_CR),
+                    SRAM_DEMO_PREFIX_LEN + TEST_LEN_7 + 7'd1,
+                    UART_LF);
+                start_uart_tx_buf_print(DEMO_LINE_LEN_7, eSRAM_DEMO_PRINT_RESULT);
             end
 
             eSRAM_DEMO_PRINT_RESULT:                                           begin
-                `UART_TX_BUF_BYTE(0) <= "S"; `UART_TX_BUF_BYTE(1) <= "R"; `UART_TX_BUF_BYTE(2) <= "A";
-                `UART_TX_BUF_BYTE(3) <= "M"; `UART_TX_BUF_BYTE(4) <= " "; `UART_TX_BUF_BYTE(5) <= "d";
-                `UART_TX_BUF_BYTE(6) <= "e"; `UART_TX_BUF_BYTE(7) <= "m"; `UART_TX_BUF_BYTE(8) <= "o";
-                `UART_TX_BUF_BYTE(9) <= "."; `UART_TX_BUF_BYTE(10) <= "."; `UART_TX_BUF_BYTE(11) <= ".";
-                `UART_TX_BUF_BYTE(12) <= " ";
                 if (demo_pass) begin
-                    `UART_TX_BUF_BYTE(13) <= "p"; `UART_TX_BUF_BYTE(14) <= "a";
-                    `UART_TX_BUF_BYTE(15) <= "s"; `UART_TX_BUF_BYTE(16) <= "s";
+                    set_uart_tx_buf(SRAM_DEMO_PASS_MSG, 7'd19);
                 end else begin
-                    `UART_TX_BUF_BYTE(13) <= "F"; `UART_TX_BUF_BYTE(14) <= "A";
-                    `UART_TX_BUF_BYTE(15) <= "I"; `UART_TX_BUF_BYTE(16) <= "L";
+                    set_uart_tx_buf(SRAM_DEMO_FAIL_MSG, 7'd19);
                 end
-                `UART_TX_BUF_BYTE(17) <= 8'h0D;
-                `UART_TX_BUF_BYTE(18) <= 8'h0A;
-                i_uart_tx_buf_count <= 7'd19;
-                i_uart_tx_buf_counter <= 7'd0;
-                print_next_state  <= ePREP_NEXT_UART_STARTUP_MSG;
-                i_demo_system_state <= ePRINT_BUF;
+                start_uart_tx_buf_print(7'd19, ePREP_NEXT_UART_STARTUP_MSG);
             end
 
             eHRAM_DEMO_WRITE_PREP:                                             begin
