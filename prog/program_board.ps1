@@ -84,7 +84,7 @@ function Show-Help {
     Write-Host "`t${boldf}-j, -jtag_frequency${normf} ${underlinef}FREQ${normf}`n`t`tOverride the JTAG programming clock frequency (default: 0.02MHz)."
     Write-Host "`t`tValid values: $($ValidJtagFrequencies -join ', ')."
     Write-Host "`t`tWindows only flag.`n"
-    Write-Host "`t${boldf}-i, -ftdi, --ftdi${normf}`n`t`tUse the ftd2xx/USB Debugger A cable path instead of the default WinUSB path. Windows only flag.`n"
+    Write-Host "`t${boldf}-i, -ftdi${normf}`n`t`tUse the ftd2xx/USB Debugger A cable path instead of the default WinUSB path. Windows only flag.`n"
     Write-Host "${boldf}EXAMPLES${normf}"
     Write-Host "`t${boldf}.\program_board.ps1${normf}`n`t`tBuild (if needed) and program the board.`n"
     Write-Host "`t${boldf}.\program_board.ps1 -c${normf}`n`t`tClean, rebuild, and program the board.`n"

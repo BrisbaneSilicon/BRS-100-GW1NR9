@@ -1,10 +1,11 @@
+[CmdletBinding(PositionalBinding = $false)]
 param (
     # ---- CORE BUILD FLAGS ----
     [Alias('board_demonstration')]
     [switch]$b,
 
     [Alias('o')]
-    [string]$teststring = "abcdefghijklmnopqrstuvwxyz123456",
+    [switch]$custom_test_string,
 
     [Alias('clock_frequency')]
     [int]$k             = 51,
@@ -47,16 +48,58 @@ param (
     [switch]$c,
 
     # ---- NOT YET IMPLEMENTED, NOT IMPORTANT FOR CURRENT BOARD----
-    [Alias('custom_target')]
-    [string]$t          = "",
+    [Alias('t')]
+    [string]$custom_target = "",
 
     [Alias('platform')]
     [string]$f          = "",
 
     [Alias('clean_platform')]
-    [switch]$m
+    [switch]$m,
+
+    [Parameter(ValueFromRemainingArguments = $true)]
+    [string[]]$RemainingArgs
 )
 
+
+# PowerShell accepts abbreviated parameter names, so explicitly reject removed
+# legacy spellings before they can bind to another short option.
+if ($MyInvocation.Line -match '(?<!\S)--?teststring(?=[:=\s]|$)') {
+    Write-Host ""
+    Write-Host "Invalid option: '-teststring'."
+    Write-Host "Try '.\build.ps1 -h' or '.\build.bat -h' for more information."
+    Write-Host ""
+    exit 1
+}
+
+$TestStringWasProvided = $PSBoundParameters.ContainsKey('custom_test_string')
+$ResolvedTestString = "abcdefghijklmnopqrstuvwxyz123456"
+
+if ($TestStringWasProvided) {
+    if (($null -eq $RemainingArgs) -or ($RemainingArgs.Count -lt 1)) {
+        Write-Host ""
+        Write-Host "Teststring must be 1 to 32 characters."
+        Write-Host "Try '.\build.ps1 -h' or '.\build.bat -h' for more information."
+        Write-Host ""
+        exit 1
+    }
+
+    $ResolvedTestString = $RemainingArgs[0]
+
+    if ($RemainingArgs.Count -gt 1) {
+        Write-Host ""
+        Write-Host "Invalid option: '$($RemainingArgs[1])'."
+        Write-Host "Try '.\build.ps1 -h' or '.\build.bat -h' for more information."
+        Write-Host ""
+        exit 1
+    }
+} elseif (($null -ne $RemainingArgs) -and ($RemainingArgs.Count -gt 0)) {
+    Write-Host ""
+    Write-Host "Invalid option: '$($RemainingArgs[0])'."
+    Write-Host "Try '.\build.ps1 -h' or '.\build.bat -h' for more information."
+    Write-Host ""
+    exit 1
+}
 
 # ---- HELP ----
 if ($h) {
@@ -82,7 +125,7 @@ if ($h) {
     Write-Host "`t${boldf}-u, -uart_baud${normf} ${underlinef}UART_BAUD${normf}`n`t`tSet user comms baud rate (default 115200).`n"
     Write-Host "`t${boldf}-r, -disable_pushbutton_reset${normf}`n`t`tDisable pushbutton 1 as hard reset.`n"
     Write-Host "`t${boldf}-b, -board_demonstration${normf}`n`t`tPerform build of board demonstration bitstream.`n"
-    Write-Host "`t${boldf}-o, -teststring${normf} ${underlinef}TEST_STRING${normf}`n`t`tSet board demonstration SRAM/HRAM/Flash test payload (1-32 printable ASCII chars, no slash in custom strings). Requires -b.`n"
+    Write-Host "`t${boldf}-o, -custom_test_string${normf} ${underlinef}TEST_STRING${normf}`n`t`tSet board demonstration SRAM/HRAM/Flash test payload (1-32 printable ASCII chars, no slash in custom strings). Requires -b.`n"
     Write-Host "`t${boldf}-e, -embedded_logic_analyzer${normf}`n`t`tInclude an Embedded Logic Analyzer (fpgacapZero) in the bitstream.`n"
     Write-Host "`t${boldf}-t, -custom_target${normf} ${underlinef}CUSTOM_TARGET${normf}`n`t`tPerform build targeting CUSTOM_TARGET.`n"
     Write-Host "`t${boldf}-k, -clock_frequency${normf} ${underlinef}FREQUENCY_MHZ${normf}`n`t`tUse a frequency of FREQUENCY_MHZ for the system clock (default 51 MHz)."
@@ -109,8 +152,7 @@ $UartBaud           = $u
 $PushbuttonReset    = if ($r) { 0 } else { 1 }
 $DoProjectGenOnly   = if ($p) { "true" } else { "false" }
 $DoSynthOnly        = if ($s) { "true" } else { "false" }
-$TestStringWasProvided = $PSBoundParameters.ContainsKey('teststring')
-$TestStringLen      = if ($null -eq $teststring) { 0 } else { $teststring.Length }
+$TestStringLen      = if ($null -eq $ResolvedTestString) { 0 } else { $ResolvedTestString.Length }
 
 if ($TestStringWasProvided -and -not $b) {
     Write-Host ""
@@ -121,7 +163,7 @@ if ($TestStringWasProvided -and -not $b) {
 }
 
 if ($b) {
-    if ([string]::IsNullOrEmpty($teststring) -or $teststring.Length -gt 32) {
+    if ([string]::IsNullOrEmpty($ResolvedTestString) -or $ResolvedTestString.Length -gt 32) {
         Write-Host ""
         Write-Host "Teststring must be 1 to 32 characters."
         Write-Host "Try '.\build.ps1 -h' or '.\build.bat -h' for more information."
@@ -129,8 +171,8 @@ if ($b) {
         exit 1
     }
 
-    for ($charIndex = 0; $charIndex -lt $teststring.Length; $charIndex++) {
-        $code = [int][char]$teststring[$charIndex]
+    for ($charIndex = 0; $charIndex -lt $ResolvedTestString.Length; $charIndex++) {
+        $code = [int][char]$ResolvedTestString[$charIndex]
         $CustomSlash = $TestStringWasProvided -and ($code -eq 0x2F)
         if (($code -lt 0x20) -or ($code -gt 0x7E) -or ($code -eq 0x22) -or $CustomSlash -or ($code -eq 0x5C) -or ($code -eq 0x60)) {
             Write-Host ""
@@ -141,7 +183,7 @@ if ($b) {
         }
     }
 
-    $TestStringLen = $teststring.Length
+    $TestStringLen = $ResolvedTestString.Length
 }
 
 # ---- UTILS & GLOBALS ----
@@ -277,12 +319,12 @@ if ($a) {
 }
 
 # ---- PARTIALLY IMPLEMENTED FLAGS ----
-if ($t) {
+if ($custom_target) {
     # check if the target exists in the CSV
-    $customDevice = $devices | Where-Object { $_.'Build Target'.Trim() -eq $t }
+    $customDevice = $devices | Where-Object { $_.'Build Target'.Trim() -eq $custom_target }
     if (-not $customDevice) {
         Write-Host ""
-        Write-Host "ERROR: Build target '$t' is not supported."
+        Write-Host "ERROR: Build target '$custom_target' is not supported."
         Write-Host ""
         Write-Host "Supported targets:"
         $devices | ForEach-Object { Write-Host "  $($_.'Build Target'.Trim())" }
@@ -340,7 +382,7 @@ Write-Host "Generating autogen_top_wrapper.sv..."
     -UartBaud                $UartBaud `
     -PushbuttonReset         $PushbuttonReset `
     -BoardDemonstration      $BoardDemonstration `
-    -TestString              $teststring `
+    -TestString              $ResolvedTestString `
     -TestStringLen           $TestStringLen `
     -EmbeddedLogicAnalyzer   $EmbeddedLogicAnalyzer
 
