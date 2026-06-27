@@ -51,7 +51,7 @@ setup_build_output_directory() {
 }
 
 generate_build_top_wrapper() {
-    source "$ddir/$device_generate_top_wrapper_script" "$artifacts_dir" "$device_top_wrapper_filename" "$target" "$system_clock_frequency_mhz"
+    source "$ddir/$device_generate_top_wrapper_script" "$artifacts_dir" "$device_top_wrapper_filename" "$target" "$system_clock_frequency_mhz" "$test_string" "$test_string_len"
 }
 
 init_platform_exit_on_failure() {
@@ -87,6 +87,9 @@ board_demonstration=0
 pushbutton_reset=1
 uart_baud=115200
 target=BRS-100-GW1NR9
+test_string="abcdefghijklmnopqrstuvwxyz123456"
+test_string_len=32
+test_string_was_provided=0
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -174,6 +177,14 @@ while [ $# -gt 0 ]; do
             board_demonstration=1
             shift 1
             ;;
+        -o|-custom_test_string|--custom_test_string)
+            chk_opt $@
+
+            test_string=$2
+            test_string_len=${#test_string}
+            test_string_was_provided=1
+            shift 2
+            ;;
         -e|--embedded_logic_analyzer)
             embedded_logic_analyzer=1
             shift 1
@@ -225,6 +236,45 @@ while [ $# -gt 0 ]; do
             ;;
     esac
 done
+
+if [ $test_string_was_provided -eq 1 ] && [ $board_demonstration -eq 0 ]; then
+    echo "Teststring is only valid with -b / --board_demonstration."
+    echo -e "Try './build.sh --help' for more information."
+    exit 1
+fi
+
+if [ $board_demonstration -eq 1 ] && [ $test_string_was_provided -eq 1 ]; then
+    if [ -z "$test_string" ] || [ ${#test_string} -gt 32 ]; then
+        echo "Teststring must be 1 to 32 characters."
+        echo -e "Try './build.sh --help' for more information."
+        exit 1
+    fi
+
+    test_string_has_invalid_chars=0
+    if [ -v LC_ALL ]; then
+        old_lc_all=$LC_ALL
+        old_lc_all_was_set=1
+    else
+        old_lc_all_was_set=0
+    fi
+    LC_ALL=C
+    if [[ "$test_string" =~ [^[:print:]] ]] || [[ "$test_string" == *\"* ]] || [[ "$test_string" == */* ]] || [[ "$test_string" == *\\* ]] || [[ "$test_string" == *\`* ]]; then
+        test_string_has_invalid_chars=1
+    fi
+    if [ $old_lc_all_was_set -eq 1 ]; then
+        LC_ALL=$old_lc_all
+    else
+        unset LC_ALL
+    fi
+
+    if [ $test_string_has_invalid_chars -eq 1 ]; then
+        echo "Teststring must contain only printable ASCII and custom strings cannot contain double quote, slash, backtick, backslash, CR, or LF."
+        echo -e "Try './build.sh --help' for more information."
+        exit 1
+    fi
+
+    test_string_len=${#test_string}
+fi
 
 if [ ! -v platform ]; then
     init_platform_exit_on_failure

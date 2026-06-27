@@ -1,12 +1,9 @@
 ﻿# =============================================================
 # generate_top_wrapper.ps1
 # Generates autogen_top_wrapper.sv with current build settings.
-# Called by build_win_v2.ps1 before running gw_sh.exe
+# Called by build.ps1 before running gw_sh.exe.
 # =============================================================
-#
-# Stage 1B: Added 18 memory bus internal wires and wired them to top_inst,
-# user_inst (user branch), and tied idle in board_demonstration_inst (demo branch).
-# =============================================================
+
 
 param (
     [string]$BuildArtifactsDirectory,   # where to save the file
@@ -15,6 +12,8 @@ param (
     [int]$UartBaud          = 115200,   # uart baud rate
     [int]$PushbuttonReset   = 1,        # pushbutton reset enabled
     [int]$BoardDemonstration = 0,       # 0 = user.sv, 1 = board_demonstration.sv
+    [string]$TestString     = "abcdefghijklmnopqrstuvwxyz123456",
+    [int]$TestStringLen     = 32,
     [int]$EmbeddedLogicAnalyzer = 0     # 0 = disabled, 1 = enabled
 )
 
@@ -87,6 +86,9 @@ import util::*;
 module autogen_top_wrapper #(
     parameter reg   [(8*VERSION_CHARS)-1:0] VERSION                 = "$buildVersion",
     parameter int                           VERSION_LEN             = $buildVersionLen,
+    parameter int                           TEST_STRING_CHARS       = 32,
+    parameter reg   [(8*TEST_STRING_CHARS)-1:0] TEST_STRING         = "$TestString",
+    parameter int                           TEST_STRING_LEN         = $TestStringLen,
 
     parameter int                           CLK_FREQUENCY_MHZ       = $ClockFrequencyMhz,
     parameter int                           UART_BAUD               = $UartBaud,
@@ -269,7 +271,10 @@ localparam CS_WIDTH         = 2;
 
             board_demonstration #(
                 .VERSION            (VERSION),
-                .VERSION_LEN        (VERSION_LEN)
+                .VERSION_LEN        (VERSION_LEN),
+                .TEST_STRING_CHARS  (TEST_STRING_CHARS),
+                .TEST_STRING        (TEST_STRING),
+                .TEST_STRING_LEN    (TEST_STRING_LEN)
             ) board_demonstration_inst (
                 .sysclk             (i_sysclk),
                 .sysclk_resetn      (i_sysclk_resetn),

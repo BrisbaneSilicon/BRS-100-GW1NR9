@@ -1,3 +1,4 @@
+[CmdletBinding(PositionalBinding=$false)]
 param(
     [switch]$h,
     [switch]$help,
@@ -21,7 +22,14 @@ param(
     [Alias('clock_frequency')]
     [int]$k = 0,
 
-    [string]$jtag_frequency
+    [Alias('j')]
+    [string]$jtag_frequency,
+
+    [Alias('i')]
+    [switch]$ftdi,
+
+    [Parameter(ValueFromRemainingArguments=$true)]
+    [string[]]$RemainingArgs
 )
 
 # ---- NORMALISE ALIASES ----
@@ -36,6 +44,13 @@ $CustomTarget              = if ($t) { $t } elseif ($custom_target) { $custom_ta
 $UpdateFlashOnly           = if ($f) { $f } elseif ($update_flash_only) { $update_flash_only } else { $null }
 $ClockMhz                  = $k
 $JtagFrequency             = $jtag_frequency
+if (-not $RemainingArgs) {
+    $RemainingArgs = @()
+} else {
+    $RemainingArgs = @($RemainingArgs)
+}
+$UseFtdi                   = $ftdi -or ($RemainingArgs -contains "--ftdi")
+$UnexpectedArgs            = @($RemainingArgs | Where-Object { $_ -ne "--ftdi" })
 
 # ---- CONSTANTS ----
 $DefaultJtagFrequency = "0.02MHz"
@@ -66,16 +81,18 @@ function Show-Help {
     Write-Host "`t${boldf}-t, -custom_target${normf} CUSTOM_TARGET`n`t`tInstead of the default target, target 'CUSTOM_TARGET'. (not implemented on Windows)`n"
     Write-Host "`t${boldf}-k, -clock_frequency${normf} ${underlinef}FREQUENCY_MHZ${normf}`n`t`tSystem clock frequency in MHz passed to the build script when auto-triggering a build."
     Write-Host "`t`tIgnored when using -m. Valid values: 51, 66, 75, 81, 87 (default: 51).`n"
-    Write-Host "`t${boldf}-jtag_frequency${normf} ${underlinef}FREQ${normf}`n`t`tOverride the JTAG programming clock frequency (default: 0.02MHz)."
+    Write-Host "`t${boldf}-j, -jtag_frequency${normf} ${underlinef}FREQ${normf}`n`t`tOverride the JTAG programming clock frequency (default: 0.02MHz)."
     Write-Host "`t`tValid values: $($ValidJtagFrequencies -join ', ')."
-    Write-Host "`t`tWindows-only flag - no short form to avoid collision with -f.`n"
+    Write-Host "`t`tWindows only flag.`n"
+    Write-Host "`t${boldf}-i, -ftdi${normf}`n`t`tUse the ftd2xx/USB Debugger A cable path instead of the default WinUSB path. Windows only flag.`n"
     Write-Host "${boldf}EXAMPLES${normf}"
     Write-Host "`t${boldf}.\program_board.ps1${normf}`n`t`tBuild (if needed) and program the board.`n"
     Write-Host "`t${boldf}.\program_board.ps1 -c${normf}`n`t`tClean, rebuild, and program the board.`n"
     Write-Host "`t${boldf}.\program_board.ps1 -b${normf}`n`t`tCheck whether firmware is built without programming.`n"
     Write-Host "`t${boldf}.\program_board.ps1 -m C:\path\to\custom.fs${normf}`n`t`tProgram the board with a custom bitstream file.`n"
     Write-Host "`t${boldf}.\program_board.ps1 -k 66${normf}`n`t`tBuild at 66 MHz and program the board.`n"
-    Write-Host "`t${boldf}.\program_board.ps1 -jtag_frequency 2.5MHz${normf}`n`t`tProgram at 2.5MHz JTAG speed. Faster but less reliable.`n"
+    Write-Host "`t${boldf}.\program_board.ps1 -j 2.5MHz${normf}`n`t`tProgram at 2.5MHz JTAG speed. Faster but less reliable.`n"
+    Write-Host "`t${boldf}.\program_board.ps1 -i${normf}`n`t`tProgram via USB Debugger A using the ftd2xx driver.`n"
     Write-Host "${boldf}IMPORTANT NOTICE${normf}"
     Write-Host "`tThe Windows ftd2xx driver may cause programmer_cli.exe to hang at embFlash Erase."
     Write-Host "`tThis script detects the hang automatically (no progress for 3 seconds) and"
@@ -92,6 +109,12 @@ if ($ShowHelp) {
     . "$PSScriptRoot\program_board_utils.ps1"
     Show-Help
     exit 0
+}
+
+if ($UnexpectedArgs.Count -gt 0) {
+    Write-Host "ERROR: Unknown argument(s): $($UnexpectedArgs -join ' ')"
+    Write-Host "Use .\program_board.ps1 -h for help."
+    exit 1
 }
 
 # ---- GLOBALS ----
@@ -269,31 +292,37 @@ if ($guiProcesses) {
     exit 1
 }
 
+$CableModeLabel   = if ($UseFtdi) { "ftd2xx" } else { "WINUSB" }
+$ScanCableMode    = if ($UseFtdi) { "F" } else { "L" }
+$CableDisplayName = if ($UseFtdi) { "USB Debugger A" } else { "Gowin USB Cable(WINUSB)" }
+$CableRegex       = if ($UseFtdi) { "USB Debugger A/0/(\d+)/null" } else { "Gowin USB Cable\(WINUSB\)/0/(\d+)/null" }
+$CableIndex       = if ($UseFtdi) { "4" } else { "5" }
+
 # ---- SCAN FOR JTAG CABLE ----
-# scan using ftd2xx driver (F flag) - this matches the GUI's "Using ftd2xx driver"
-# checkbox which must be checked for this board to work.
-# board shows up as two USB Debugger A interfaces:
-#   index 0 - JTAG  - used for programming
-#   index 1 - UART  - used for serial communication
+# WinUSB is the default cable path. Use --ftdi/-ftdi for boards that expose the
+# GOWIN programmer as USB Debugger A through the ftd2xx driver.
 Write-Host ""
-Write-Host "Scanning for connected cables (WINUSB)..."
-Write-Host $ProgrammerCli
-$scanOutput = & $ProgrammerCli --scan-cables L 2>&1
+Write-Host "Scanning for connected cables ($CableModeLabel)..."
+$scanOutput = & $ProgrammerCli --scan-cables $ScanCableMode 2>&1
 Write-Host $scanOutput
 
 # extract JTAG cable location from scan output
-# scan output format: "Gowin USB Cable(WINUSB)/0/529/null (USB location:529)"
 $locationMatch = ($scanOutput | Out-String)
-$regexMatch    = [regex]::Match($locationMatch, "Gowin USB Cable\(WINUSB\)/0/(\d+)/null")
+$regexMatch    = [regex]::Match($locationMatch, $CableRegex)
 
 if (-not $regexMatch.Success) {
     Write-Host ""
-    Write-Host "ERROR: Could not find JTAG interface (Gowin USB Cable(WINUSB), index 0)."
+    Write-Host "ERROR: Could not find JTAG interface ($CableDisplayName, index 0)."
     Write-Host ""
     Write-Host "Common causes:"
     Write-Host "  1. Board not plugged in via USB-C"
     Write-Host "  2. Wrong USB cable (must support data, not just power)"
     Write-Host "  3. Driver issue - try unplugging and replugging the board"
+    if ($UseFtdi) {
+        Write-Host "  4. Driver mode mismatch - retry without --ftdi for WinUSB mode"
+    } else {
+        Write-Host "  4. WinUSB mode unsupported by this GOWIN install/cable - retry with --ftdi"
+    }
     exit 1
 }
 
@@ -363,20 +392,17 @@ if (-not $CustomBitfile) {
 }
 
 # ---- PROGRAM THE BOARD ----
-# on Windows, programmer_cli.exe defaults to the WINUSB cable type which does not
-# work with the BRS-100-GW1NR9's USB Debugger A interface. three arguments are
-# required together to force the correct ftd2xx driver path:
-#   --cable-index 5  : selects "USB Debugger A" cable type (WINUSB driver)
-#   --location <loc> : targets the specific USB device (from --scan-cables L)
+# Three arguments must stay aligned with the scan mode:
+#   --cable-index    : selects the GOWIN cable type
+#   --location <loc> : targets the specific USB device from --scan-cables
 #   --frequency      : JTAG clock speed (default 0.5MHz, configurable via -jtag_frequency)
-# without all three, programmer_cli falls back to FT2CH and fails with CRC errors.
 # operation_index 5 = embFlash Erase,Program (matches Linux build.sh behaviour)
 Write-Host ""
 Write-Host "====================================="
 Write-Host " BRS-100-GW1NR9 Windows Programmer"
 Write-Host "====================================="
 Write-Host "Device    : $DeviceArg"
-Write-Host "Cable     : Gowin USB Cable(WINUSB) (cable-index 5, location $cableLocation - JTAG)"
+Write-Host "Cable     : $CableDisplayName (cable-index $CableIndex, location $cableLocation - JTAG)"
 Write-Host "Frequency : $JtagFrequency"
 Write-Host "Operation : embFlash Erase, Program (index 5)"
 Write-Host "Bitstream : $FsFile"
@@ -388,14 +414,14 @@ Write-Host "      will be attempted. Replug USB and re-run if recovery fails."
 Write-Host ""
 
 # echo exact command line before executing (matches Linux behaviour)
-Write-Host "Program command line: '$ProgrammerCli --device $DeviceArg --cable-index 5 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile'"
+Write-Host "Program command line: '$ProgrammerCli --device $DeviceArg --cable-index $CableIndex --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile $FsFile'"
 Write-Host ""
 Write-Host "*** GOWIN programmer_cli Command Line Console ***"
 Write-Host ""
 
 $result = Invoke-ProgrammerCliWithStallDetection `
     -Exe $ProgrammerCli `
-    -Arguments @('--device', $DeviceArg, '--cable-index', '5',
+    -Arguments @('--device', $DeviceArg, '--cable-index', $CableIndex,
                  '--location', $cableLocation, '--frequency', $JtagFrequency,
                  '--operation_index', '5', '--fsFile', $FsFile)
 
@@ -403,7 +429,7 @@ $result = Invoke-ProgrammerCliWithStallDetection `
 # retry via a fresh console (WindowStyle Hidden) to recreate the isolation of
 # "open a new terminal" - empirically this wakes the wedged ftd2xx driver.
 # 60 s stall timeout gives the driver time to clear after each kill.
-$retryInner = "& '$ProgrammerCli' --device $DeviceArg --cable-index 5 --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile '$FsFile'; exit `$LASTEXITCODE"
+$retryInner = "& '$ProgrammerCli' --device $DeviceArg --cable-index $CableIndex --location $cableLocation --frequency $JtagFrequency --operation_index 5 --fsFile '$FsFile'; exit `$LASTEXITCODE"
 
 for ($retry = 1; $retry -le 2 -and $result.Stalled; $retry++) {
     Write-Host ""
