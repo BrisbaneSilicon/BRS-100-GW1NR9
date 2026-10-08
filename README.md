@@ -635,7 +635,7 @@ chmod +x litex_setup.py
 6. Install a CPU GCC toolchain:
 ```bash
 pip3 install meson ninja
-./litex_setup.py --gcc=riscv
+sudo ./litex_setup.py --gcc=riscv
 ```
 7. Add the GoWIN toolchain and programming binaries to your PATH:
 ```bash
