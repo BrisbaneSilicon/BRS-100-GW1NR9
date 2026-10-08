@@ -663,9 +663,10 @@ python brisbaneSilicon_brs_100_gw1nr9.py --flash --prog-kit gowin
 programmer_cli --device GW1NR-9C --fsFile <LiteX Install Directory>/litex-boards/litex_boards/targets/build/brisbaneSilicon_brs_100_gw1nr9/gateware/brisbaneSilicon_brs_100_gw1nr9.fs --cable-index 1 --operation_index 5
 programmer_cli --device GW1NR-9C --spiaddr 0x00000 --fsFile <LiteX Install Directory>/litex-boards/litex_boards/targets/build/brisbaneSilicon_brs_100_gw1nr9/software/bios/bios.bin --cable-index 1 --operation_index 36
 ```
-13. The LEDs of the BRS-100-GW1NR9 should now be flashing as per a set pattern.
-14. Connect to UART1 of the BRS-100-GW1NR9 as per [Board Demonstration](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9#board-demonstration), and press Button 1 to restart the board.
-15. You should see something similar to the following:
+13. Note, if either of the previous two steps failed, you might still have the FTDI driver loaded. Unload it via `sudo rmmod ftdi_sio`.
+14. The LEDs of the BRS-100-GW1NR9 should now be flashing as per a set pattern.
+15. Connect to UART1 of the BRS-100-GW1NR9 as per [Board Demonstration](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9#board-demonstration), and press Button 1 to restart the board.
+16. You should see something similar to the following:
     
 ![Alt text](img/litex.png)
 
