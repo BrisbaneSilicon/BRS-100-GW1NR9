@@ -663,7 +663,9 @@ programmer_cli --device GW1NR-9C --spiaddr 0x00000 --fsFile <LiteX Install Direc
 13. The LEDs of the BRS-100-GW1NR9 should now be flashing as per a set pattern.
 14. Connect to UART1 of the BRS-100-GW1NR9 as per [Board Demonstration](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9#board-demonstration), and press Button 1 to restart the board.
 15. You should see something similar to the following:
+    
 ![Alt text](img/litex.png)
+
 16. Experiment with the LiteX BIOS via the support commands. To list them:
 ```bash
 litex> help
