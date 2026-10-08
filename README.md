@@ -644,6 +644,7 @@ PATH="$PATH:<GoWIN Install Directory>/Programmer/bin/"
 ```
 8. Attempt to build the BRS-100-GW1NR9 target:
 ```bash
+cd litex-boards/litex_boards/targets/
 python brisbaneSilicon_brs_100_gw1nr9.py --build
 ```
 9. If that fails, you will need to copy [this](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9/tree/public/foreign/litex/hyperram.patch) patch to \<LiteX Install Directory>/litex/litex/soc/software/libbase/
