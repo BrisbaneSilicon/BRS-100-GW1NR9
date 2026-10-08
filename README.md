@@ -24,6 +24,7 @@ Example project for the [BRS-100-GW1NR9](https://brisbanesilicon.com.au/devboard
     *   [FTDI Setup](#ftdi-setup)
     *   [OpenOCD Setup](#openocd-setup)
     *   [FcapZ Setup](#fcapz-setup)
+    *   [LiteX Setup](#litex-setup)
 <br>
 
 ## Overview
@@ -612,6 +613,61 @@ Info : Listening on port 4444 for telnet connections
 FpgacapZero is an open-source, vendor-agnostic FPGA debug core, an Embedded Logic Analyzer (ELA) for waveform capture, an Embedded I/O (EIO) for runtime read/write of fabric signals.
 
 To install fpgacapZero, simply follow [OpenOCD Setup](#openocd-setup) and then the instructions available [here](https://github.com/lcapossio/fpgacapZero#quick-start). Once fpgacapZero is installed, follow [Embedded Logic Analyzer](#embedded-logic-analyzer) to inject and probe an ELA core.
+
+<br>
+
+### LiteX Setup
+
+The LiteX framework provides a convenient and efficient infrastructure to create FPGA Cores/SoCs, to explore various digital design architectures and create [full FPGA based systems](https://github.com/enjoy-digital/litex/wiki/Projects).
+
+To run LiteX on the BRS-100-GW1NR9, perform the steps below (note that some of the initial steps are covered by the 'Quick start guide' [here](https://github.com/enjoy-digital/litex/wiki/Projects))
+
+1. Ensure you are running Linux, preferably Ubuntu.
+2. Ensure you have completed the steps in [Getting Started](#getting-started).
+3. Install Python 3.7+.
+4. Navigate to a directory in which you wish to install LiteX.
+5. Install Migen/LiteX and LiteX's cores:
+```bash
+wget https://raw.githubusercontent.com/enjoy-digital/litex/master/litex_setup.py
+chmod +x litex_setup.py
+./litex_setup.py --init --install --user --config=standard
+```
+6. Install a CPU GCC toolchain:
+```bash
+pip3 install meson ninja
+./litex_setup.py --gcc=riscv
+```
+7. Add the GoWIN toolchain and programming binaries to your PATH:
+```bash
+PATH="$PATH:<GoWIN Install Directory>/IDE/bin"
+PATH="$PATH:<GoWIN Install Directory>/Programmer/bin/"
+```
+8. Attempt to build the BRS-100-GW1NR9 target:
+```bash
+python brisbaneSilicon_brs_100_gw1nr9.py --build
+```
+9. If that fails, you will need to copy [this](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9/tree/public/foreign/litex/hyperram.patch) patch to \<LiteX Install Directory>/litex/litex/soc/software/libbase/
+10. Apply it (below) and repeat Step 7.
+```bash
+patch < hyperram.patch
+```
+11. Next, flash the bitstream and BIOS to the BRS-100-GW1NR9:
+```bash
+python brisbaneSilicon_brs_100_gw1nr9.py --flash --prog-kit gowin
+```
+12. Alternatively, flash and write the BIOS to the QSPI manually:
+```bash
+programmer_cli --device GW1NR-9C --fsFile <LiteX Install Directory>/litex-boards/litex_boards/targets/build/brisbaneSilicon_brs_100_gw1nr9/gateware/brisbaneSilicon_brs_100_gw1nr9.fs --cable-index 1 --operation_index 5
+programmer_cli --device GW1NR-9C --spiaddr 0x00000 --fsFile <LiteX Install Directory>/litex-boards/litex_boards/targets/build/brisbaneSilicon_brs_100_gw1nr9/software/bios/bios.bin --cable-index 1 --operation_index 36
+```
+13. The LEDs of the BRS-100-GW1NR9 should now be flashing as per a set pattern.
+14. Connect to UART1 of the BRS-100-GW1NR9 as per [Board Demonstration](https://github.com/BrisbaneSilicon/BRS-100-GW1NR9#board-demonstration), and press Button 1 to restart the board.
+15. You should see something similar to the following:
+![Alt text](img/litex.png)
+16. Experiment with the LiteX BIOS via the support commands. To list them:
+```bash
+litex> help
+```
 
 <br>
 
