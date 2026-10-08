@@ -641,8 +641,8 @@ sudo ./litex_setup.py --gcc=riscv
 ```bash
 PATH=$PATH:<GoWIN Install Directory>/IDE/bin/
 PATH=$PATH:<GoWIN Install Directory>/Programmer/bin/
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/Gowin/Gowin_V1.9.12_linux/IDE/lib/
-LD_PRELOAD=$LD_PRELOAD:/lib/x86_64-linux-gnu/libfreetype.so:/lib/x86_64-linux-gnu/libz.so.1
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/Gowin/Gowin_V1.9.12_linux/IDE/lib/
+export LD_PRELOAD=/lib/x86_64-linux-gnu/libfreetype.so:/lib/x86_64-linux-gnu/libz.so.1
 ```
 8. Attempt to build the BRS-100-GW1NR9 target:
 ```bash
