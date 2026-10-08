@@ -68,10 +68,5 @@
          config_reg_0 &= ~(1                                  << HYPERRAM_CONFIG_0_REG_FLE_OFFSET);
          config_reg_0 |=  (HYPERRAM_CONFIG_0_REG_FLE_DISABLED << HYPERRAM_CONFIG_0_REG_FLE_OFFSET);
      }
-@@ -150,4 +150,4 @@
-     printf("\n");
  }
- 
--#endif
-+#endif
 \ No newline at end of file
